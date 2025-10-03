@@ -1,0 +1,225 @@
+\chapter{Requirement Specification} 
+\label{cha:reqspec}
+
+With the before described considerations about building a \acs{ReID} system technical and ethical in Section XXX-XX.
+This section will focus on, how the system is intended to operate and how it will be used, see Section \ref{sec:usecase}, which requirements this apply to it, see Section \ref{sec:reqspec}, and at last how the system will be tested to ensure the requirements is met, see Section \ref{sec:testspec}.
+
+\section{Use Case}
+\label{sec:usecase}
+
+To better understand the intended use of a \acs{ReID} system and the resulting implications for function and design requirements, the following section presents a use case for the system. The use case is structured based on an outline from IBM \cite{usecase}.
+
+\subsection{Re-identify a Person of Interest in New Footage}
+A police officer can use the system to track a \acs{POI}, such as a thief, murderer, missing person or victim of crime, across multiple surveillance feeds once they have been found in a single video clip. The system's output can be used to map the person's route through town or locate new video sequences with greater details for an formal identification.
+
+\vspace{1em}
+
+\noindent\textbf{Actors}
+\begin{itemize}
+    \item Primary actors: Law enforcement, police investigator, security analyst.
+    \item Supporting actors: Police personnel, that collects the surveillance footage from external sources, surveillance cameras.
+\end{itemize}
+\vspace{1em}
+
+\noindent\textbf{Goal}
+
+\noindent Determine whether a \acs{POI}, that already is identified in one location, is to be found in other surveillance footage in order to track the movement of the person without manually checking camera footage.
+
+\vspace{1em}
+
+\noindent\textbf{Preconditions}
+\begin{itemize}
+    \item \acs{POI} is found in one location, obtaining one or more reference photos.
+    \item Data availability: New video footage has been collected from surrounding cameras by officers.
+    \item The new surveillance footage has to be from same time period, insuring the \acs{POI} has the same appearance as reference photo.
+    \item Ethical and legal use: The system require the actor to log in with a personal login.
+    \item Ethical and legal use: The system require a case number for each use.
+\end{itemize}
+\vspace{1em}
+
+\noindent\textbf{Basic flow}
+\begin{enumerate}
+\item  Actor uploads reference photo(-s) of \acs{POI} into the system.
+\item Actor uploads camera footage into system.
+\item System processes video material, selecting frames.
+\item System analysis / feature extraction / improves image quality.
+\item System search for match in the videos.
+\item System returns list of matches over a set threshold with the video footage, to the user so they can look it through and make their verdict.
+\item System saves the results and logs the use.
+\end{enumerate}
+\vspace{1em}
+
+\noindent\textbf{Alternative flows}
+\begin{itemize}
+    \item Low confidence score on matches: The use of system is logged, a report of nothing found, and user can try with new reference photo.
+\end{itemize}
+\vspace{1em}
+
+\noindent\textbf{Post conditions} 
+\begin{itemize}
+    \item \acs{POI} is either found on footage and the matches are returned or no conclusion.
+    \item Ethical use: The use of the system is logged.
+    \item Results saved for later retrieval.
+\end{itemize}
+
+
+
+
+\section{Requirement Specification} \label{sec:reqspec}
+
+The scope of this project is not to implement a full functional \acs{ReID} system with all thinkable features integrated and a finished user interface. The requirement presented in this section will focus on which functionalities, performance and intended use, is expected of the system, rather than the exact design of the user face.
+\\\\
+The requirements are organized using MoSCoW's prioritization method, which assigns each requirement one of four priority categories; Must have, Should have, Could have and Won't have, also sometimes called Wish to have. As indicated in the name of the priority, Must have is the minimal functionalities and performance of the system, required to be functional. Should-have and Could-have are categories, that rank the less essential requirements helping to prioritize which features to focus on, when additional time becomes available. Finally, the Won't have category is for features that can't be implemented in the current iteration, but is wanted in a later iteration or the final product. 
+\\
+The MoSCoW method helps prioritize features by distinguishing between essential requirements and expected but less critical features \cite{Moscow}. 
+\\
+This project will focus on fulfilling the Must-haves and, the amount of Should-haves the time constraint allows.
+\\\\
+The requirements are divided into three separate tables, describing the three types of requirements: Model, Usage and Safety, providing structure and clarifying which aspect the requirement addresses. Furthermore, two categories are added to the description of the requirements; functional or non-functional. This category states if the requirement specifies a functionality of the system or how well it should perform. The tables has a column called Traceability, which states which section the requirement originates from.
+
+\begin{table}[H]
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.3\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
+\rowcolor[HTML]{D8E9F7} 
+\textbf{Req. nr}& \textbf{Model Requirements} & \textbf{Priority}                                        & \textbf{Category}                 & \textbf{Traceability}              \\\hline
+ 1& The system correctly identifies a person in at least X\% of test cases. // The system has an accuracy (precision/recall or F1 score) of at least xxx\%. & \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
+ 2& The system connects to the police login database to authenticate users.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 3& The system connects to the police case database to authenticate case reference.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\ \hline
+ 4& The system has a web-based graphical user interface accessible through a standard browser.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline\end{tabular}
+\end{table}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.1\linewidth}
+                        |>{\raggedright\arraybackslash}p{0.3\linewidth}
+                        |>{\raggedright\arraybackslash}p{0.15\linewidth}
+                        |>{\raggedright\arraybackslash}p{0.15\linewidth}
+                        |>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
+\rowcolor[HTML]{D8E9F7} \cellcolor[HTML]{D8E9F7}
+\textbf{Req. nr}& \textbf{Usage Requirements} & \textbf{Priority} & \textbf{Category} & \textbf{Traceability} \\\hline
+ 5& The system allows the user to upload one query image.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 6& The system allows the user to upload multiple query images.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 7& The system allows the user to upload one frame sequence to gallery.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 8& The system allows the user to upload multiple frame sequences to gallery.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 9& The system allows the user to upload video format to gallery.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 10& The system allows the user decide the order forwhich the system analyze the material.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 11& The system prioritizes the order of video analysis based on geotags.
+The prioritization is determined by the geographical distance between each video’s geotag and the geotag of the reference photo.
+Videos closer to the reference photo location shall be analyzed first.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 12& The system returns a list of matches, when all material is analyzed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 13& The system returns intermediate results whenever a match is found, before finishing the full analysis.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 14& The system provide a confidence score for each detected match, and only return results above a configurable threshold.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
+ 15& For each match, the system returns camera ID and timestamp of the frame or video.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 16& The system returns the relevant frame for which a match is detected.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 17& The system returns relevant video footage for each match.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline 
+\end{longtable}
+
+\begin{table}[H]
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.3\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
+\rowcolor[HTML]{D8E9F7} 
+\textbf{Req. nr}& \textbf{Safety Requirements} & \textbf{Priority}                                        & \textbf{Category}                 & \textbf{Traceability}              \\\hline
+        18&                    The system requires user authentication with a valid login before access is granted& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \\\hline19& The system shall require a valid case number to be entered before any analysis can be performed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
+        20&                    The system logs each use of the system, including: User ID, Timestamp, case number, attached files and results.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \\\hline\end{tabular}
+\end{table}
+
+\section{Test Specification}
+\label{sec:testspec}
+
+In order to check if all requirements from Section \ref{sec:reqspec} are met and implemented properly, this section will present a test specification, as a plan for how each requirement for the system is tested. For each requirement one or more test cases are defined, specifying an input and the expected result for a given scenario under a defined set of conditions. This ensures a clear definition for when a requirement is fulfilled: if the result of the test case matches the expected outcome, the requirement is met, otherwise, the system has to be modified \cite{testspec_geek}.
+
+\section{Test cases}
+The test cases presented in this section are designed to verify whether the requirements of the system are met. Since it is expected that the final system only will fulfill the requirements prioritized \textit{must have} or \textit{should have}, the test cases is limited to these requirements. 
+For each test case, one or more requirement ID's are referenced to ensure clarity and traceability. Furthermore, each test case is structured with test case ID, input and expected result.\vspace{1em}
+
+\noindent \hrulefill
+
+\vspace{1em}
+\noindent\textbf{Test case ID: 2}
+\vspace{1em}
+
+\noindent Req. nr. 2
+\vspace{1em}
+
+\noindent Description: 
+Verify that the system connects to the police login database to authenticate users.\\
+\vspace{1em}
+
+\noindent Precondition:
+\begin{itemize}
+    \item A valid user account exist in database
+\end{itemize}
+\vspace{1em}
+
+\noindent Input:
+\begin{itemize}
+    \item Username: valid\_officer
+    \item Password: correctPassword321
+\end{itemize}
+\vspace{1em}
+
+\noindent Expected output:
+\begin{itemize}
+    \item     The system successfully connects to the police login database.
+    \item The user is authenticated and granted access to the system.
+\end{itemize}
+\vspace{1em}
+
+\noindent Post conditions:
+\begin{itemize}
+    \item User can use the system
+\end{itemize}
+
+ \noindent \hrulefill
+
+
+
+
+Der skal skrives test cases til:
+
+R 1: The system correctly identifies a person in at least X\% of test cases. // The system has an accuracy (precision/recall or F1 score) of at least xxx\%. 
+
+R 2:	The system connects to the police login database to authenticate users.
+
+R 3:	The system connects to the police case database to authenticate case reference.
+
+R 4:	The system has a web-based graphical user interface accessible through a standard browser.
+
+R 5:	The system allows the user to upload one query image.
+
+R 6:	The system allows the user to upload multiple query images.
+
+R 7:	The system allows the user to upload one frame sequence to gallery.
+
+R 8:	The system allows the user to upload multiple frame sequences to gallery.
+
+R 12:	The system returns a list of matches, when all material is analyzed.	
+
+R 14: The system provide a confidence score for each detected match, and only return results above a configurable threshold.
+
+R 15:	For each match, the system returns camera ID and timestamp of the frame or video.
+
+R 16:	The system returns the relevant frame for which a match is detected.
+
+R 18: The system requires user authentication with a valid login before access is granted
+
+R 19: The system shall require a valid case number to be entered before any analysis can be performed.
+
+R 20: The system logs each use of the system, including: User ID, Timestamp, case number, attached files and results.
+
+
+
+INFORMATION TIL TESTCASE OPBYGNING
+\begin{itemize}
+    \item \textbf{Test Objectives: }Specifies the goals of each test while defining what aspects of the software are being evaluated.
+    \item \textbf{Test Scope:} The specific features, functionalities, or modules covered within the testing process.
+    \item \textbf{Test Scenarios:} A list of use cases and potential situations that testers will simulate during the evaluation.
+    \item \textbf{Test Data:} The specific data sets required to execute each test scenario.
+    \item \textbf{Expected Results:} The anticipated outcomes for each test case, providing a clear benchmark for success.
+    \item \textbf{Pass/Fail Criteria:} The defined set of parameters that determine whether a test is a pass or fail. This helps ensure objectivity in the evaluation process.
+    \item \textbf{Test Procedures:} Step-by-step instructions detailing how to execute each test case, promoting consistency and clarity for testers.
+\end{itemize}
+
+
+\begin{itemize}
+    \item \textbf{Maintain Traceability:} Establish a clear link between test cases and specific software requirements. This helps enable easy identification of the functionalities during evaluation.
+    \item \textbf{Prioritize Test Cases:} Not all tests are equal. Emphasize test cases based on risk assessment and application criticality. This ensures focus on areas with the highest potential for defects.
+\end{itemize}
+
+https://autify.com/blog/software-test-specification-a-step-toward-flawless-functionality
