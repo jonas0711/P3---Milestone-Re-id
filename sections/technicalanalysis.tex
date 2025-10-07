@@ -43,39 +43,32 @@ Footage quality gets worse the greater distance it is recording. As seen in Figu
     \label{fig:camera_distance}
 \end{figure}
 
+
 \section{Computer Vision}
 Denne sektion skal danne bro imellem den fysiske/kamera delen af kamera, og hvordan det omdannes til information som en maskine kan bruge. 
-\\ ReID afsnittet vil senere uddybe hvordan et ReID netværk forvandler denne information til vektorer (embedding), og derfra kan genkende personer. Danner også grundlaget for at forklare forskellen på billedbaseret ReID og videobas
-\\ 
+\\ ReID afsnittet vil senere uddybe hvordan et ReID netværk forvandler denne information til vektorer (embedding), og derfra kan genkende personer. Bruges som setup til at forklare forskellen på billedbaseret ReID og videobaseret ReID. 
 
 \subsection{Frames as Information}
 Hvad information indeholder en billedfil og hvordan indsamles/bruges denne?
 \\ Lys, farver, tekstur osv. 
 
 \subsection{Frames in a Time Series}
-Hvad yderligere information kan man få fra billeder i en tidsrække? 
-\\ Bevægelse, lysændringer, konsistens af objekter osv.
-
-\section{Neural Networks}
-
+Hvad yderligere information kan man få fra billeder hvis de er i en tidsrække? 
+\\ Bevægelse, lysændringer (et dårligt frame bliver reddet af andre bedre frames) , konsistens af objekter (maskinen lærer bedre hvordan noget ændre sig over tid) osv.
 
 
 \section{Re-identification}
-
-
-\subsection{Metric Learning}
-
+Afsnittet skal beskrive hvad et ReID netværk er. 
+\\ query, gallery, embedding, open-set learning, one-/few-shot learning
 
 \subsection{Image-based Re-identification}
-
+En overordnet pipeline for hvordan et billedbaseret ReID netværk fungerer, fra billeder til features. Henviser til CV afsnitet om billeder.
 
 \subsection{Video-based Re-identification}
-
-
-\subsection{Evaluation Metrics}
-
+Bygger videre på den forrige pipeline, og CV afsnittet om frames i tiddserie, for at forklare hvordan billed tidsserier kan gavne en model. Fortæller også om hvor "dyrere" det bliver at køre, hvilket henvises til senere når valget om at arbejde med billeder eller videoer skal tages. 
 
 \subsection{Challenges in Surveillance Re-identification}
+Hvilke domæne-relevante udfordringer skal vi forvente? Hvilke af disse kan løses igennem super-resolution? Opsamler alle førnævnte udfordringer og danner rammerne for problemstillingen. 
 
 
 \section{Super-Resolution}
@@ -85,7 +78,7 @@ Surveillance images captured from large distances or in poor lighting conditions
 
 The fundamental challenge with SR is that many distinct HR images can produce the same LR measurement under realistic imaging pipelines, making SR an ill-posed inverse problem without a unique solution. Practical SR systems address this by incorporating prior information about natural images to constrain the solution space \cite{Wang2019Survey,Farsiu2004Survey}. Deep learning has revolutionized SR by learning end-to-end mappings from LR to HR directly from data. The Super-Resolution Convolutional Neural Network (SRCNN) demonstrated that a compact Convolutional Neural Network (CNN) trained on bicubic downsampled pairs can outperform hand-crafted pipelines \cite{dong2015imagesuperresolutionusingdeep}.
 
-\subsection{Downsampling vs. Real LR Images}
+\subsection{Downsampling vs. Real Low-Resolution Images}
 \label{subsec:DownsamplingVsReal}
 
 Most academic benchmarks generate LR images by artificially downsampling HR images with bicubic interpolation, creating a domain gap between synthetic training data and real-world deployment scenarios \cite{Agustsson2017NTIRE,Timofte2017NTIRE}. Real LR images are shaped by complex degradations including optical factors (lens Modulation Transfer Function (MTF), defocus, motion blur), sensor limitations (Color Filter Array (CFA) patterns and demosaicing), and in-camera processing (tone mapping, JPEG compression). Models trained only on bicubic data often fail when confronted with these real-world degradation patterns \cite{Cai2019RealSR,Wei2020DRealSR}.
@@ -110,11 +103,21 @@ This trade-off directly impacts application design. Forensic analysis requiring 
 
 For ReID applications, this presents a critical consideration. If SR introduces perceptual improvements through hallucinated details that do not preserve discriminative features the ReID model was trained to recognize, performance may degrade despite improved visual quality. As discussed in Section 3.3.8, ReID models extract features like clothing color and coarse textures. If SR modifies these features in pursuit of perceptual realism, enhanced images may become less suitable for ReID. Comprehensive evaluation reporting both distortion measures and perceptual assessments enables informed method selection \cite{Zhang2018LPIPS,Mittal2013NIQE,Wang2004SSIM}.
 
+
 \section{Super-Resolution Re-Identification}
+Hvordan forbinder man de to i praksis?
+
+\subsection{Neural Networks}
+Først forklare hvad neural netværk er, og hvad de består af, for at danne rammerne til næste underafsnit.
 
 \subsection{Trained Together or Separately}
+Definer forskellen på et samlet netværk og to seperate, pros/cons. Skal danne fundament for valget som tages senere. 
 
-\subsection{}
+\subsection{Backpropagation}
+Forklare hvordan SR bliver bedre i et samlet netværk igennem backpropogation. 
+
+\subsection{Evaluating Output}
+Hvordan evaluere man SR i en samlet eller delt model?
 
 
 \section{Related Work - flyttes?}
