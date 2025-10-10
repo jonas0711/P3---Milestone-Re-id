@@ -4,11 +4,11 @@ This chapter will present and analyze the technical foundations of the problems 
 \section{Surveillance Equipment and Footage}
 \label{subsec:Surveillance_equipment_n_footage}
 
-Surveillance cameras are widely used in both public and private settings, and many different factors can influence the overall quality and consistency of recorded footage. Since such recordings can in some cases be the deciding factor when solving crimes, as presented in Section \ref{subsec:Police_Application}, it is important to be aware of the limitations and challenges that can occur, while also having an overall understanding of the technical structure of the systems \cite{arxiv_superres2021}.
+As stated in Section \ref{sec:police}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. Since such recordings can in some cases be the deciding factor when solving crimes, as presented in Section \ref{subsec:Police_Application}, it is crucial to be aware of the limitations and challenges that can occur, while also having an overall understanding of the technical structure of the systems\cite{arxiv_superres2021}.
  
-\subsection{How Cameras Work}
+\subsection{Camera Functionality}
 \label{subsubsec:How_cameras_work}
-Fundamentally, a camera functions by processing light and converting it into digital data. First, the light passes through a lens, which focuses it onto an image sensor that is made up of millions of photosites (pixels) that can measure the intensity of the light. These measurements are then converted into electrical signals that represent the brightness and color of the different pixels in the image \cite{unc_camera_pipeline}.
+Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a sequence which when played in order, gives the illusion of movement in the final footage. These pictures are created by processing light and converting it into digital data. First, the light passes through a lens which focuses it onto an image sensor that is made up of millions of photosites that measures the intensity of the light. These measurements are then converted into electrical signals that represent the brightness and color of the different pixels in the image \cite{unc_camera_pipeline} \cite{ucocare2024SurvilanceCameraFunction}.
 There are many underlying elements that happen as well, which can differ in each camera. For example, digital processing like white balance correction, compression and exposure adjustments are used to create the final image or video stream \cite{unc_camera_pipeline}.
 An example of this process can be seen in Figure \ref{fig:camera_pipeline}.
 
@@ -20,18 +20,20 @@ An example of this process can be seen in Figure \ref{fig:camera_pipeline}.
     \label{fig:camera_pipeline}
 \end{figure}
 \noindent
-These processes mostly differ from camera to camera, which all have their own distinct methods, hardware, settings and quality. This leads to differences in the final footage, an example of this can be seen in Figure \ref{fig:lens_comparison}, where images have different characteristics all depending on the camera used. It is important to understand these fundamental elements when working with surveillance recordings, as they expose the different factors that influence the final output footage, and the way it is processed and worked on \cite{korene_imatest2022_cv_iq}.
+These processes mostly differ from camera to camera, which all have their own distinct methods, hardware, settings and quality. This leads to differences in the final footage, an example of this can be seen in Figure \ref{fig:lens_comparison} where 3 sets of pictures captured with different camera lenses are compared to highlight the \ac{FOV} and color variances. It is important to understand these fundamental elements when working with surveillance recordings, as they expose the different factors that influence the final output footage, and the way it is processed and worked on \cite{korene_imatest2022_cv_iq}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/images/runcam-swift-lens-comparison.jpg}
-    \caption{Lens comparison on different cameras to highlight change in color, brightness and \ac{FOV} in the footage.}
+    \caption{3 sets of images shot at the same location, but with different camera lenses. Used to highlight the changes in the image when using dissimilar camera hardware.}
     \label{fig:lens_comparison}
 \end{figure}
 \subsection{Technical Impacts on Footage}
-As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple different factors that can influence the overall output of the image. The cameras themselves are rarely alike in terms of quality and features, and some have further restrictions on resolution and refresh rate to reduce energy consumption and storage, while others are able to deliver clearer images with higher resolution and smoother frame rates. In addition, certain cameras include extra functionalities such as night vision, infrared (\acs{IR}), or pan tilt-zoom (\acs{PTZ}) \cite{nightvision_enhancement2018}. This is important to be aware of when working with \ac{AI}, as computer vision works by analyzing and learning the different pixel patterns in images and videos \cite{common_challenges_image_class2024}, which, if not done correctly, can cause unwanted biases for the \acs{AI}-model when used on other surveillance systems by fixating on unimportant noise that would not be present in other instances \cite{opencv2025visionproblems}.
+\label{subsec:TechnicalImpactFootage}
+As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple different factors that can influence the overall output of the image. The cameras themselves are rarely alike in terms of quality and features, and some have further restrictions on resolution and refresh rate to reduce energy consumption and storage, while others are able to deliver clearer images with higher resolution and smoother frame rates. In addition, certain cameras include extra functionalities such as night vision, infrared (\acs{IR}), or pan tilt-zoom (\acs{PTZ}) \cite{nightvision_enhancement2018} \cite{ucocare2024SurvilanceCameraFunction}. This is important to be aware of when working with \ac{AI}, as computer vision works by analyzing and learning the different pixel patterns in images and videos \cite{common_challenges_image_class2024}, which, if not done correctly, can cause unwanted biases for the \acs{AI}-model when used on other surveillance systems by fixating on unimportant noise that would not be present in other instances \cite{opencv2025visionproblems}.
 
 \subsection{Environmental Impacts on Footage}
-As surveillance cameras are used for many different tasks, they will be placed in a variety of situations and conditions. Just like how the internal hardware and software can cause challenges when using \acs{AI}, the external factors such as location, season, and weather can create difficulties as well. For example, there are a lot of differences in footage from a camera that is placed inside rather than outside where weather like rain or snow can create noise which reduce clarity and usefulness in the final footage. In contrast, a camera inside is not affected by this, and therefore is viewed differently by the model \cite{arxiv_superres2021}. 
+
+The challenges are not only limited to the differences in the cameras themselves, but also the environment they are placed in. Just like how the internal hardware and software can cause problems when using \acs{AI} (as stated in Section \ref{subsec:TechnicalImpactFootage}), the external factors such as location, season, and weather can create difficulties as well. For example, there are a lot of differences in footage from a camera that is placed inside rather than outside where weather like rain or snow can create noise which reduce clarity and usefulness in the final footage. In contrast, a camera inside is not affected by these elements, and the differences in these elements of footage can make the model generalize poorly overall\cite{arxiv_superres2021}. 
 \\\\
 Other aspects that can influence the models ability to generalize is light. Many surveillance cameras are used at night, where minimal visibility is achieved with a spotlight or \acf{IR} filters \cite{nightvision_enhancement2018}. However, cameras in well-lit areas have no use for these filters.
 \\\\
@@ -76,7 +78,7 @@ Hvilke domæne-relevante udfordringer skal vi forvente? Hvilke af disse kan løs
 
 Surveillance images captured from large distances or in poor lighting conditions often result in low resolution, where important details such as facial features and clothing patterns become unclear. Super-Resolution (SR) is an image processing technique that reconstructs a High-Resolution (HR) image from one or more Low-Resolution (LR) observations, addressing the degraded imagery challenges described in Section 3.1.
 
-The fundamental challenge with SR is that many distinct HR images can produce the same LR measurement under realistic imaging pipelines, making SR an ill-posed inverse problem without a unique solution. Practical SR systems address this by incorporating prior information about natural images to constrain the solution space \cite{Wang2019Survey,Farsiu2004Survey}. Deep learning has revolutionized SR by learning end-to-end mappings from LR to HR directly from data. The Super-Resolution Convolutional Neural Network (SRCNN) demonstrated that a compact Convolutional Neural Network (CNN) trained on bicubic downsampled pairs can outperform hand-crafted pipelines \cite{dong2015imagesuperresolutionusingdeep}.
+Super-resolution (SR) reconstructs a high-resolution (HR) image from one or more low-resolution (LR) observations. The core difficulty is that many different HR images can explain the same LR measurement under realistic imaging pipelines, making SR an inverse problem with no unique solution; practical systems therefore incorporate prior knowledge about natural images to constrain the solution space \cite{Wang2019Survey}. In common benchmarks, LR inputs are produced by bicubic downsampling 2-D cubic-convolution resampling over a 4×4 pixel neighborhood—which yields smooth LR images while omitting real-world blur, noise, and compression \cite{Wang2019Survey}. Deep learning approaches learn the LR→HR mapping directly from data. The Super-Resolution Convolutional Neural Network (SRCNN) showed that a compact convolutional model trained on bicubic LR–HR pairs can outperform hand-crafted pipelines \cite{dong2015imagesuperresolutionusingdeep}.
 
 \subsection{Downsampling vs. Real Low-Resolution Images}
 \label{subsec:DownsamplingVsReal}
@@ -85,7 +87,7 @@ Most academic benchmarks generate LR images by artificially downsampling HR imag
 
 Two strategies bridge this gap. First, collecting real paired datasets like RealSR and DRealSR, which capture scenes at different resolutions and demonstrate improved transfer to real images \cite{Cai2019RealSR,Wei2020DRealSR}. Second, synthesizing realistic degradations during training, exemplified by Real-ESRGAN, which applies varying blur kernels, noise models, and compression artifacts to create diverse training data that better mimics real camera pipelines \cite{Wang2021RealESRGAN}.
 
-Evaluation metrics depend on the test data characteristics. Peak Signal-to-Noise Ratio (PSNR) and Structural Similarity Index (SSIM) work well for bicubic benchmarks \cite{Wang2004SSIM}, while Learned Perceptual Image Patch Similarity (LPIPS) and Natural Image Quality Evaluator (NIQE) correlate better with human judgment on real-world data \cite{Zhang2018LPIPS,Mittal2013NIQE}. Best practice reports both distortion measures (PSNR/SSIM) for comparability with existing literature and perceptual assessments (LPIPS/NIQE) for practical applicability \cite{Lugmayr2020NTIRE}.
+When evaluating SR the metrics depends  on the test data characteristics. Peak Signal-to-Noise Ratio (PSNR) and Structural Similarity Index (SSIM) work well for bicubic benchmarks \cite{Wang2004SSIM}, while Learned Perceptual Image Patch Similarity (LPIPS) and Natural Image Quality Evaluator (NIQE) correlate better with human judgment on real-world data \cite{Zhang2018LPIPS}. Best practice reports both distortion measures (PSNR/SSIM) for comparability with existing literature and perceptual assessments (LPIPS/NIQE) for practical applicability \cite{Lugmayr2020NTIRE}.
 
 \subsection{Deep Learning Approaches}
 
@@ -97,11 +99,11 @@ Recent real-world variants like Real-ESRGAN incorporate the realistic degradatio
 
 \subsection{Perception–Distortion Trade-off and Evaluation}
 
-A central design principle for SR is the formal perception–distortion trade-off, which establishes that minimizing distortion metrics (PSNR/SSIM) while maximizing perceptual quality represents contradictory objectives that cannot be jointly optimized \cite{Blau2018PerceptionDistortion}. Methods prioritizing distortion produce smooth outputs that minimize pixel-wise error but appear blurry. Methods prioritizing perceptual quality introduce realistic high-frequency details that satisfy human observers but incur higher distortion scores.
+A central design principle for SR is the formal perception–distortion trade-off, which establishes that min imizing distortion metrics (PSNR/SSIM) while maximizing perceptual quality represents contradictory objectives that cannot be jointly optimized \cite{Blau2018PerceptionDistortion}. Methods prioritizing distortion produce smooth outputs that minimize pixel-wise error but appear blurry. Methods prioritizing perceptual quality introduce realistic high-frequency details that satisfy human observers but incur higher distortion scores.
 
 This trade-off directly impacts application design. Forensic analysis requiring high fidelity should prioritize distortion metrics using L1/L2 losses and accept blur to avoid hallucinating details. Visual display applications should prioritize perceptual quality using adversarial and perceptual losses.
 
-For ReID applications, this presents a critical consideration. If SR introduces perceptual improvements through hallucinated details that do not preserve discriminative features the ReID model was trained to recognize, performance may degrade despite improved visual quality. As discussed in Section 3.3.8, ReID models extract features like clothing color and coarse textures. If SR modifies these features in pursuit of perceptual realism, enhanced images may become less suitable for ReID. Comprehensive evaluation reporting both distortion measures and perceptual assessments enables informed method selection \cite{Zhang2018LPIPS,Mittal2013NIQE,Wang2004SSIM}.
+For ReID applications, this presents a critical consideration. If SR introduces perceptual improvements through hallucinated details that do not preserve discriminative features the ReID model was trained to recognize, performance may degrade despite improved visual quality. As discussed in Section 3.3.8, ReID models extract features like clothing color and coarse textures. If SR modifies these features in pursuit of perceptual realism, enhanced images may become less suitable for ReID. Comprehensive evaluation reporting both distortion measures and perceptual assessments enables informed method selection \cite{Zhang2018LPIPS,Wang2004SSIM}.
 
 
 \section{Super-Resolution Re-Identification}
@@ -120,7 +122,7 @@ Forklare hvordan SR bliver bedre i et samlet netværk igennem backpropogation.
 Hvordan evaluere man SR i en samlet eller delt model?
 
 
-\section{Related Work - flyttes?}
+\section{Related Work - flyttes?}\label{sec: related work}
 
 \subsection{DeepReID: Deep Filter Pairing Neural Network for Person Re-Identification}
 
@@ -134,7 +136,7 @@ This paper proposes a method for single image \ac{SR} called \ac{SRCNN} \cite{SR
 \\\\
 Even though this method achieved superior performance to the state-of-the-art methods, it might not be a good idea to apply the \ac{SRCNN} to a \ac{ReID} problem. This is because \ac{SRCNN} does not know that the goal is \ac{ReID} and might distort useful features in the process of enhancing the image. An ideal \ac{SR} model for \ac{ReID} would enhance features useful for recognition, for example the edges around clothes. 	
 
-\subsection{Resolution-invariant Person Re-Identification}
+\subsection{Resolution-invariant Person Re-Identification} 
 
 This paper proposes a method for person \ac{ReID} robust to resolution variance by jointly training a \ac{FFSR} module and a \ac{RIFE} by end-to-end \ac{CNN} learning \cite{FFSR}. \ac{FFSR} enhances the person’s image without focusing on the background. \ac{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. 
 \\\\

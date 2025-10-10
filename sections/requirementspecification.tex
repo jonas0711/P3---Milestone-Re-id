@@ -1,12 +1,10 @@
 \chapter{Requirement Specification} 
 \label{cha:reqspec}
 
-With the before described considerations about building a \acs{ReID} system technical and ethical in Section XXX-XX.
-This section will focus on, how the system is intended to operate and how it will be used, see Section \ref{sec:usecase}, which requirements this apply to it, see Section \ref{sec:reqspec}, and at last how the system will be tested to ensure the requirements is met, see Section \ref{sec:testspec}.
+While keeping the before described considerations about building a \ac{ReID} system with \ac{SR} both technical and ethical in Section \ref{sec:police}-\ref{sec: related work} in mind, this Section will focus on, how the system is intended to operate and how it will be used, see Section \ref{sec:usecase}, which requirements this apply to it, see Section \ref{sec:reqspec}, and at last how the system will be tested to ensure the requirements is met, see Section \ref{sec:testspec}.
 
 \section{Use Case}
 \label{sec:usecase}
-
 To better understand the intended use of a \acs{ReID} system and the resulting implications for function and design requirements, the following section presents a use case for the system. The use case is structured based on an outline from IBM \cite{usecase}.
 
 \subsection{Re-identify a Person of Interest in New Footage}
@@ -67,8 +65,6 @@ No matches with confidence score over threshold is found:
     \item Results saved for later retrieval.
 \end{itemize}
 
-***AFRUNDING***
-
 \section{Requirement Specification} \label{sec:reqspec}
 The scope of this project is not to implement a full functional \acs{ReID} system with all thinkable features integrated and a finished user interface. The requirement presented in this section will focus on the functionalities, performance, and intended use, that are expected of the system, rather than the exact design of the user interface.
 \\\\
@@ -82,9 +78,9 @@ The requirements are divided into three separate tables, describing the three ty
 \rowcolor[HTML]{D8E9F7} 
 \textbf{Req. no.}& \textbf{Model Requirements} & \textbf{Priority}                                        & \textbf{Category}                 & \textbf{Traceability}              \\\hline
  1& The system correctly identifies a person in at least X\% of test cases. OR The system has an accuracy (precision/recall or F1 score) of at least xxx\%. & \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
- 2\hypertarget{req:2}{}& The system connects to the police login database to authenticate users.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 2\hypertarget{req:2}{}& The system connects to the police login database to authenticate users.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
  3
-\hypertarget{req:3}{}& The system connects to the police case database to authenticate case reference.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\ \hline
+\hypertarget{req:3}{}& The system connects to the police case database to authenticate case reference.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\ \hline
  4
 \hypertarget{req:4}{}& The system has a web-based graphical user interface accessible through a standard browser.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline\end{tabular}
 \end{table}
@@ -96,31 +92,30 @@ The requirements are divided into three separate tables, describing the three ty
                         |>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} \cellcolor[HTML]{D8E9F7}
 \textbf{Req. no.}& \textbf{Usage Requirements} & \textbf{Priority} & \textbf{Category} & \textbf{Traceability} \\\hline
- 5 \hypertarget{req:5}{}& The system allows the user to upload one query image.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 6\hypertarget{req:6}{}& The system allows the user to upload multiple query images.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 7\hypertarget{req:7}{}& The system allows the user to upload one frame sequence to gallery.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 8\hypertarget{req:8}{}& The system allows the user to upload multiple frame sequences to gallery.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 9& The system allows the user to upload video format to gallery.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 10& The system allows the user decide the order forwhich the system analyze the material.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 5 \hypertarget{req:5}{}& The system allows the user to upload one query image.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 6\hypertarget{req:6}{}& The system allows the user to upload multiple query images.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 7\hypertarget{req:7}{}& The system allows the user to upload one frame sequence to gallery.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 8\hypertarget{req:8}{}& The system allows the user to upload multiple frame sequences to gallery.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 9& The system allows the user to upload video format to gallery.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 10& The system allows the user to decide the order the system analyze the material.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
  11& The system prioritizes the order of video analysis based on geotags.
 The prioritization is determined by the geographical distance between each video’s geotag and the geotag of the reference photo.
 Videos closer to the reference photo location shall be analyzed first.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 12\hypertarget{req:12}{}& The system returns a list of matches, when all material is analyzed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 13& The system returns intermediate results whenever a match is found, before finishing the full analysis.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
+ 12\hypertarget{req:12}{}& The system returns a list of matches, when all material is analyzed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 13& The system returns intermediate results whenever a match is found, before finishing the full analysis.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
  14 \hypertarget{req:14}{}& The system provide a confidence score for each detected match, and only return results above a configurable threshold.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
- 15 \hypertarget{req:15}{}& For each match, the system returns camera ID and timestamp of the frame or video.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 16 \hypertarget{req:16}{}& The system returns the relevant frame for which a match is detected.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 17& The system returns relevant video footage for each match.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline 
+ 15 \hypertarget{req:15}{}& For each match, the system returns camera ID and timestamp of the frame or video.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 16 \hypertarget{req:16}{}& The system returns the relevant frame for which a match is detected.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
+ 17& The system returns relevant video footage for each match.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline 
 \end{longtable}
 
 \begin{table}[H]
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.3\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
 \textbf{Req. no.}& \textbf{Safety Requirements} & \textbf{Priority}                                        & \textbf{Category}                 & \textbf{Traceability}              \\\hline
-        18 \hypertarget{req:18}{}&                    The system requires user authentication with a valid login before access is granted& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \\\hline19 \hypertarget{req:19}{}& The system shall require a valid case number to be entered before any analysis can be performed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
-        20 \hypertarget{req:20}{}&                    The system logs each use of the system, including: User ID, Timestamp, case number, attached files and results.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \\\hline\end{tabular}
+        18 \hypertarget{req:18}{}&                    The system requires user authentication with a valid login before access is granted& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \ref{sec:usecase}\\\hline19 \hypertarget{req:19}{}& The system shall require a valid case number to be entered before any analysis can be performed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\ref{sec:usecase}\\\hline
+        20 \hypertarget{req:20}{}&                    The system logs each use of the system, including: User ID, Timestamp, case number, attached files and results.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \ref{sec:usecase}\\\hline\end{tabular}
 \end{table}
-*** AFRUNDING ***
 
 \section{Test Specification}
 \label{sec:testspec}
@@ -204,4 +199,4 @@ The system successfully accept the query image.\\ \hline
 \end{tabular}
 \end{table}
 
-The requirements and test cases presented in this Chapter will be used to evaluate the system in Chapter XXXXX.
+\noindent The requirements and test cases presented in this Chapter will be used to evaluate the system in Chapter XXXXX.
