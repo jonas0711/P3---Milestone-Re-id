@@ -1,3 +1,29 @@
+% ===========================================
+% REFRENCE TEMPLATE
+% ===========================================
+//
+%book{citation-key,
+    author ={},
+    title = {},
+    publisher/url = {},
+    year = {},
+    note ={}
+}
+
+NOTES TO REFRENCE TEMPLATE:
+%book/misc/article{citation-key, (Make a citation key that is unique such as auther and year. For example "KevinSpacey2002".
+Choose between book/misc/article as type of reference)
+
+    author ={}, (write the author/s names. There should be "and" inbetween names. For example: Peter Peterson and James Jamerson and Kalvin Klein)
+
+    title = {}, (Write the title of the article, book, etc.)
+    publisher/url = {}, (Write the url to the article or the publisher of the book here)
+    year = {},(Write the year of the material here)
+    note ={} (Write at what date you accessed the site here. The format should be as follows: "Accessed: 23-Sep-2025". Use abriviations for months such as: "Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec"
+}
+
+
+
 % ============================================
 % SURVEILLANCE AND SOCIETY SOURCES
 % ============================================
@@ -159,7 +185,7 @@
     year = {2022},
     url = {https://www.avisen.dk/overvaagning-og-gps-oplysninger-sendte-politi-paa-sp_731284.aspx},
     note = {Accessed: 23-Sep-2025}
-}
+} %fejl her
 
 @misc{mia_stevn_avisen,
     author = {{Avisen.dk}},
@@ -231,13 +257,11 @@
     url = {https://arxiv.org/pdf/2107.04133}
 }
 
-@inproceedings{nightvision_enhancement2018,
-    author = {Aashish Bhandari and Aayush Kafle and Pranjal Dhakal and Prateek Raj Joshi and Dinesh Baniya Kshatri},
-    title = {Image Enhancement and Object Recognition for Night Vision Surveillance},
-    booktitle = {Proceedings of the International Conference on Communication and Signal Processing (ICCSP)},
-    year = {2018},
-    pages = {0860--0864},
-    doi = {10.1109/ICCSP.2018.8524415}
+@misc{ecamnightvisionCCTV2025,
+    author = {Paul Cioca},
+    title = {Understanding How Night Vision Cameras Work: A Practical Guide},
+    url = {https://ecam.com/security-blog/how-night-vision-cameras-work},
+    year = {2025}
 }
 
 @misc{opencv2025visionproblems,
@@ -277,6 +301,16 @@
     note = {Accessed: 28-Sep-2025}
 }
 
+@misc{HRvsLR,
+    author = {Adobe},
+    title = {Everything you need to know about hi res and high resolution images.},
+    year = {2025},
+    url ={https://www.adobe.com/uk/creativecloud/photography/discover/high-resolution.html},
+    note = {Accessed: 31-Okt-2025}
+}
+
+
+
 %=============================================% RELATED WORKS
 %=============================================
 @misc{FPNN,
@@ -285,6 +319,22 @@
     year = {2014},
     url = {https://openaccess.thecvf.com/content_cvpr_2014/papers/Li_DeepReID_Deep_Filter_2014_CVPR_paper.pdf},
     note = {accessed: 5-oct-2025}
+}
+
+@misc{DMRL,
+    author = {Suncheng Xiang and Hao Chen and Wei Ran and Zefang Yu and Ting Liu and Dahong Qian and Yuzhuo Fu},
+    title = {Deep multimodal representation learning for generalizable person re-identification},
+    year = {2023},
+    url = {https://link.springer.com/article/10.1007/s10994-023-06352-7},
+    note = {accessed: 19-oct-2025}
+}
+
+@misc{OSNet,
+    author = {Kaiyang Zhou1 and Yongxin Yang and Andrea Cavallaro and Tao Xiang},
+    title = {Omni-Scale Feature Learning for Person Re-Identification},
+    year = {2019},
+    url = {https://openaccess.thecvf.com/content_ICCV_2019/papers/Zhou_Omni-Scale_Feature_Learning_for_Person_Re-Identification_ICCV_2019_paper.pdf},
+    note = {accessed: 20-oct-2025}
 }
 
 @misc{SRCNN,
@@ -302,6 +352,15 @@
     url = {https://arxiv.org/pdf/1906.09748},
     note = {accessed: 5-oct-2025}
 }
+
+@misc{enhancementimprovereid,
+    author = {Oliverio J. Santana and Javier Lorenzo-Navarro and David Freire-Obregón and Daniel Hernández-Sosa and Modesto Castrillón-Santana},
+    title = {Applying deep learning image enhancement methods to improve person re-identification},
+    year = {2024},
+    url = {https://www.sciencedirect.com/science/article/pii/S0925231224007823},
+    note = {accessed: 19-oct-2025}
+}
+
 
 % ============================================
 % METHODOLOGY & REQUIREMENTS
@@ -453,3 +512,100 @@
     title ={Components and Working Principles of Surveillance Cameras} ,
     url = {https://ucocare.net/blogs/blog/components-and-working-principles-of-surveillance-cameras}
 }
+
+@misc{LensComparisonDifferences,
+    key = {oscarilang.com},
+    url = {https://oscarliang.com/runcam-swift-camera-lens-options/},
+    title = {Different Lens Options for Runcam Swift FPV Camera},
+    note = {Used to show the differences in camera lenses.}
+}
+
+@misc{CCTVCameraFootageComparison2015,
+    author = {Craig Henderson and Ebroul Izquierdo},
+    url = {https://www.researchgate.net/publication/272157160_Robust_Feature_Matching_in_the_Wild},
+    title = {Robust Feature Matching in the Wild},
+    year = {2015}
+}
+
+@misc{ClassificationWeatherEffects2022,
+    title = {AWDMC-Net: Classification of Adversarial Weather Degraded Multiclass scenes using a Convolution Neural Network},
+    year = {2022},
+    url = {https://www.sciencedirect.com/science/article/abs/pii/S1077314222000960},
+    author = {Sourav Dey Roy and Mrinal Kanti Bhowmik}
+}
+
+
+% ======================================
+% Computer Vision
+% ======================================
+@misc{IBM2025computerVision,
+  author       = {Rina Diane Caballar and Cole Stryker},
+  title        = {What Is Computer Vision?},
+  url          = {https://www.ibm.com/think/topics/computer-vision},
+  year         = {2025},
+  note         = {Accessed: 19-Oct-2025}
+}
+
+% ======================================
+% Re identification
+% ======================================
+
+@misc{Zheng2016PersonReID,
+  author = {Liang Zheng and Yi Yang and Alexander G. Hauptmann},
+  title  = {Person Re-identification: Past, Present and Future},
+  url    = {https://arxiv.org/pdf/1610.02984},
+  year   = {2016},
+  note   = {Accessed: 19-Oct-2025}
+}
+
+@misc{Liao2014OpenSet,
+  author = {Shengcai Liao and Zhipeng Mo and Jianqing Zhu and Yang Hu and Stan Z. Li},
+  title  = {Open-set Person Re-identification},
+  url    = {https://arxiv.org/abs/1408.0872},
+  year   = {2014},
+  note   = {Accessed: 19-Oct-2025}
+}
+
+@misc{TripletLoss,
+  author = {PyTorch Documentation},
+  title  = {torch.nn.TripletMarginLoss — PyTorch},
+  url    = {https://docs.pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html},
+  year   = {2025},
+  note   = {Accessed: 19-Oct-2025}
+}
+
+@misc{Khaliluzzaman2023Gait,
+  author = {Md. Khaliluzzaman and Ashraf Uddin and Kaushik Deb and Md. Junayed Hasan},
+  title  = {Person Recognition Based on Deep Gait: A Survey},
+  url    = {https://www.mdpi.com/1424-8220/23/10/4875},
+  year   = {2023},
+  note   = {Accessed: 19-Oct-2025}
+}
+
+@misc{Zheng2015OneShot,
+  author = {Wei-Shi Zheng and Shaogang Gong and Tao Xiang},
+  title  = {Towards Open-World Person Re-Identification by One-Shot Group-Based Verification},
+  url    = {https://www.researchgate.net/publication/282499552_Towards_Open-World_Person_Re-Identification_by_One-Shot_Group-Based_Verification},
+  year   = {2015},
+  note   = {Accessed: 19-Oct-2025}
+}
+
+@misc{Zhou2019OmniScale,
+  author = {Kaiyang Zhou and Yongxin Yang and Andrea Cavallaro and Tao Xiang},
+  title  = {Omni-Scale Feature Learning for Person Re-Identification},
+  url    = {https://arxiv.org/abs/1905.00953},
+  year   = {2019},
+  note   = {Accessed: 19-Oct-2025}
+}
+
+@misc{Saad2024VideoReID,
+  author        = {Rana S. M. Saad and M. Mona and M. Alturki},
+  title         = {Deep video-based person re-identification (Deep Vid-ReID): comprehensive survey},
+  url           = {https://www.researchgate.net/publication/380601871_Deep_video-based_person_re-identification_Deep_Vid-ReID_comprehensive_survey},
+  year          = {2024},
+  note          = {Accessed: 19-Oct-2025}
+}
+
+
+
+

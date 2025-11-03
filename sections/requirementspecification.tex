@@ -1,202 +1,27 @@
 \chapter{Requirement Specification} 
 \label{cha:reqspec}
 
-While keeping the before described considerations about building a \ac{ReID} system with \ac{SR} both technical and ethical in Section \ref{sec:police}-\ref{sec: related work} in mind, this Section will focus on, how the system is intended to operate and how it will be used, see Section \ref{sec:usecase}, which requirements this apply to it, see Section \ref{sec:reqspec}, and at last how the system will be tested to ensure the requirements is met, see Section \ref{sec:testspec}.
-
-\section{Use Case}
-\label{sec:usecase}
-To better understand the intended use of a \acs{ReID} system and the resulting implications for function and design requirements, the following section presents a use case for the system. The use case is structured based on an outline from IBM \cite{usecase}.
-
-\subsection{Re-identify a Person of Interest in New Footage}
-A police officer can use the system to track a \acs{POI}, such as a thief, murderer, missing person or victim of crime, across multiple surveillance feeds once they have been found in a single video clip. The system's output can be used to map the \ac{POI}'s route through town or locate new video sequences with greater details for a formal identification.
-
-\vspace{1em}
-
-\noindent\textbf{Actors}
-\begin{itemize}
-    \item Primary actors: Law enforcement, police investigator, security analyst.
-    \item Supporting actors: Police personnel, that collects the surveillance footage from external sources, surveillance cameras.
-\end{itemize}
-\vspace{1em}
-
-\noindent\textbf{Goal}
-
-\noindent Determine whether a \acs{POI}, that already is identified in one location, is to be found in other surveillance footage in order to track the movement of the person without manually checking the footage.
-
-\vspace{1em}
-
-\noindent\textbf{Preconditions}
-\begin{itemize}
-    \item \acs{POI} is found in one location, obtaining one or more query images.
-    \item Data availability: New video footage has been collected from surrounding cameras by officers.
-    \item The new surveillance footage has to be from the same time period, insuring the \acs{POI} has the same appearance as the query image.
-    \item Ethical and legal use: The system requires the actor to log in with a personal login.
-    \item Ethical and legal use: The system requires a case number for each use.
-\end{itemize}
-\vspace{1em}
-
-\noindent\textbf{Basic flow}
-\begin{enumerate}
-\item  Actor logs into system using personal login.
-\item Actor writes case number
-\item Actor uploads query image(-s) of \acs{POI} into the system.
-\item Actor uploads camera footage into the system's gallery.
-\item System processes video material into digestible frames.
-\item System analysis, feature extraction, improves image quality.
-\item System search for match in the gallery.
-\item System returns a list of matches over a set threshold with the video footage allowing the user make the final verdict.
-\item System saves the results and logs the use.
-\end{enumerate}
-\vspace{1em}
-
-\noindent\textbf{Alternative flows}
-No matches with confidence score over threshold is found: 
-\begin{itemize}
-\item The use of the system is logged.
-        \item  System reports: "\ac{POI} not found in gallery.
-        \item User can try with new query image.
-    \end{itemize}
-\vspace{1em}
-
-\noindent\textbf{Post conditions} 
-\begin{itemize}
-    \item The system returns, either that the \ac{POI} is found in gallery and frames with matches are returned, or a report of nothing found is returned.
-    \item Ethical use: The use of the system is logged.
-    \item Results saved for later retrieval.
-\end{itemize}
-
-\section{Requirement Specification} \label{sec:reqspec}
-The scope of this project is not to implement a full functional \acs{ReID} system with all thinkable features integrated and a finished user interface. The requirement presented in this section will focus on the functionalities, performance, and intended use, that are expected of the system, rather than the exact design of the user interface.
+As defined in the problem statement, this project focuses on building and testing how \ac{SR} can be combined with and improve the performance of \ac{ReID}. Consequently, the requirements will focus on these two networks and their integration. For that same reason, the requirements will not describe a complete \ac{ReID} system and are therefore not exhaustive. The scope implies that the \ac{SR} and {ReID} integration does not include an object detection module, and thus expecting cropped images as input.
 \\\\
-The requirements are organized using MoSCoW's prioritization method, which assigns each requirement one of four priority categories; \textit{Must Have}, \textit{Should Have}, \textit{Could Have} and \textit{Won't Have}, also sometimes called \textit{Wish to Have}. As indicated in the name of the priority, \textit{Must Have} is the minimal functionalities and performance of the system, required to be functional. \textit{Should Have} and \textit{Could Have} are categories, that rank the less essential requirements helping to prioritize which features to focus on, when additional time becomes available. Finally, the \textit{Won't Have} category is for features that cannot be implemented in the current iteration, but are wanted in a later iteration or the final product. MoSCoW method helps prioritize features by distinguishing between essential requirements and expected but less critical features \cite{Moscow}. 
-\\
-This project will focus on fulfilling the \textit{Must Haves} and, the amount of \textit{Should Haves} that the time constraint allows.
-\\\\
-The requirements are divided into three separate tables, describing the three types of requirements: Model, Usage and Safety, providing structure and clarifying which aspect the requirement addresses. Furthermore, two categories are added to the description of the requirements; functional or non-functional. This category states if the requirement specifies a functionality of the system or a constrain for the system. The tables have a column called Traceability, which states which section the requirement originates from.
+The priority of the requirements are phrased using MoSCoW's prioritization method \cite{Moscow}. Each requirement will be testable and measurable with defined success criteria, and have a traceability tag.
 \begin{table}[H]
-\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.3\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
-\textbf{Req. no.}& \textbf{Model Requirements} & \textbf{Priority}                                        & \textbf{Category}                 & \textbf{Traceability}              \\\hline
- 1& The system correctly identifies a person in at least X\% of test cases. OR The system has an accuracy (precision/recall or F1 score) of at least xxx\%. & \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
- 2\hypertarget{req:2}{}& The system connects to the police login database to authenticate users.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 3
-\hypertarget{req:3}{}& The system connects to the police case database to authenticate case reference.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\ \hline
- 4
-\hypertarget{req:4}{}& The system has a web-based graphical user interface accessible through a standard browser.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline\end{tabular}
+\textbf{Req. no.}& \textbf{Module: Super-Resolution}& \textbf{Success criteria}& \textbf{Traceability}              \\\hline
+ 1\hypertarget{req:1}{}& The SR module must outperform a simple Bicubic interpolation measured in [loss-function].& Fail/Pass&Section \ref{sec:SuperResolution}\\\hline\end{tabular}
 \end{table}
-
-\begin{longtable}{|>{\raggedright\arraybackslash}p{0.1\linewidth}
-                        |>{\raggedright\arraybackslash}p{0.3\linewidth}
-                        |>{\raggedright\arraybackslash}p{0.15\linewidth}
-                        |>{\raggedright\arraybackslash}p{0.15\linewidth}
-                        |>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
-\rowcolor[HTML]{D8E9F7} \cellcolor[HTML]{D8E9F7}
-\textbf{Req. no.}& \textbf{Usage Requirements} & \textbf{Priority} & \textbf{Category} & \textbf{Traceability} \\\hline
- 5 \hypertarget{req:5}{}& The system allows the user to upload one query image.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 6\hypertarget{req:6}{}& The system allows the user to upload multiple query images.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 7\hypertarget{req:7}{}& The system allows the user to upload one frame sequence to gallery.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 8\hypertarget{req:8}{}& The system allows the user to upload multiple frame sequences to gallery.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 9& The system allows the user to upload video format to gallery.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 10& The system allows the user to decide the order the system analyze the material.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 11& The system prioritizes the order of video analysis based on geotags.
-The prioritization is determined by the geographical distance between each video’s geotag and the geotag of the reference photo.
-Videos closer to the reference photo location shall be analyzed first.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\\\hline
- 12\hypertarget{req:12}{}& The system returns a list of matches, when all material is analyzed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 13& The system returns intermediate results whenever a match is found, before finishing the full analysis.& \cellcolor[HTML]{FFE7D1}Could have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 14 \hypertarget{req:14}{}& The system provide a confidence score for each detected match, and only return results above a configurable threshold.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\\\hline
- 15 \hypertarget{req:15}{}& For each match, the system returns camera ID and timestamp of the frame or video.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 16 \hypertarget{req:16}{}& The system returns the relevant frame for which a match is detected.& \cellcolor[HTML]{FEFFD6} Should have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline
- 17& The system returns relevant video footage for each match.& \cellcolor[HTML]{F4C1C1} Won't have& \cellcolor[HTML]{EBE4F7}Functional&\ref{sec:usecase}\\\hline 
-\end{longtable}
-
 \begin{table}[H]
-\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.3\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
-\textbf{Req. no.}& \textbf{Safety Requirements} & \textbf{Priority}                                        & \textbf{Category}                 & \textbf{Traceability}              \\\hline
-        18 \hypertarget{req:18}{}&                    The system requires user authentication with a valid login before access is granted& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \ref{sec:usecase}\\\hline19 \hypertarget{req:19}{}& The system shall require a valid case number to be entered before any analysis can be performed.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional&\ref{sec:usecase}\\\hline
-        20 \hypertarget{req:20}{}&                    The system logs each use of the system, including: User ID, Timestamp, case number, attached files and results.& \cellcolor[HTML]{E0FFCC} Must have& \cellcolor[HTML]{FFECF5}Non-functional& \ref{sec:usecase}\\\hline\end{tabular}
+\textbf{Req. no.}& \textbf{Module: Re-Identification}& \textbf{Success criteria}& \textbf{Traceability}              \\\hline
+ 2\hypertarget{req:2}{}& The module must have a stand
+alone accuracy of
+minimum XXX.& > xxxx&Krav fra Related works.\\\hline\end{tabular}
 \end{table}
-
-\section{Test Specification}
-\label{sec:testspec}
-
-In order to check if all requirements from Section \ref{sec:reqspec} are met and implemented properly, this section will present a test specification, which specify how each system requirement is to be tested. For each requirement, one or more test cases are defined, specifying an input and the expected result for a given scenario under a defined set of conditions. This ensures a clear definition for when a requirement is fulfilled: if the result of the test case matches the expected outcome, the requirement is met, otherwise, the system has to be modified \cite{testspec_geek}.
-
-\subsection{Test Cases}
-The test cases presented in this section are designed to verify whether the requirements of the system are met. Since it is expected that the final system will only fulfill the requirements prioritized \textit{Must Have} or \textit{Should Have}, the test cases are limited to these requirements. 
-For each test case, one or more requirement ID's are referenced to ensure clarity and traceability. Furthermore, each test case is structured with test case ID, input and expected result. To avoid making an unnecessary intense test case selection with multiple identical test cases with small variations, most test cases have additional requirements included in parentheses. These requirements can be tested with that same test case with slight changes.
 \begin{table}[H]
-\begin{tabular}{|p{7cm}|p{7cm}|}
-\hline
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
-\textbf{Test case ID: 2} & \textbf{Req. no. \hyperlink{req:2}{2}, \hyperlink{req:18}{18} (\hyperlink{req:3}{3}, \hyperlink{req:19}{19})}\\ \hline
-
-\multicolumn{2}{|p{14cm}|}{\textbf{Description:} \newline Verify that the system connects to the police login database to authenticate users.} \\ \hline
-
-\textbf{Precondition:} \newline A valid user account exist in database & 
-\textbf{Postconditions:} \newline User can use the system \\ \hline
-
-\textbf{Input:} \newline
-Username: valid\_officer \newline
-Password: correctPassword321&
-\textbf{Expected output:} \newline
-The system successfully connects to the police login database. \newline
-The user is authenticated and granted access to the system. \\ \hline
-\end{tabular}
+\textbf{Req. no.}& \textbf{Combined}& \textbf{Success criteria}& \textbf{Traceability}              \\\hline
+ 3\hypertarget{req:3}{}& The combined SR and Re-ID system should outperform the Re-ID network measured in XXX.& Fail/Pass&Section \ref{sec:superres-reid}\\\hline
+ 4\hypertarget{req:4}{}& The complete system must be deployed in the cloud.& Fail/Pass&Chapter \ref{cha: problemstatement}\\\hline\end{tabular}
 \end{table}
-
-\begin{table}[H]
-\begin{tabular}{|p{7cm}|p{7cm}|}
-\hline
-\rowcolor[HTML]{D8E9F7} 
-\textbf{Test case ID: 3}& \textbf{Req. no. \hyperlink{req:4}{4},  (\hyperlink{req:5}{5}, \hyperlink{req:6}{6}, \hyperlink{req:7}{7}, \hyperlink{req:8}{8})}\\ \hline
-
-\multicolumn{2}{|p{14cm}|}{\textbf{Description:} \newline Verify that the system can accept query image from the user for analysis.} \\ \hline
-
-\textbf{Precondition:} \newline The image is the right format for upload.& 
-\textbf{Postconditions:} \newline User can get material analyzed.\\ \hline
-
-\textbf{Input:} \newline
-Image&
-\textbf{Expected output:} \newline
-The system successfully accept the query image.\\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\begin{tabular}{|p{7cm}|p{7cm}|}
-\hline
-\rowcolor[HTML]{D8E9F7} 
-\textbf{Test case ID: 4}& \textbf{Req. no. \hyperlink{req:12}{12},  (\hyperlink{req:14}{14}, \hyperlink{req:15}{15}, \hyperlink{req:16}{16})}\\ \hline
-
-\multicolumn{2}{|p{14cm}|}{\textbf{Description:} \newline Verify that the system can accept query image from the user for analysis.} \\ \hline
-
-\textbf{Precondition:} \newline The image is the right format for upload.& 
-\textbf{Postconditions:} \newline User can get material analyzed.\\ \hline
-
-\textbf{Input:} \newline
-Image&
-\textbf{Expected output:} \newline
-The system successfully accept the query image.\\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\begin{tabular}{|p{7cm}|p{7cm}|}
-\hline
-\rowcolor[HTML]{D8E9F7} 
-\textbf{Test case ID: 4}& \textbf{Req. no. \hyperlink{req:20}{20}}\\ \hline
-
-\multicolumn{2}{|p{14cm}|}{\textbf{Description:} \newline Verify that the system can accept query image from the user for analysis.} \\ \hline
-
-\textbf{Precondition:} \newline The image is the right format for upload.& 
-\textbf{Postconditions:} \newline User can get material analyzed.\\ \hline
-
-\textbf{Input:} \newline
-Image&
-\textbf{Expected output:} \newline
-The system successfully accept the query image.\\ \hline
-\end{tabular}
-\end{table}
-
-\noindent The requirements and test cases presented in this Chapter will be used to evaluate the system in Chapter XXXXX.

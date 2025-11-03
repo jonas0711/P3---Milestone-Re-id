@@ -1,118 +1,219 @@
 \chapter{Technical Analysis} \label{cha: technicalanalysis}
-This chapter will present and analyze the technical foundations of the problems described in Chapter \ref{cha:problemanalysis}. It focuses on surveillance equipment, computer vision techniques, person Re-Identification, image Super-Resolution, and related works.   
+This chapter will present and analyze the technical foundations of the problems described in Chapter \ref{cha:problemanalysis}. It focuses on surveillance equipment, computer vision techniques, person Re-Identification, image Super-Resolution, and the combination of these. Related works will be presented throughout the chapter, where relevant to each section.
 
 \section{Surveillance Equipment and Footage}
 \label{subsec:Surveillance_equipment_n_footage}
 
-As stated in Section \ref{sec:police}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. Since such recordings can in some cases be the deciding factor when solving crimes, as presented in Section \ref{subsec:Police_Application}, it is crucial to be aware of the limitations and challenges that can occur, while also having an overall understanding of the technical structure of the systems\cite{arxiv_superres2021}.
+% Note
+% Vi synes at pointen omkring at alle cameraer er forskellige, er lidt lang i forhold til, hvad vi kommer til at bruge det til senere. Kunne godt skrive det lidt kortere og præcist. Husk at hvis ikke det nævnes i takeaways (eller bruges som tankestrøm for at lave pointen), så er det nok ikke nødvendigt at have med. 
+% Vi synes, at vi skal vente med at sige konkret betydning for AI, og hellere senere henvise til de pointer du præsentere i afsnittet.
+
+%Stuktur:
+% - Surveillance video = mange billeder i time series. 
+% - Alle kameraer er forskellige (lidt kortere og præcis)
+% - Vejr og lys forhold (det der står nu er fint, der skal ikke mere til fordi vi afgrænser os fra det senere)
+% - Surveillance dækker stort område, derfor jo større afstand, jo mindre pixels. (Må gerne stå lidt mere om)
+% Takeaways: Kameraer er forskellige, Vejret og lys påvirkning, Mindre antal pixel på person.
+
+%Vi ønsker pointerne:
+%- Alle kameraer er forskellige, giver forskellige billeder
+%- Vejrets og lys påvirkning
+%- Surveillance dækker stort område, derfor jo større afstand, jo mindre pixels. (der kommer noget i problemanalysen som kan refereres til)
+
+
+
+As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. To tackle the project proposal regarding improving \ac{ReID}, it is beneficial to first understand the challenges of using surveillance footage as a data source.
  
 \subsection{Camera Functionality}
 \label{subsubsec:How_cameras_work}
-Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a sequence which when played in order, gives the illusion of movement in the final footage. These pictures are created by processing light and converting it into digital data. First, the light passes through a lens which focuses it onto an image sensor that is made up of millions of photosites that measures the intensity of the light. These measurements are then converted into electrical signals that represent the brightness and color of the different pixels in the image \cite{unc_camera_pipeline} \cite{ucocare2024SurvilanceCameraFunction}.
+Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement in the final footage. These pictures are created by processing light and converting it into digital data. First, the light passes through a lens which focuses it onto an image sensor that is made up of millions of photosites that measures the intensity of the light. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
 There are many underlying elements that happen as well, which can differ in each camera. For example, digital processing like white balance correction, compression and exposure adjustments are used to create the final image or video stream \cite{unc_camera_pipeline}.
-An example of this process can be seen in Figure \ref{fig:camera_pipeline}.
+An in-depth example of this process can be seen in Figure \ref{fig:camera_pipeline}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{figures/images/How_camera_works_pipeline.png}
+    \includegraphics[width=1\linewidth]{figures/images/camera_pipeline.png}
     \caption{A typical camera pipeline.
-    NOTE: This is an example for a standard consumer camera, there are many other cameras which can have different elements in it. }
+    NOTE: This is an example for a standard consumer camera, there are many other cameras which can have different processing steps in it \cite{unc_camera_pipeline}. }
     \label{fig:camera_pipeline}
 \end{figure}
 \noindent
-These processes mostly differ from camera to camera, which all have their own distinct methods, hardware, settings and quality. This leads to differences in the final footage, an example of this can be seen in Figure \ref{fig:lens_comparison} where 3 sets of pictures captured with different camera lenses are compared to highlight the \ac{FOV} and color variances. It is important to understand these fundamental elements when working with surveillance recordings, as they expose the different factors that influence the final output footage, and the way it is processed and worked on \cite{korene_imatest2022_cv_iq}.
+This process mostly differs from camera to camera, which all have their own distinct pipeline structure(?), hardware, settings, and quality. This leads to differences in the final footage, an example of this can be seen in Figure \ref{fig:lens_comparison}, where 3 sets of pictures captured with different camera lenses are compared, to highlight the \ac{FOV} and color variances. It is important to understand these fundamental elements when working with surveillance footage, as they expose the different factors that influence the final output footage and the way it is processed \cite{korene_imatest2022_cv_iq}.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/images/runcam-swift-lens-comparison.jpg}
-    \caption{3 sets of images shot at the same location, but with different camera lenses. Used to highlight the changes in the image when using dissimilar camera hardware.}
+    \caption{3 sets of images shot at the same location, but with different camera lenses. Used to highlight the changes in the image, when using dissimilar camera hardware \cite{LensComparisonDifferences}.}
     \label{fig:lens_comparison}
 \end{figure}
+
 \subsection{Technical Impacts on Footage}
 \label{subsec:TechnicalImpactFootage}
-As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple different factors that can influence the overall output of the image. The cameras themselves are rarely alike in terms of quality and features, and some have further restrictions on resolution and refresh rate to reduce energy consumption and storage, while others are able to deliver clearer images with higher resolution and smoother frame rates. In addition, certain cameras include extra functionalities such as night vision, infrared (\acs{IR}), or pan tilt-zoom (\acs{PTZ}) \cite{nightvision_enhancement2018} \cite{ucocare2024SurvilanceCameraFunction}. This is important to be aware of when working with \ac{AI}, as computer vision works by analyzing and learning the different pixel patterns in images and videos \cite{common_challenges_image_class2024}, which, if not done correctly, can cause unwanted biases for the \acs{AI}-model when used on other surveillance systems by fixating on unimportant noise that would not be present in other instances \cite{opencv2025visionproblems}.
+As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple different factors that can influence the overall output of the image. The cameras themselves are rarely alike in terms of quality and features, and some have further restrictions on resolution and refresh rate to reduce energy consumption and storage, while others are able to deliver clearer images with higher resolution and smoother frame rates. In addition, certain cameras include extra functionalities such as night vision, infrared (\acs{IR}), or pan tilt-zoom (\acs{PTZ}) \cite{ecamnightvisionCCTV2025, ucocare2024SurvilanceCameraFunction}. This is important to be aware of when working with \ac{AI}, as computer vision works by analyzing and learning the different pixel patterns in images and videos, which, if not done correctly, can cause unwanted biases for an \ac{AI}-model when used on other surveillance systems by fixating on unimportant noise that would not be present in other instances \cite{opencv2025visionproblems, common_challenges_image_class2024}.
 
 \subsection{Environmental Impacts on Footage}
+The challenges are not only limited to the differences in the cameras themselves, but also the environment they are placed in. Similarly to how the internal hardware and software can cause problems when used as a data source, as stated in Section \ref{subsec:TechnicalImpactFootage}, the external factors such as location, season, and weather can create difficulties as well. For example, there are a lot of differences in footage from a camera that is placed inside rather than outside where weather like rain or snow can create noise which reduce clarity and usefulness in the final footage. 
+In contrast, a camera inside is not affected by these elements, and these differences can make the model generalize poorly if not properly addressed \cite{arxiv_superres2021, ClassificationWeatherEffects2022}. 
+\\\\
+Other environmental aspects that can influence the models ability to generalize is light and distance. Many surveillance cameras are used outside at night, where light is limited and therefore makes capturing image details difficult. Especially when working with computer vision, it is important to capture images with as many details as possible, which is generally harder in poor lighting conditions. Even with external camera attachments such as spotlights and \acs{IR} filters, which increases visibility in low light areas, it still lacks in contrast to footage of a well lit room or a sunny day \cite{common_challenges_image_class2024, opencv2025visionproblems, ecamnightvisionCCTV2025}.
+\\\\
+Furthermore, footage quality gets worse the greater distance it is recording, which many street surveillance cameras struggle with. As seen in Figure \ref{fig:camera_distance}, subjects further away from the camera get blurrier and more unrecognizable, which is also one of the reasons for implementing a \acs{SR} system, that can create usable data of such cases.
 
-The challenges are not only limited to the differences in the cameras themselves, but also the environment they are placed in. Just like how the internal hardware and software can cause problems when using \acs{AI} (as stated in Section \ref{subsec:TechnicalImpactFootage}), the external factors such as location, season, and weather can create difficulties as well. For example, there are a lot of differences in footage from a camera that is placed inside rather than outside where weather like rain or snow can create noise which reduce clarity and usefulness in the final footage. In contrast, a camera inside is not affected by these elements, and the differences in these elements of footage can make the model generalize poorly overall\cite{arxiv_superres2021}. 
-\\\\
-Other aspects that can influence the models ability to generalize is light. Many surveillance cameras are used at night, where minimal visibility is achieved with a spotlight or \acf{IR} filters \cite{nightvision_enhancement2018}. However, cameras in well-lit areas have no use for these filters.
-\\\\
-Footage quality gets worse the greater distance it is recording. As seen in Figure \ref{fig:camera_distance}, subjects further away from the camera get blurrier and more unrecognizable, which is also one of the reasons for implementing a \acs{SR} system, that can create usable data of such cases. 
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/images/Typical-images-from-a-single-CCTV-camera-with-poor-lighting-and-long-range-camera-views.png}
-    \caption{Picture from a surveillance camera in poor light and different distances to the subject marked with a cyan box.}
+    \caption{Pictures from a surveillance camera in poor light and different distances to the subject marked with a cyan box \cite{CCTVCameraFootageComparison2015}.}
     \label{fig:camera_distance}
 \end{figure}
 
+\subsection{Key takeaways / Footage impact on ReID} 
+\label{subsec:camera_takeaways}
+The main goal of this Section is to explain some of the fundamental difficulties and problems that arise when working with Surveillance footage on a \ac{ReID} system. Camera differences such as lenses, sensor, filters, and camera accessories, can create unique image thumbprints which the \ac{ReID} system can learn and therefore alter the outcome of the classification by generalizing on those patterns. 
+\\\\
+Externally, many aspects can have similar results. For example, weather, light, and distance can create problematic noise in the footage, which effects the \ac{ReID} system by introducing non-important elements, or overall obscuring the clarity and quality of the footage, and therefore affecting the performance of a \ac{ReID} network. 
 
 \section{Computer Vision}
-Denne sektion skal danne bro imellem den fysiske/kamera delen af kamera, og hvordan det omdannes til information som en maskine kan bruge. 
-\\ ReID afsnittet vil senere uddybe hvordan et ReID netværk forvandler denne information til vektorer (embedding), og derfra kan genkende personer. Bruges som setup til at forklare forskellen på billedbaseret ReID og videobaseret ReID. 
+This section is largely based on IBM's \textit{What is computer vision?}, which serves as an accessible overview of the \ac{CV} domain \cite{IBM2025computerVision}. \ac{CV} is the field of \ac{AI}, that enables machines with the ability to interpret and understand visual inputs such as images and videos. The focus of this section is on these data formats. 
 
-\subsection{Frames as Information}
-Hvad information indeholder en billedfil og hvordan indsamles/bruges denne?
-\\ Lys, farver, tekstur osv. 
+\subsection{Images as Information}
+An image is a matrix of pixels, with each pixel usually having three channels, such as in RGB (Red, Green, Blue) or HSV (Hue, Saturation, Value) formats. These pixels represent the light intensity and color information measured by the photosites in cameras, and when assembled can recreate a captured scene, as stated in Section \ref{subsubsec:How_cameras_work}. 
+\\\\
+Based on the values in each channel of each pixel, and how they relate to neighboring pixels, algorithms can  derive meaningful information from images. For this to be effective, images typically require preprocessing which standardizes input to limit a model’s need for uncertainty. Classic image preprocessing consists of normalizing light or color, resizing, cropping, and denoising.  
 
-\subsection{Frames in a Time Series}
-Hvad yderligere information kan man få fra billeder hvis de er i en tidsrække? 
-\\ Bevægelse, lysændringer (et dårligt frame bliver reddet af andre bedre frames) , konsistens af objekter (maskinen lærer bedre hvordan noget ændre sig over tid) osv.
+\subsection{Images in a Time Series}
+\label{subsec:images_in_a_time_series}
+While a two dimensional image can convey information about all three spatial dimensions, images in a time series capture the fourth, temporal, dimension as well. Adding time as a dimension lets algorithms understand motion and change, as the focus is no longer on static images, but on the changes which happen between frames. Analyzing these changes over time allows for tracking of objects, understanding consistencies, and for compensating bad frames which suffer from poor lighting, motion blur, or occlusion, through surrounding frames. 
+\\\\
+In this format, frames are still stored as matrices of pixels which usually contain three channels, but they are stacked chronologically as well. Frames offer deeper information, but they also require substantially more processing, as even using only five frames would mean five times more processing than for a single image. Therefore, it is important to consider whether sequential frames processing is necessary for the task at hand, to avoid over computation. 
 
 
-\section{Re-identification}
-Afsnittet skal beskrive hvad et ReID netværk er. 
-\\ query, gallery, embedding, open-set learning, one-/few-shot learning
+\section{Person Re-identification Networks}
+\label{sec:ReID-tech}
+Building upon the introduction in Section \ref{ReID-prob}, a person \ac{ReID} algorithm aims to identify the same individuals, while separating distinct identities. While \ac{ReID} tasks can be built using different architecture, this report focuses on using neural networks. At its core, a \ac{ReID} network functions by processing query images of the \ac{POI}, and gallery images, consisting of surveillance footage in which the \ac{POI} is assumed to be in. For each query and gallery image, the network converts it into embeddings which represent the individual in a learned vector-space \cite{Zheng2016PersonReID}. 
+\\\\
+Fundamental challenges for \ac{ReID} networks include the issues of open-set and one-shot learning. A multitude of different individuals are expected to walk in front of surveillance cameras, many of whom have no reason to be monitored or might only appear once in the model’s lifetime. The odds of the same person, which could be defined as the classification class, appearing in both the training set and during real world use, are naturally very low. Consequently, the network is expected to generalize to new individuals instead of resorting to already seen ones, which characterizes the open-set problem \cite{Liao2014OpenSet}. 
+\\\\
+Furthermore, there might only be a single query image of the \ac{POI} accessible, from which the network can learn identifying features for the \ac{ReID} task. Networks usually prefer large amounts of input for solid classification, but as this is rarely the case when looking for a \ac{POI}, the network is trained to adapt and extract identifying information from the limited input \cite{Zheng2015OneShot}. 
+\\\\
+During training, a network learns how to extract identifying features that place embeddings of the same individuals closely, while also distancing them from separate individuals. This is accomplished through metric learning, which guides the model to to minimize distances between embeddings of the same person, while also maximizing the distances between different individuals. 
+
+using objectives such as triplet loss, where the \ac{ReID} module is trained with 3 inputs, an anchor (the query image), a positive (an instance of the same individual), and a negative (an instance of a different individual) \cite{TripletLoss}.
+\\\\
+The output of the network is a feature embedding, which is used for \ac{ReID} through a similarity score based on the distance between each query and gallery image. The system then returns a ranking of the gallery embeddings with the closest distance to the query embedding, usually shortened by either setting a confidence threshold or a top \textit{x} list \cite{Zheng2016PersonReID}.
 
 \subsection{Image-based Re-identification}
-En overordnet pipeline for hvordan et billedbaseret ReID netværk fungerer, fra billeder til features. Henviser til CV afsnitet om billeder.
+Skriv noget om de specifikke features som trækkes ud fra billeder. + Figur af segmenterede features, fx en jakke som helhed og logoet på jakken. 
+
+Giv eksempler på fine-grained features - præsenter begrebet
 
 \subsection{Video-based Re-identification}
-Bygger videre på den forrige pipeline, og CV afsnittet om frames i tiddserie, for at forklare hvordan billed tidsserier kan gavne en model. Fortæller også om hvor "dyrere" det bliver at køre, hvilket henvises til senere når valget om at arbejde med billeder eller videoer skal tages. 
+\label{subsec:VideoReID}
+When using frames in a time series, instead of individual images, the structure remains much the same, but the network aggregates the embeddings of each frame through pooling, achieving greater robustness and feature-range \cite{Khaliluzzaman2023Gait}. Frames which are affected by poor lighting or occlusion, can still have their useful information extracted as the surrounding frames can fill their gaps. Since having multiple frames allows motion to be captured, a network can learn new features such as gait, gaining the ability to identify individuals based on walking pattern \cite{Khaliluzzaman2023Gait}. 
+\\\\
+The consequence of these benefits, as mentioned in Section \ref{subsec:images_in_a_time_series}, are substantially larger storage and computational requirements. Image-based \ac{ReID} is therefore easier to set up and cheaper to utilize, as well as having data which is easier to source and annotate. 
 
 \subsection{Challenges in Surveillance Re-identification}
-Hvilke domæne-relevante udfordringer skal vi forvente? Hvilke af disse kan løses igennem super-resolution? Opsamler alle førnævnte udfordringer og danner rammerne for problemstillingen. 
+\label{subsec:challenges-ReID}
+The challenges related to person \ac{ReID} in a real-world surveillance domain will be summarized in this section.
+\\\\
+The inherent open-set and one-shot learning problems stated in Section \ref{sec:ReID-tech} set constraints on the \ac{ReID}-task. The network must learn how to find descriptive features which allow distinguishing between individuals, based on very limited information. One might picture these features to be fine-grained, as a black jacket on its own would not be enough information for even a human to identify a specific person. Capturing these fine-grained features is however unreliable itself, due to the real-world domain of person \ac{ReID}.
+\\\\
+Section \ref{subsec:camera_takeaways} states the complications that can occur when working with different hardware, camera units, and physical environments. Some of these challenges can be mitigated through pre-processing or training the network to generalize sufficiently. However, there is a trade-off between generalizability and retaining fine-grained information.
+\\\\
+The images might further be of inherently poor quality due to surveillance cameras typically covering a large area, have lower resolution, and compression due to storage limitations. Each person only occupies a small part of the whole image, leaving limited information available for analysis by the system. 
+\\\\
+In summary, the main challenge of a \ac{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the pre-processing step before the network performs embedding, with techniques such as \ac{SR} showing the potential to improve quality (Kan projektforslag bruges som kilde her?). 
 
+\subsection{Related Works for Re-Identification}
+INTO: Focusing on \ac{ReID} networks
+
+\subsubsection{DeepReID: Deep Filter Pairing Neural Network for Person Re-Identification}
+
+This paper from 2014 proposes a \ac{FPNN} for person \ac{ReID} that automatically learns features optimal for this task directly from image data, instead of relying on hand-crafted ones \cite{FPNN}. The model uses paired filters, one set for each camera view, to learn how a person’s appearance changes across different cameras. This helps the network adapt to variations in lighting, color, angles, viewpoints, and person positions. The model learns to focus on person-specific features and becomes tolerant to imperfect detections and background clutter. 
+\\\\
+Despite outperforming state-of-the-art methods at the time, this solution has several limitations. The dataset used is relatively small, with 13,164 images of 1,360 different people, which may introduce bias and limit generalization. While the dataset does represent real-life scenarios of obtained data from surveillance cameras, and lighting is mentioned as a key challenge, there is no analysis of image resolution effects or how they could improve the model’s performance. This gap could be explored through integrating \ac{SR} techniques.  As this paper is more than a decade old, it is also beneficial to look at more recent papers. 
+
+\subsubsection{Deep Multimodal Fusion for Generalizable Person Re-Identification}
+
+A research team introduced a \ac{DMRL} framework for person re-identification in 2023, which aims to improve model generalization across different domains \cite{DMRL}. Instead of only relying on visual data, text information describing the person in the image and the environment, is also included in the pre-training of the model. This representation allows the model to capture semantic features, that are more robust to changes in camera types, environments and lighting conditions. After pre-training, the model is fine-tuned using a realistic real-world dataset, to better align with real-world deployment scenarios. Experiments on benchmarks demonstrate that \ac{DMRL} outperforms existing domain generalization and meta-learning methods. 
+\\\\
+However, the focus of this paper is primarily on semantic and domain-level feature alignment, with less focus on the visual quality of the images. Exploring how super-resolution techniques could further enhance the multimodal features learned in \ac{DMRL} could be an interesting direction for future works. 
+
+%Published in 2023 and cited by 23. Link to Github: https://github.com/JeremyXSC/DMRL
+
+\subsubsection{Omni-Scale Feature Learning for Person Re-Identification}
+
+(Det er den arkitektur vi overvejer at bruge i vores system)
+\\\\
+This research from 2019 presents a novel deep \ac{ReID} \ac{CNN}, termed Omni-Scale Network (OSNet), designed for person Re-identification \cite{OSNet}. The main idea is discriminative features for \ac{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight.
+\\\\
+While OSNet presents a lightweight architecture with state-of-the-art achieved performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
+
+%Published in 2019, cited by 1292. Github link: https://github.com/
+
+\subsection{Takeaways}
+
+The exact pipeline differs between each \ac{ReID} network. Some choose to preprocess the image first, while others inject the images directly into the network. The desired feature depth also varies as some might focus on granular features such as logos, while others might focus on overall shape of body and clothes, or even both at the same time \cite{Zhou2019OmniScale}. 
 
 \section{Super-Resolution}
 \label{sec:SuperResolution}
 
-Surveillance images captured from large distances or in poor lighting conditions often result in low resolution, where important details such as facial features and clothing patterns become unclear. Super-Resolution (SR) is an image processing technique that reconstructs a High-Resolution (HR) image from one or more Low-Resolution (LR) observations, addressing the degraded imagery challenges described in Section 3.1.
+As stated in Section \ref{subsec:challenges-ReID}, surveillance images often suffer from poor quality, which results in fine-grained details to be lost. This can be mitigated through \acf{SR} integration. \ac{SR} is an image processing technique that reconstructs a \ac{HR} image from one or more \ac{LR} images. The main challenge is that multiple \ac{HR} images can result in the same \ac{LR} image, making \ac{SR} an inverse problem with no unique solution.
+\\\\
 
-Super-resolution (SR) reconstructs a high-resolution (HR) image from one or more low-resolution (LR) observations. The core difficulty is that many different HR images can explain the same LR measurement under realistic imaging pipelines, making SR an inverse problem with no unique solution; practical systems therefore incorporate prior knowledge about natural images to constrain the solution space \cite{Wang2019Survey}. In common benchmarks, LR inputs are produced by bicubic downsampling 2-D cubic-convolution resampling over a 4×4 pixel neighborhood—which yields smooth LR images while omitting real-world blur, noise, and compression \cite{Wang2019Survey}. Deep learning approaches learn the LR→HR mapping directly from data. The Super-Resolution Convolutional Neural Network (SRCNN) showed that a compact convolutional model trained on bicubic LR–HR pairs can outperform hand-crafted pipelines \cite{dong2015imagesuperresolutionusingdeep}.
+% Figur af low til high res gennem SR boks
 
-\subsection{Downsampling vs. Real Low-Resolution Images}
-\label{subsec:DownsamplingVsReal}
+% Beskrivelse af billede / Hvad sker der i boksenl
+Classical image up-sampling consists of interpolation, where the spatial dimensions are increased, achieving a smoother and more visually appealing picture. The fallback of these method's is the inherent smoothness produced, which causes fine-grained details to be lost in the process. As stated in (noget reid), the task of accurately re-identifying the same individual requires identifiable features which can distinguish different individuals. Deep learning has revolutionized this task, as it offers methods which can scale the spatial dimension up, without over-smoothing and consequently loss of information. 
+\\\\
+A simplified overview of general \ac{CNN} approaches for \ac{SR} can be described as follows. The network takes an input of the \ac{LR}. This input is then sent through convolution layers that extract features at different scaled, with filters applied to create feature maps, with non-linear activation functions applied to introduce flexibility.  These feature maps are then sent through up-sampling layers that aim to increase the spatial dimension and "correctly hallucinating" the missing details. These up-sampled feature maps are sent through more convolutional layers with the purpose of learning the complex relationships between the low- and high-resolution images. The final layer produces an image. 
+\\\\
 
-Most academic benchmarks generate LR images by artificially downsampling HR images with bicubic interpolation, creating a domain gap between synthetic training data and real-world deployment scenarios \cite{Agustsson2017NTIRE,Timofte2017NTIRE}. Real LR images are shaped by complex degradations including optical factors (lens Modulation Transfer Function (MTF), defocus, motion blur), sensor limitations (Color Filter Array (CFA) patterns and demosaicing), and in-camera processing (tone mapping, JPEG compression). Models trained only on bicubic data often fail when confronted with these real-world degradation patterns \cite{Cai2019RealSR,Wei2020DRealSR}.
-
-Two strategies bridge this gap. First, collecting real paired datasets like RealSR and DRealSR, which capture scenes at different resolutions and demonstrate improved transfer to real images \cite{Cai2019RealSR,Wei2020DRealSR}. Second, synthesizing realistic degradations during training, exemplified by Real-ESRGAN, which applies varying blur kernels, noise models, and compression artifacts to create diverse training data that better mimics real camera pipelines \cite{Wang2021RealESRGAN}.
-
-When evaluating SR the metrics depends  on the test data characteristics. Peak Signal-to-Noise Ratio (PSNR) and Structural Similarity Index (SSIM) work well for bicubic benchmarks \cite{Wang2004SSIM}, while Learned Perceptual Image Patch Similarity (LPIPS) and Natural Image Quality Evaluator (NIQE) correlate better with human judgment on real-world data \cite{Zhang2018LPIPS}. Best practice reports both distortion measures (PSNR/SSIM) for comparability with existing literature and perceptual assessments (LPIPS/NIQE) for practical applicability \cite{Lugmayr2020NTIRE}.
-
-\subsection{Deep Learning Approaches}
-
-Modern SR architectures extend early CNNs with deeper networks, residual connections, and training objectives beyond pixel-wise losses. Super-Resolution Generative Adversarial Network (SRGAN) introduced adversarial training to SR, combining a generator network with a discriminator that distinguishes real from generated images \cite{Ledig2017SRGAN}. The generator uses 16 residual blocks, while training optimizes both adversarial loss (pushing outputs toward the manifold of natural images) and perceptual loss computed in VGG-19 feature space rather than pixel space.
-
-Enhanced SRGAN (ESRGAN) refined this approach with Residual-in-Residual Dense Blocks (RRDB) that remove batch normalization to avoid artifacts, relativistic adversarial training where the discriminator judges relative rather than absolute realism, and improved perceptual loss formulation \cite{Wang2018ESRGAN}. These refinements enabled significantly sharper textures, winning the Perceptual Image Restoration and Manipulation (PIRM) 2018 perceptual SR track.
-
-Recent real-world variants like Real-ESRGAN incorporate the realistic degradation pipelines discussed above or employ domain adaptation techniques to improve robustness outside controlled bicubic settings \cite{Wang2021RealESRGAN,Cai2019RealSR}.
+\subsection{Data for Super Resolution}
+% Hvad er low res og high res
+\acf{HR} refers to an image, photo, video, or audio with a large amount of detail. A \ac{HR} image contains higher concentrations of pixels, resulting in better quality and clarity, contrary to a \ac{LR} image with fewer pixels and thus less detail \cite{HRvsLR}. 
+\\\\
+% Data hvordan får man low og high res billeder
+To train a \ac{SR} network, pairs of \ac{HR} and \ac{LR} images of the same scene are required. A common approach is to generate \ac{LR} synthetically down-sampling a \ac{HR} image using bicubic interpolation. A synthetic \ac{LR} image lack characteristic noise and degradations present real \ac{LR} images has \cite{Cai2019RealSR,Wei2020DRealSR}. 
+\\\\
+(Because of variations in lighting, distances, and hardware limitations real \ac{LR} images face, as described in Section \ref{Surveillance Equipment and Footage}, \ac{LR} images made from bicubic interpolation will not accurately resemble the real word \ac{LR} images like surveillance footage. This domain gap will affect a model if solely trained on synthetic data\cite{Agustsson2017NTIRE,Timofte2017NTIRE}.) 
+\\\\
+Another approach to achieve pairs of \ac{HR} and \ac{LR} images is to capture a scene in different scales using different lenses. This method gives a real-world representation of the motive in both \ac{HR} and \ac{LR}, avoiding to introduce bias onto the data through using an artificial down-sampling \cite{Cai2019RealSR,Wei2020DRealSR}. Further noise can be added through varying blur kernels, noise models, and compression distortions to create diverse training data that better simulates real camera pipelines \cite{Wang2021RealESRGAN}.
 
 \subsection{Perception–Distortion Trade-off and Evaluation}
+% Udfordringer ved SR
+    % Tradeoff mellem visuel sammenhæng og hallucination
+A central design principle for \ac{SR} is the perception–distortion trade-off, which establishes that minimizing distortion metrics such as \ac{PSNR} and \ac{SSIM} while maximizing perceptual quality cannot be achieved simultaneously \cite{Blau2018PerceptionDistortion}. Methods prioritizing distortion produce smooth outputs that minimize pixel-wise error but appear blurry. Methods prioritizing perceptual quality introduce realistic high-frequency details that satisfy the human eye but result in higher distortion scores.
+\\\\
+For \ac{ReID} applications, this presents a critical consideration. If \ac{SR} introduces perceptual improvements through hallucinated details that do not preserve discriminative features relevant to the \ac{ReID} model, performance may degrade despite improved visual quality \cite{Zhang2018LPIPS,Wang2004SSIM}.
 
-A central design principle for SR is the formal perception–distortion trade-off, which establishes that min imizing distortion metrics (PSNR/SSIM) while maximizing perceptual quality represents contradictory objectives that cannot be jointly optimized \cite{Blau2018PerceptionDistortion}. Methods prioritizing distortion produce smooth outputs that minimize pixel-wise error but appear blurry. Methods prioritizing perceptual quality introduce realistic high-frequency details that satisfy human observers but incur higher distortion scores.
+%mulige kilder til overordnet forklaring
+% https://www.e-consystems.com/blog/camera/technology/what-is-super-resolution/
+%https://www.digitalocean.com/community/tutorials/image-super-resolution#resources
+%https://research.facebook.com/blog/2020/07/introducing-neural-supersampling-for-real-time-rendering/
+%https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/7ef605fc8dba5425d6965fbd4c8fbe1f-Paper-round2.pdf
 
-This trade-off directly impacts application design. Forensic analysis requiring high fidelity should prioritize distortion metrics using L1/L2 losses and accept blur to avoid hallucinating details. Visual display applications should prioritize perceptual quality using adversarial and perceptual losses.
+\subsection{Related Works for Super Resolution}\label{sec: related work}
 
-For ReID applications, this presents a critical consideration. If SR introduces perceptual improvements through hallucinated details that do not preserve discriminative features the ReID model was trained to recognize, performance may degrade despite improved visual quality. As discussed in Section 3.3.8, ReID models extract features like clothing color and coarse textures. If SR modifies these features in pursuit of perceptual realism, enhanced images may become less suitable for ReID. Comprehensive evaluation reporting both distortion measures and perceptual assessments enables informed method selection \cite{Zhang2018LPIPS,Wang2004SSIM}.
+\subsubsection{Learning a Deep Convolutional Network for Image Super-Resolution}
 
+From 2014, this paper proposes a method for single image \ac{SR} called \ac{SRCNN} \cite{SRCNN}. The method directly learns an end-to-end mapping between the low- and high-resolution images and jointly optimizes all layers to learn how to reconstruct fine details and textures from data. The mapping is implemented as a deep \ac{CNN} that takes the \ac{LR} image as the input and outputs the \ac{HR} image.
+\\\\
+Even though this method achieved superior performance to the state-of-the-art methods, it might not be a good idea to apply the \ac{SRCNN} to a \ac{ReID} problem. This is because \ac{SRCNN} does not know that the goal is \ac{ReID} and might distort useful features in the process of enhancing the image. An ideal \ac{SR} model for \ac{ReID} would enhance features useful for recognition, for example the edges around clothes\cite{SRCNN}. 	
 
-\section{Super-Resolution Re-Identification}
-Hvordan forbinder man de to i praksis?
+\section{Super-Resolution Re-Identification}\label{sec:superres-reid}
+Hvordan kan disse forbindes? Lav fundamentet for de eksperimenter som kan/skal foretages. Dette afsnit giver god mening at flette meget sammen med related works, da de både kan give inspiration til eksperimenter, i form af huller i deres arbejde, eller grund til ikke at foretage specifikke eksperimenter hvis vi kan tage udgangspunkt i deres konklusion. 
+\\\\
+Image-level or feature-level? If image-level, standardize image size through SR network before entering ReID (only sequential)? Input only SR image or include LR? Omit HR images from SR pipeline? Generalizing the network (through mixed datasets)? Both query and gallery run through SR or use SR query with HR gallery? Apply pixel-level ("simple") or feature-level (complicated) SR?
+\\\\
+Ablation studies: end-to-end with initial weights vs no weights (hvis det giver mening idk). 
 
 \subsection{Neural Networks}
 Først forklare hvad neural netværk er, og hvad de består af, for at danne rammerne til næste underafsnit.
 
-\subsection{Trained Together or Separately}
+\subsection{Sequential or End-to-end Integration}
 Definer forskellen på et samlet netværk og to seperate, pros/cons. Skal danne fundament for valget som tages senere. 
 
 \subsection{Backpropagation}
@@ -121,23 +222,19 @@ Forklare hvordan SR bliver bedre i et samlet netværk igennem backpropogation.
 \subsection{Evaluating Output}
 Hvordan evaluere man SR i en samlet eller delt model?
 
+\subsection{Related Works for Person Re-Identification Combined with Super-Resolution}
+To 
 
-\section{Related Work - flyttes?}\label{sec: related work}
+\subsubsection{Resolution-Invariant Person Re-Identification} 
 
-\subsection{DeepReID: Deep Filter Pairing Neural Network for Person Re-Identification}
-
-This paper proposes a \ac{FPNN} for person \ac{ReID} that automatically learns features optimal for this task directly from image data, instead of relying on hand-crafted ones \cite{FPNN}. The model uses paired filters, one set for each camera view, to learn how a person’s appearance changes across different cameras. This helps the network adapt to variations in lighting, color, angles, viewpoints, and person positions. The model learns to focus on person-specific features and becomes tolerant to imperfect detections and background clutter. 
-\\\\
-Despite outperforming state-of-the-art methods at the time, this solution has several limitations. The dataset used is relatively small, with 13,164 images of 1,360 different people, which may introduce bias and limit generalization. While the dataset does represent real-life scenarios of obtained data from surveillance cameras, and lighting is mentioned as a key challenge, there is no analysis of image resolution effects or how they could improve the model’s performance. This gap could be explored through integrating \ac{SR} techniques.  
-
-\subsection{Learning a Deep Convolutional Network for Image Super-Resolution}
-
-This paper proposes a method for single image \ac{SR} called \ac{SRCNN} \cite{SRCNN}. The method directly learns an end-to-end mapping between the low- and high-resolution images and jointly optimizes all layers to learn how to reconstruct fine details and textures from data. The mapping is implemented as a deep \ac{CNN} that takes the \ac{LR} image as the input and outputs the \ac{HR} image.
-\\\\
-Even though this method achieved superior performance to the state-of-the-art methods, it might not be a good idea to apply the \ac{SRCNN} to a \ac{ReID} problem. This is because \ac{SRCNN} does not know that the goal is \ac{ReID} and might distort useful features in the process of enhancing the image. An ideal \ac{SR} model for \ac{ReID} would enhance features useful for recognition, for example the edges around clothes. 	
-
-\subsection{Resolution-invariant Person Re-Identification} 
-
-This paper proposes a method for person \ac{ReID} robust to resolution variance by jointly training a \ac{FFSR} module and a \ac{RIFE} by end-to-end \ac{CNN} learning \cite{FFSR}. \ac{FFSR} enhances the person’s image without focusing on the background. \ac{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. 
+A method for person \ac{ReID} robust to resolution variance by jointly training a \ac{FFSR} module and a \ac{RIFE} by end-to-end \ac{CNN} learning \cite{FFSR}, was proposed in this paper from 2019. \ac{FFSR} enhances the person’s image without focusing on the background. \ac{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. 
 \\\\
 Although this method is very promising in combining \ac{ReID} with \ac{SR} it does have the limitation of depending on paired low- and high-resolution images, which are unavailable in real-world settings. 
+
+\subsubsection{Applying Deep Learning Image Enhancement Methods to Improve Person Re-Identification}
+ 
+The most recent paper from 2024 proposes a pipeline where low-light image enhancements are introduced before embedding-features on night-time images \cite{enhancementimprovereid}. The motivation behind it is that other Re-Id models assume images are captured in good lighting and of high quality, in contrast to real-world scenarios where image conditions may be degraded by poor lighting and other noise. The pipeline achieves significant improvements on performance of the Re-Id model, demonstrating that image enhancement as a pre-processing step can boost Re-ID performance when working with challenging image quality conditions, such as video-surveillance. 
+\\\\
+However, this method introduces image enhancements as a separate preprocessing step, rather than integrating the enhancement into the ReID pipeline. This separation means that enhanced images are treated as fixed inputs, preventing the model from adapting the enhancement process jointly with the embedding learning. 
+
+%Published in 2024, cited by 5. No github available.

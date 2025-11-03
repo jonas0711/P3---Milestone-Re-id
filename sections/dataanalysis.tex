@@ -1,1 +1,30 @@
 \chapter{Data Analysis} \label{cha: data}
+
+\section{Dataset}
+\begin{table}[]
+\begin{tabular}{lrrrrrll}
+\hline
+\rowcolor[HTML]{D8E9F7} Dataset& IDs (train/test) & Images total & Train & Query & Gallery & Cam & Annotation \\ \hline
+Market-1501 & 751/750 & 32,668 & 12,936 & 3,368 & 19,732 & 6 & DPM  \\
+DukeMTMC-ReID & 702/702  & 36,411 & 16,522 & 2,228 & 17,661 & 8 & Manual  \\
+CUHK03 (labeled) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Manual \\
+CUHK03 (detected) & 767/700 & 14,096 & 7,365 & 1,400 & 5,332 & 10 & DPM  \\ \hline
+\end{tabular}
+\end{table}
+\ac{DPM}
+
+\subsection{??Selection criteria}
+Open access with a free clear license. Real surveillance conditions. Well defined train, query, and gallery splits. Multiple cameras and resolution variants. Compatibility  with common used \ac{ReID} structure.
+
+\subsection{ReID Dataset}
+Market-1501 was collected from The Chinese University of Hong Kong campus setting with 6 non overlapping cameras. Its made for image based \ac{ReID} under realistic variation in in viewpoint, lightning and clothing. Auto detection introduces background noise and compression noise.  which is useful for model robustness. In our experiments we use Market-1501 for baseline \ac{ReID}, sequential \ac{SR} to \ac{ReID}, and for end to end fine tuning.
+
+DukeMTMC-ReID is made from multi camera video setup with 8 cameras and strong outdoor light variation. The dataset has *** Noget om de 408 ekstra billeder der er til for at lave støj så man kan gøre den bedre. ** Preprocessing is simular to Market-1501 **
+
+CUHK03 is smaller 
+
+Licensing and distrubition: We download only from official sources and respect the orginal research licenses for Market-1501 and DukeMTMC-ReID. CUHK03 is used in a non commercial research. 
+
+\subsection{SR Data}
+
+Div2K
