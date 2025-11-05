@@ -26,8 +26,8 @@ As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras ar
  
 \subsection{Camera Functionality}
 \label{subsubsec:How_cameras_work}
-Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement in the final footage. These pictures are created by processing light and converting it into digital data. First, the light passes through a lens which focuses it onto an image sensor that is made up of millions of photosites that measures the intensity of the light. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
-There are many underlying elements that happen as well, which can differ in each camera. For example, digital processing like white balance correction, compression and exposure adjustments are used to create the final image or video stream \cite{unc_camera_pipeline}.
+Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement in the final footage. These pictures are created by processing light and converting it into digital data. First, the light passes through a lens which focuses it onto an image sensor that is made up of millions of photosites (also known as pixels) that measures the intensity of the light. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
+There are many underlying elements that happen as well, which can differ in each camera. For example, digital processing like white balance correction, compression and exposure adjustments are used to manipulate the images into a desired look in the final image or video file \cite{unc_camera_pipeline}.
 An in-depth example of this process can be seen in Figure \ref{fig:camera_pipeline}.
 
 \begin{figure}[H]
@@ -135,23 +135,23 @@ This paper from 2014 proposes a \ac{FPNN} for person \ac{ReID} that automaticall
 \\\\
 Despite outperforming state-of-the-art methods at the time, this solution has several limitations. The dataset used is relatively small, with 13,164 images of 1,360 different people, which may introduce bias and limit generalization. While the dataset does represent real-life scenarios of obtained data from surveillance cameras, and lighting is mentioned as a key challenge, there is no analysis of image resolution effects or how they could improve the model’s performance. This gap could be explored through integrating \ac{SR} techniques.  As this paper is more than a decade old, it is also beneficial to look at more recent papers. 
 
-\subsubsection{Deep Multimodal Fusion for Generalizable Person Re-Identification}
-
-A research team introduced a \ac{DMRL} framework for person re-identification in 2023, which aims to improve model generalization across different domains \cite{DMRL}. Instead of only relying on visual data, text information describing the person in the image and the environment, is also included in the pre-training of the model. This representation allows the model to capture semantic features, that are more robust to changes in camera types, environments and lighting conditions. After pre-training, the model is fine-tuned using a realistic real-world dataset, to better align with real-world deployment scenarios. Experiments on benchmarks demonstrate that \ac{DMRL} outperforms existing domain generalization and meta-learning methods. 
-\\\\
-However, the focus of this paper is primarily on semantic and domain-level feature alignment, with less focus on the visual quality of the images. Exploring how super-resolution techniques could further enhance the multimodal features learned in \ac{DMRL} could be an interesting direction for future works. 
-
 %Published in 2023 and cited by 23. Link to Github: https://github.com/JeremyXSC/DMRL
 
 \subsubsection{Omni-Scale Feature Learning for Person Re-Identification}
 
-(Det er den arkitektur vi overvejer at bruge i vores system)
-\\\\
-This research from 2019 presents a novel deep \ac{ReID} \ac{CNN}, termed Omni-Scale Network (OSNet), designed for person Re-identification \cite{OSNet}. The main idea is discriminative features for \ac{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight.
+This research from 2019 presents a novel deep \ac{ReID} \ac{CNN}, termed Omni-Scale Network (OSNet), designed for person \ac{ReID} \cite{OSNet}. The main idea is that discriminative features for \ac{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight.
 \\\\
 While OSNet presents a lightweight architecture with state-of-the-art achieved performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
 
 %Published in 2019, cited by 1292. Github link: https://github.com/
+
+\subsubsection{Applying Deep Learning Image Enhancement Methods to Improve Person Re-Identification}
+ 
+The most recent paper from 2024 proposes a pipeline where low-light image enhancements are introduced before embedding-features on night-time images \cite{enhancementimprovereid}. The motivation behind it is that other Re-Id models assume images are captured in good lighting and of high quality, in contrast to real-world scenarios where image conditions may be degraded by poor lighting and other noise. The pipeline achieves significant improvements on performance of the Re-Id model, demonstrating that image enhancement as a pre-processing step can boost Re-ID performance when working with challenging image quality conditions, such as video-surveillance. 
+\\\\
+However, this method introduces image enhancements as a separate preprocessing step, rather than integrating the enhancement into the ReID pipeline. This separation means that enhanced images are treated as fixed inputs, preventing the model from adapting the enhancement process jointly with the embedding learning. 
+
+%Published in 2024, cited by 5. No github available.
 
 \subsection{Takeaways}
 
@@ -204,37 +204,14 @@ From 2014, this paper proposes a method for single image \ac{SR} called \ac{SRCN
 Even though this method achieved superior performance to the state-of-the-art methods, it might not be a good idea to apply the \ac{SRCNN} to a \ac{ReID} problem. This is because \ac{SRCNN} does not know that the goal is \ac{ReID} and might distort useful features in the process of enhancing the image. An ideal \ac{SR} model for \ac{ReID} would enhance features useful for recognition, for example the edges around clothes\cite{SRCNN}. 	
 
 \section{Super-Resolution Re-Identification}\label{sec:superres-reid}
-Hvordan kan disse forbindes? Lav fundamentet for de eksperimenter som kan/skal foretages. Dette afsnit giver god mening at flette meget sammen med related works, da de både kan give inspiration til eksperimenter, i form af huller i deres arbejde, eller grund til ikke at foretage specifikke eksperimenter hvis vi kan tage udgangspunkt i deres konklusion. 
-\\\\
-Image-level or feature-level? If image-level, standardize image size through SR network before entering ReID (only sequential)? Input only SR image or include LR? Omit HR images from SR pipeline? Generalizing the network (through mixed datasets)? Both query and gallery run through SR or use SR query with HR gallery? Apply pixel-level ("simple") or feature-level (complicated) SR?
-\\\\
-Ablation studies: end-to-end with initial weights vs no weights (hvis det giver mening idk). 
-
-\subsection{Neural Networks}
-Først forklare hvad neural netværk er, og hvad de består af, for at danne rammerne til næste underafsnit.
-
-\subsection{Sequential or End-to-end Integration}
-Definer forskellen på et samlet netværk og to seperate, pros/cons. Skal danne fundament for valget som tages senere. 
-
-\subsection{Backpropagation}
-Forklare hvordan SR bliver bedre i et samlet netværk igennem backpropogation. 
-
-\subsection{Evaluating Output}
-Hvordan evaluere man SR i en samlet eller delt model?
 
 \subsection{Related Works for Person Re-Identification Combined with Super-Resolution}
-To 
+The proposed idea of implementing \ac{SR} with \ac{ReID} has been tried and before. 
 
 \subsubsection{Resolution-Invariant Person Re-Identification} 
 
-A method for person \ac{ReID} robust to resolution variance by jointly training a \ac{FFSR} module and a \ac{RIFE} by end-to-end \ac{CNN} learning \cite{FFSR}, was proposed in this paper from 2019. \ac{FFSR} enhances the person’s image without focusing on the background. \ac{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. 
+A method for person \ac{ReID} robust to resolution variance by jointly training a \ac{FFSR} module and a \ac{RIFE} by joint end-to-end \ac{CNN} learning \cite{FFSR}, was proposed in this paper from 2019. \ac{FFSR} enhances the person in the image without focusing on the background. This is done through evaluation with their own metric, foreground focus SR loss, using a defined mask around the person to priority that part of the image more. \ac{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. Through jointly training of the two modules \ac{FFSR} and \ac{RIFE}, a resolution invariant ReID system, because \ac{FFSR} learns from the \ac{ReID}'s objective, making it specifically optimized for this task. 
 \\\\
 Although this method is very promising in combining \ac{ReID} with \ac{SR} it does have the limitation of depending on paired low- and high-resolution images, which are unavailable in real-world settings. 
 
-\subsubsection{Applying Deep Learning Image Enhancement Methods to Improve Person Re-Identification}
- 
-The most recent paper from 2024 proposes a pipeline where low-light image enhancements are introduced before embedding-features on night-time images \cite{enhancementimprovereid}. The motivation behind it is that other Re-Id models assume images are captured in good lighting and of high quality, in contrast to real-world scenarios where image conditions may be degraded by poor lighting and other noise. The pipeline achieves significant improvements on performance of the Re-Id model, demonstrating that image enhancement as a pre-processing step can boost Re-ID performance when working with challenging image quality conditions, such as video-surveillance. 
-\\\\
-However, this method introduces image enhancements as a separate preprocessing step, rather than integrating the enhancement into the ReID pipeline. This separation means that enhanced images are treated as fixed inputs, preventing the model from adapting the enhancement process jointly with the embedding learning. 
-
-%Published in 2024, cited by 5. No github available.
+https://www.sciencedirect.com/science/article/pii/S0031320320304854#sec0006

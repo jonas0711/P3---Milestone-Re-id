@@ -1,16 +1,30 @@
 \chapter{Data Analysis} \label{cha: data}
 
 \section{Dataset}
-\begin{table}[]
-\begin{tabular}{lrrrrrll}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{
+|>{\raggedright\arraybackslash}p{0.15\linewidth}
+|>{\raggedright\arraybackslash}p{0.13\linewidth}
+|>{\raggedright\arraybackslash}p{0.13\linewidth}
+|>{\raggedright\arraybackslash}p{0.06\linewidth}
+|>{\raggedright\arraybackslash}p{0.07\linewidth}
+|>{\raggedright\arraybackslash}p{0.08\linewidth}
+|>{\raggedright\arraybackslash}p{0.05\linewidth}
+|>{\raggedright\arraybackslash}p{0.12\linewidth}|
+}
 \hline
-\rowcolor[HTML]{D8E9F7} Dataset& IDs (train/test) & Images total & Train & Query & Gallery & Cam & Annotation \\ \hline
-Market-1501 & 751/750 & 32,668 & 12,936 & 3,368 & 19,732 & 6 & DPM  \\
-DukeMTMC-ReID & 702/702  & 36,411 & 16,522 & 2,228 & 17,661 & 8 & Manual  \\
-CUHK03 (labeled) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Manual \\
-CUHK03 (detected) & 767/700 & 14,096 & 7,365 & 1,400 & 5,332 & 10 & DPM  \\ \hline
+\rowcolor[HTML]{D8E9F7} 
+\textbf{Dataset} & \textbf{IDs (train/test)} & \textbf{Images total} & \textbf{Train} & \textbf{Query} & \textbf{Gallery} & \textbf{Cam} & \textbf{Annotation} \\ \hline
+Market-1501 & 751/750 & 32,668 & 12,936 & 3,368 & 19,732 & 6 & DPM \\ \hline
+DukeMTMC-ReID & 702/702  & 36,411 & 16,522 & 2,228 & 17,661 & 8 & Manual \\ \hline
+CUHK03 (labeled) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Manual \\ \hline
+CUHK03 (detected) & 767/700 & 14,096 & 7,365 & 1,400 & 5,332 & 10 & DPM \\ \hline
 \end{tabular}
 \end{table}
+
+
 \ac{DPM}
 
 \subsection{??Selection criteria}
