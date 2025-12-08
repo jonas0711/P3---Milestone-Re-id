@@ -1,0 +1,58 @@
+\chapter{Experiments} \label{cha: experiments}
+
+In order to determine whether adding an SR module to the ReID model will add any notable value, several experiments are conducted to create a clear and fair method for comparison.
+
+\section{Baseline OSNet} \label{sec: baselineosnet}
+The OOD test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift in real-world deployment. To ensure a fair comparison, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on XXX. Flip augmentation is used to create more data. 
+
+\subsection{OOD Test on the Baseline OSNet} \label{sec: oodtestny}
+
+Since the implemented person \acs{ReID} model is trained on the Market-1501 dataset, a new OOD test must be conducted to fulfill this project's definition of an OOD test, as described in Section \ref{outofdistributiontest}. This OOD test is conducted using the dataset DukeMTMC-ReID under three different conditions, as well as the dataset iLIDS-VID which is unknown to OSNet. They are presented in Table \ref{tab:newood_conditions}.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{
+|>{\raggedright\arraybackslash}p{0.28\linewidth}
+|>{\raggedright\arraybackslash}p{0.50\linewidth}
+|>{\centering\arraybackslash}p{0.20\linewidth}|
+}
+\hline
+\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Dataset for OOD Test}} \\
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Condition} & \textbf{Description} & \textbf{Dataset} \\
+\hline
+Unmodifed &
+Unmodified images, used as the reference baseline. & DukeMTMC-
+ReID \\
+\hline
+Downscale: \newline 0.75 / 0.5 / 0.25 &
+Images downscaled with a scaler, using height and width of the image.  &
+DukeMTMC-
+ReID \\
+\hline
+JPEG Compression: \newline 50 / 25 / 15 &
+Images compressed using JPEG at quality levels 50 (medium), 25 (low), and 15 (very low). &
+DukeMTMC-
+ReID \\
+\hline
+Unmodified &
+Image pairs from an unseen dataset, with primarily indoor images, to test cross-domain generalization. &
+iLIDS-VID \\
+\hline
+\end{tabular}
+\caption{Overview of the datasets used to evaluate OSNet under degraded and out-of-distribution conditions.}
+\label{tab:newood_conditions}
+\end{table}
+
+
+\section{Robust OSNet} \label{sec: robustosnet}
+This experiment explores if training the person \acs{ReID} model on heavily augmentated data will produce a more robust model than the off-the-shelf baseline presented in Setion \ref{sec: baselineosnet}. The applied data augmentation is presented in Section \ref{sec: dataaugmentation}. 
+
+\section{SR + Baseline OSNet} \label{sec: sr+baseline}
+Based on the results presented in Section \ref{sec: robustosnet}, the problem of images being out of distribution is not adequately solved. Therefore, a second experiment is conducted. The baseline model presented in Section \ref{sec: baselineosnet} is combined with a chosen SR model. 
+
+\section{Joint SR and Baseline OSNet}
+The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the OSNet baseline model with SR in a joint end-to-end framework. 
+

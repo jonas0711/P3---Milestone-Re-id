@@ -6,3 +6,88 @@ In carrying out the project, both in developing the system and in documenting th
 During documentation of the project, generative AI have been useful in correcting language, ensuring that the message come across clearly. LLMs is excellent at repetitive tasks such as formatting data. When applied to such tasks, the outputs have been reviewed afterward to make sure nothing is altered. Furthermore, LLMs have been used when setting up layout in LaTeX as well as correcting LaTeX errors. Finally, LLM has been used to summarize and presenting methods, giving a preunderstanding to a subject before further reading.
 \\
 In developing the AI system, generative AI have mostly been used for debugging. Some error messages are difficult to decode. Generative AI can not only simplify the problem but also assist with code changes to solve the problem. This drastically reduces the time spend on debugging, allowing for time spend on improving model and testing different configurations. In addition, Generative AI has been used for a quick documentation description, examples of application of methods and brainstorming alternative solutions. 
+
+\section{Image names for out-of-distribution test}\label{app:out-of-dis}
+
+\subsection{Subset from Market1501}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{0.45\linewidth}|p{0.45\linewidth}|}
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Query} & \textbf{Gallery} \\
+\hline
+0008\_c5s1\_000401\_01.jpg & 0008\_c1s1\_000451\_02.jpg \\
+0021\_c5s1\_002176\_05.jpg & 0021\_c3s1\_001826\_01.jpg \\
+0029\_c5s1\_002526\_03.jpg & 0029\_c4s1\_002501\_04.jpg \\
+0031\_c4s1\_002476\_02.jpg & 0031\_c2s1\_001876\_04.jpg \\
+0034\_c6s1\_003351\_01.jpg & 0034\_c5s1\_005251\_04.jpg \\
+0051\_c3s1\_059092\_03.jpg & 0051\_c2s1\_059371\_05.jpg \\
+0054\_c5s1\_006776\_02.jpg & 0054\_c4s1\_007176\_01.jpg \\
+0062\_c2s1\_015476\_04.jpg & 0062\_c1s1\_008776\_01.jpg \\
+0072\_c5s1\_011276\_02.jpg & 0072\_c3s1\_010576\_01.jpg \\
+0078\_c2s1\_011376\_01.jpg & 0078\_c1s1\_011576\_04.jpg \\
+0092\_c6s1\_014051\_02.jpg & 0092\_c5s1\_014251\_03.jpg \\
+0101\_c4s1\_020501\_03.jpg & 0101\_c1s1\_024426\_04.jpg \\
+0161\_c2s1\_029451\_02.jpg & 0161\_c1s1\_030926\_01.jpg \\
+0198\_c2s1\_038676\_03.jpg & 0198\_c1s2\_019491\_01.jpg \\
+0295\_c5s1\_066923\_03.jpg & 0295\_c3s1\_066342\_05.jpg \\
+0372\_c5s1\_088873\_02.jpg & 0372\_c3s1\_088417\_01.jpg \\
+0644\_c6s2\_039468\_01.jpg & 0644\_c3s2\_039187\_01.jpg \\
+0654\_c5s2\_038330\_02.jpg & 0654\_c4s3\_052404\_01.jpg \\
+0675\_c5s2\_045655\_02.jpg & 0675\_c3s2\_046062\_02.jpg \\
+1063\_c6s3\_004442\_02.jpg & 1063\_c5s2\_142674\_04.jpg \\
+1175\_c6s4\_016302\_02.jpg & 1175\_c5s3\_089937\_01.jpg \\
+1403\_c6s4\_000002\_05.jpg & 1403\_c5s3\_073487\_10.jpg \\
+1465\_c6s3\_082717\_03.jpg & 1465\_c5s3\_059240\_10.jpg \\
+1484\_c5s3\_068012\_03.jpg & 1484\_c6s3\_085217\_01.jpg \\
+1490\_c6s3\_085667\_01.jpg & 1490\_c6s4\_000802\_03.jpg \\
+\hline
+\end{tabular}
+\caption{Query and gallery image pairs used from the Market-1501 dataset. Each pair represents the same identity captured by different cameras.}
+\label{tab:market1501_subset}
+\end{table}
+
+
+\subsection{Subset from iLIDS-VID}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{0.45\linewidth}|p{0.45\linewidth}|}
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Query} & \textbf{Gallery} \\
+\hline
+cam1\_person144.png & cam1\_person006.png \\
+cam1\_person294.png & cam1\_person007.png \\
+cam2\_person006.png & cam1\_person015.png \\
+cam2\_person007.png & cam1\_person016.png \\
+cam2\_person015.png & cam1\_person029.png \\
+cam2\_person016.png & cam1\_person040.png \\
+cam2\_person029.png & cam1\_person068.png \\
+cam2\_person040.png & cam1\_person089.png \\
+cam2\_person068.png & cam1\_person095.png \\
+cam2\_person089.png & cam1\_person100.png \\
+cam2\_person095.png & cam1\_person147.png \\
+cam2\_person100.png & cam1\_person157.png \\
+cam2\_person147.png & cam1\_person163.png \\
+cam2\_person157.png & cam1\_person168.png \\
+cam2\_person163.png & cam1\_person187.png \\
+cam2\_person168.png & cam1\_person212.png \\
+cam2\_person187.png & cam1\_person221.png \\
+cam2\_person212.png & cam1\_person229.png \\
+cam2\_person221.png & cam1\_person234.png \\
+cam2\_person229.png & cam1\_person255.png \\
+cam2\_person234.png & cam1\_person273.png \\
+cam2\_person255.png & cam1\_person304.png \\
+cam2\_person273.png & cam1\_person316.png \\
+cam2\_person304.png & cam2\_person144.png \\
+cam2\_person316.png & cam2\_person294.png \\
+\hline
+\end{tabular}
+\caption{Query and gallery image pairs from the iLIDS-VID dataset. Each pair represents the same identity observed by two different cameras.}
+\label{tab:custom_camera_pairs}
+\end{table}

@@ -3,21 +3,23 @@
 
 As defined in the problem statement, this project focuses on building and testing how \ac{SR} can be combined with and improve the performance of \ac{ReID}. Consequently, the requirements will focus on these two networks and their integration. For that same reason, the requirements will not describe a complete \ac{ReID} system and are therefore not exhaustive. The scope implies that the \ac{SR} and {ReID} integration does not include an object detection module, and thus expecting cropped images as input.
 \\\\
-The priority of the requirements are phrased using MoSCoW's prioritization method \cite{Moscow}. Each requirement will be testable and measurable with defined success criteria, and have a traceability tag.
+Each requirement will be testable and measurable with defined success criteria, and have a traceability tag. Section 
+
 \begin{table}[H]
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
 \textbf{Req. no.}& \textbf{Module: Super-Resolution}& \textbf{Success criteria}& \textbf{Traceability}              \\\hline
- 1\hypertarget{req:1}{}& The SR module must outperform a simple Bicubic interpolation measured in [loss-function].& Fail/Pass&Section \ref{sec:SuperResolution}\\\hline\end{tabular}
+ 1\hypertarget{req:1}{}& The SR module must outperform a simple Bicubic interpolation measured in [performance metric].& Fail/Pass&Section \ref{sec:SuperResolution}\\\hline\end{tabular}
 \end{table}
+
 \begin{table}[H]
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
 \textbf{Req. no.}& \textbf{Module: Re-Identification}& \textbf{Success criteria}& \textbf{Traceability}              \\\hline
- 2\hypertarget{req:2}{}& The module must have a stand
-alone accuracy of
-minimum XXX.& > xxxx&Krav fra Related works.\\\hline\end{tabular}
+ 2\hypertarget{req:2}{}& The module must have a Rank-1 of x (vil vi have tal på?).& &Section \ref{subsec:takeawayspreid}\\\hline
+ & The module must have a mAP accuracy of x (vil vi have tal på?).& &Section \ref{subsec:takeawayspreid}\\\hline\end{tabular}
 \end{table}
+
 \begin{table}[H]
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
@@ -25,3 +27,5 @@ minimum XXX.& > xxxx&Krav fra Related works.\\\hline\end{tabular}
  3\hypertarget{req:3}{}& The combined SR and Re-ID system should outperform the Re-ID network measured in XXX.& Fail/Pass&Section \ref{sec:superres-reid}\\\hline
  4\hypertarget{req:4}{}& The complete system must be deployed in the cloud.& Fail/Pass&Chapter \ref{cha: problemstatement}\\\hline\end{tabular}
 \end{table}
+
+%Skal vi stille krav til generaliserbarhed i stedet?

@@ -1,44 +1,92 @@
-\chapter{Data Analysis} \label{cha: data}
+\chapter{Data Analysis} \label{cha:data}
+This chapter presents the datasets used in this project. The selected datasets represent realistic surveillance conditions and are established datasets within person re-identification (ReID) research, ensuring comparability across studies \cite{ZhouSurvey2021}.
 
-\section{Dataset}
+\section{Overview of Datasets}
+An overview of the datasets used for training and evaluation is shown in Table \ref{tab:reid_datasets}.
 
 \begin{table}[H]
 \centering
+\renewcommand{\arraystretch}{1.2}
 \begin{tabular}{
-|>{\raggedright\arraybackslash}p{0.15\linewidth}
-|>{\raggedright\arraybackslash}p{0.13\linewidth}
-|>{\raggedright\arraybackslash}p{0.13\linewidth}
-|>{\raggedright\arraybackslash}p{0.06\linewidth}
-|>{\raggedright\arraybackslash}p{0.07\linewidth}
-|>{\raggedright\arraybackslash}p{0.08\linewidth}
-|>{\raggedright\arraybackslash}p{0.05\linewidth}
-|>{\raggedright\arraybackslash}p{0.12\linewidth}|
-}
+|>{\raggedright\arraybackslash}p{0.18\linewidth}
+|>{\centering\arraybackslash}p{0.11\linewidth}
+|>{\centering\arraybackslash}p{0.12\linewidth}
+|>{\centering\arraybackslash}p{0.07\linewidth}
+|>{\centering\arraybackslash}p{0.07\linewidth}
+|>{\centering\arraybackslash}p{0.08\linewidth}
+|>{\centering\arraybackslash}p{0.05\linewidth}
+|>{\raggedright\arraybackslash}p{0.12\linewidth}|}
 \hline
-\rowcolor[HTML]{D8E9F7} 
-\textbf{Dataset} & \textbf{IDs (train/test)} & \textbf{Images total} & \textbf{Train} & \textbf{Query} & \textbf{Gallery} & \textbf{Cam} & \textbf{Annotation} \\ \hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Dataset} & \textbf{Unique IDs (train/test)} & \textbf{Images total} & \textbf{Train} & \textbf{Query} & \textbf{Gallery} & \textbf{Cam} & \textbf{Annotation} \\ \hline
 Market-1501 & 751/750 & 32,668 & 12,936 & 3,368 & 19,732 & 6 & DPM \\ \hline
-DukeMTMC-ReID & 702/702  & 36,411 & 16,522 & 2,228 & 17,661 & 8 & Manual \\ \hline
-CUHK03 (labeled) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Manual \\ \hline
-CUHK03 (detected) & 767/700 & 14,096 & 7,365 & 1,400 & 5,332 & 10 & DPM \\ \hline
+DukeMTMC-ReID & 702/702 & 36,411 & 16,522 & 2,228 & 17,661 & 8 & Manual \\ \hline
+CUHK03 (labeled / detected) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Manual / DPM \\ \hline
 \end{tabular}
+\caption{Overview of person re-identification datasets used in this project. Figures follow official dataset documentation.}
+\label{tab:reid_datasets}
 \end{table}
 
 
-\ac{DPM}
+\section{Dataset Selection}
+Datasets were chosen based on open academic access, realistic surveillance conditions, well-defined train/query/gallery splits, multiple viewpoints per identity, and resolution variation. \cite{ZhouSurvey2021}.
 
-\subsection{??Selection criteria}
-Open access with a free clear license. Real surveillance conditions. Well defined train, query, and gallery splits. Multiple cameras and resolution variants. Compatibility  with common used \ac{ReID} structure.
+\section{Dataset Descriptions}
 
-\subsection{ReID Dataset}
-Market-1501 was collected from The Chinese University of Hong Kong campus setting with 6 non overlapping cameras. Its made for image based \ac{ReID} under realistic variation in in viewpoint, lightning and clothing. Auto detection introduces background noise and compression noise.  which is useful for model robustness. In our experiments we use Market-1501 for baseline \ac{ReID}, sequential \ac{SR} to \ac{ReID}, and for end to end fine tuning.
+\subsection*{Market-1501}
+\noindent
+Market-1501 is one of the most widely used datasets for person re-identification. It was recorded at Tsinghua University in Beijing using six surveillance cameras. Five in HD and one in SD resolution. The dataset contains 32{,}668 cropped images of 1{,}501 unique individuals, each appearing in at least two camera views. Bounding boxes were generated automatically with a Deformable Part Model (DPM) detector, and therefore the dataset provides cropped images of persons.
+Because the detections are automatic, some bounding boxes are misaligned or partially cropped, which makes the dataset realistic for providing realistic material in real-world surveillance conditions \cite{Zheng2015ICCV}.
 
-DukeMTMC-ReID is made from multi camera video setup with 8 cameras and strong outdoor light variation. The dataset has *** Noget om de 408 ekstra billeder der er til for at lave støj så man kan gøre den bedre. ** Preprocessing is simular to Market-1501 **
+\subsection*{DukeMTMC-ReID}
+\noindent
+DukeMTMC-ReID is from the Duke Multi-Target Multi-Camera project and was recorded on the Duke University campus using eight 1080p cameras. The dataset contains 36{,}411 person images divided into 702 training and 702 test identities. 
+The data capture diverse viewpoints, lighting variations, and scales—from close-up pedestrians to distant, low-resolution figures which provides realistic footage from security cameras where the distance to the person can differ \cite{Gou2017DukeMTMC4ReID}. This diversity strengthens evaluation across different camera positions and environmental conditions.
 
-CUHK03 is smaller 
+\subsection*{CUHK03}
+\noindent
+CUHK03 was collected at The Chinese University of Hong Kong and was one of the first ReID datasets large enough to support deep learning. It consists of approximately 14{,}000 images of about 1{,}467 individuals captured by ten cameras arranged as five camera pairs. Each person appears in two cameras, giving two different viewpoints for every identity.  
+The dataset is released in two versions: a \emph{labeled} set with manually annotated bounding boxes, and a \emph{detected} set generated by the same \ac{DPM} detector used in Market-1501 \cite{Li2014DeepReID}.  
+While CUHK03 is smaller than Market-1501 and DukeMTMC-ReID, its clear structure and the two annotation versions make it well suited for providing our model noise and viewpoint variation in the trainingsdata.
 
-Licensing and distrubition: We download only from official sources and respect the orginal research licenses for Market-1501 and DukeMTMC-ReID. CUHK03 is used in a non commercial research. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/images/ReID.png}
+    \caption{Enter Caption}
+    \label{fig:ReIddataset}
+\end{figure}
 
-\subsection{SR Data}
 
-Div2K
+\subsection*{MSMT17}
+\ac{MSMT} 17 was recorded by a network of 15 surveillance cameras deployed across  indoor and outdoor environments, capturing video footage over an extended period. The dataset was  designed to address real-world challenges in person \ac{ReID} including complex lighting variations, diverse viewpoint changes, and the scale requirements of large camera networks. It contains 126,441 annotated bounding boxes of 4,101 unique identities. The raw videos were captured during 12 different time slots throughout the day, spanning about 180 hours of footage in total. This temporal coverage results in  lighting variations, ranging from bright daylight to low light evening conditions, which closely mirrors the operational conditions of real-world surveillance systems. The combination of indoor and outdoor scenes, long-duration recording, and diverse environmental conditions enables \ac{ReID} models trained on MSMT17 to better generalize to real-world surveillance scenarios with varying lighting, viewpoints, and scale. \cite{wei2018person}
+
+
+\subsection*{ILIDS-vid}
+
+
+\subsection*{Div2K}
+\ac{DIV2K} was introduced as part of the NTIRE 2017 Challenge on Single Image Super-Resolution \cite{Agustsson_2017_CVPR_Workshops} The dataset consists of 1,000 high-quality RGB images manually collected from the Internet, with careful attention to image quality, diversity of sources, content variety, and specially copyright considerations. Images are of 2K resolution. The dataset is split into 800 training images and 100 validation images, with an additional 100 test images. For each HR image, corresponding LR images are provided at downscaling factors of ×2, ×3, and ×4, generated using bicubic interpolation. Additionally unknown degradation track provides LR images created with hidden degradation operators to try to simulate realistic scenarios. The images were selected to achieve balanced distribution across visual content bit-per-pixel compression rates. featuring diverse content including normal scenes, textures, objects, and patterns. This diversity and high quality make \acs{DIV2K} widely used benchmarks for training and evaluating \acs{SR} algorithms \cite{Agustsson_2017_CVPR_Workshops}.
+
+\subsection*{RELLISUR}
+\noindent
+RELLISUR was collected by Aalborg University focused on image resolution, not digital downsampling. Each of the 850 scenes are recorded in 3 different scales. X1 scale, X2 scale and X4 scale are made by changing the focal length. This difference in resolution originates from the optical settings and not made by bicubic manipulation. The dataset contains of a low light and a normal light part. We use the normal light consisting of 2,550 images split into test, train and validation. RELLISUR covers indoor and outdoor and consists different kinds of structures, materials and distances to the objects to enhance usability for \ac{SR} in realistic environments. 
+\ref{aakerberg2021rellisur}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/images/SR.png}
+    \caption{Enter Caption}
+    \label{fig:placeholder2}
+\end{figure}
+
+\section{Generalizability, Strengths, and Limitations}
+The three datasets complement each other. They cover multi-camera setups, varied viewpoints, and include both manual and detector-generated crops. \textit{Market-1501} contributes realistic detector noise, \textit{CUHK03} provides a clean labeled split plus a detected split that mirrors real pipelines, \textit{DukeMTMC-ReID} adds clear scale variation, where the same person appears both near and far. Together, they offer a solid basis for training and testing across camera changes, viewpoint shifts, and moderate lighting differences.
+\\\\
+The coverage of culture, weather, and geography is narrow. All datasets are from single university campuses (two in East Asia, one in the United States), mainly in daytime. There is little variation in season and weather (e.g., rain, snow, fog) and limited night scenes. Clothing styles and demographics reflect local contexts rather than global diversity. Automatic boxes improve realism but can include background clutter and partial crops. Manual boxes are cleaner but less like real pipelines. In short, the datasets are strong benchmarks for comparable settings. For use in other places—different cities, climates, or cultural contexts—models may need domain adaptation or a small amount of local data.
+
+
+
+
+
+
+\

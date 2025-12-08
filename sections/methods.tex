@@ -1,1 +1,54 @@
 \chapter{Methods} \label{cha: methods}
+
+\section{ReID Module: OSNet} \label{lab:methodreid}
+
+The OSNet model presented in Section \ref{sec:omniscale} demonstrates strong performance across several person re-identification benchmarks. The model is chosen as the \acs{ReID} module for this project based on this performance and the lightweight architecture, allowing for competitive accuracy on limited hardware. The details of the architecture are presented in this section, based on Figure \ref{fig:osnetpipeline}. 
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=1\linewidth]{osnetpipelinebud.drawio.png}
+    \caption{An overview of the pipeline for the OSNet module.}
+    \label{fig:osnetpipeline}
+\end{figure}
+\noindent As mentioned in Section \ref{sec:omniscale}, the model adaptively captures discriminative features for person ReID across different spatial scales. This is achieved through Omni-Scale Blocks (OSBlocks), which are the fundamental building units of OSNet. The full pipeline of OSNet is presented in Figure \ref{fig:osnetpipeline}, while the internal process of a single OSBlock is presented in Figure \ref{fig:osblockpipeline}. 
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=1\linewidth]{osblockpipeline.drawio.png}
+    \caption{An overview of the process inside the OSBlocks.}
+    \label{fig:osblockpipeline}
+\end{figure}
+
+\noindent The first OSBlock receives a feature map created by an initial convolution and maxpooling, with the following OSBlocks taking the feature map from the previous layer. In these blocks, the feature map is processed by a 1x1 convolution, which reduces the channel dimensions. Subsequently, four parallel streams apply convolutions with kernel sizes \textit{3x3}, \textit{5x5}, \textit{7x7}, and \textit{9x9}, corresponding to increasing receptive fields, to capture features at different scales, which defines the omni-scale capability. Each branch uses depthwise separable convolutions, also called lite 3x3, to improve efficiency. The output from all four streams is then aggregated with channel-wise adaptive aggregation to dynamically weigh each scale based on the input. The aggregation is implemented with a lightweight gating mechanism, that learns to weigh each scale adaptively. This fusion is what makes the model omni-scale. After the fusion, a 1x1 convolution restores the original channels. The final result is added to the input of the block by a skip connection and passed through a ReLU activation function. Each stage contains two OSBlocks with stride=1, before an OSBlock with stride=2 downsamples the feature map. 
+\\\\
+This process is repeated until the fourth convolution stage, which is followed by a 1x1 convolution, to fuse information across all channels. Global average pooling is used to collapse the spatial dimensions into one value per channel resulting in a feature vector, which is passed through a fully connected layer to produce the final embedding that is used for person re-identification. 
+
+
+\section{EDSR}
+The Enhanced Deep Super-Resolution Network \ac{EDSR} and \ac{MDSR} are \ac{ResNet} based architectures for a single image \ac{SR} designed with an emphasis on high reconstruction quality and stable training. \ac{EDSR} can be viewed as a simplified yet substantially deepened and widened successor to  \ac{SRResNET}. The architecture consists of a convolutional layer, a deep stack of residual blocks and a upsampling module that produces the super-resolution output for a given scaling factor. A key design is the removal of batch normalization layers from the residual blocks. In low level vision tasks, batch normalization has been observed to degrade image quality and unnecessarily constrain the dynamic range of feature representations while also increasing memory usage. By excluding batch normalization, \ac{EDSR} can use more feature channels and more layers within the same resource budget, which in practice leads to an improvement in \ac{PSNR} and \ac{SSIM} on standard \ac{SR} benchmarks.
+\\\\
+To support very deep and wide models, \ac{EDSR} uses residual scaling, where the output of each residual block is multiplied by a small factor (typically 0,1) before being added to the skip connection. This simple mechanism helps to keep the training process numerically stable. The upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, so only the final layers project the feature maps to high resolution . 
+\\\\
+The \ac{MDSR} architecture extends this idea to multiple scaling factors by introducing a shared "main branch" of residual blocks combined with small scale specific prepossessing and upsampling modules for each scale (2x, 3x, 4x). In this way a single model can support multiple upscaling factors, with a relatively low parameter count and without a substantial loss in performance  compared to separate single scale models. As a result \ac{EDSR} and \ac{MDSR} constitute a general and well established architectural option for learning based \ac{SR} and have frequently been used as a reference or starting point in subsequent work \cite{lim2017edsr}.
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{edsrpipeline.drawio.png}
+    \caption{An overview of the ESDR pipeline.}
+    \label{fig:edsrpipeline}
+\end{figure}
+
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{resblockpipeline.drawio.png}
+    \caption{An overview of the internal process of the resblocks.}
+    \label{fig:resblockpipeline}
+\end{figure}
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{upsampleblockpipeline.drawio.png}
+    \caption{An overview of the internal process of the upsample block.}
+    \label{fig:upsampleblockpipeline}
+\end{figure}
+

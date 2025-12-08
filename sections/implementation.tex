@@ -1,1 +1,171 @@
 \chapter{Implementation} \label{cha: implementation}
+This Chapter presents the implementation of the SR and ReID together with the overall implementation choices.
+\section{Dataloading}
+\label{imp_dataloading}
+Both of the data loaders are built using the Dataset and DataLoader classes from torch.utils.data. They are designed to generate batches of data samples for training and for validation and test both query and gallery splits. 
+\\\\
+For the \ac{ReID} datasets, three datasets are used for training: MSMT17, Market1501 and CUHK03. The data loader is combining these datasets, enabling joint training across all of them. To prevent any person-id conflict, in case where the same person-id is appearing in multiple dataset, and ensure continues id-values a json file with mappings from the old id with a dataset specific prefix in front to a new continues value is created. This ensures that all person IDs remain unique across dataset, while preserving person-id for each person and introducing continues values for which a softmax can be trained on. In the process of creating the json file, every 10th new person-id are pulled into a validation set. In the data loader, one sample per person ID is added to the query set. The remaining samples are checked for matching person ID and camera ID. If they do not match both, they are added to the gallery set.
+\\\\
+The data loader for the SR datasets simply splits the images into input and target images, and creates batches, while shuffling the images from DIV2K and RELLISUR dataset.
+
+\section{Dataaugmentation} \label{sec: dataaugmentation}
+In order to test if \ac{SR} is worth implementing in terms of adding extra parameters to the pipeline, it is first tested, if heavy data augmentation can improve model performance in terms of generalization across different image scales and resolution, and robustness in real life scenarios. The different types of augmentation and their purpose is included in Table \ref{tab:augmentationtypes}.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}\hline
+         \cellcolor[HTML]{D8E9F7} \textbf{Augmentation}&  \cellcolor[HTML]{D8E9F7} \textbf{Purpose}\\\hline
+         Normalization&  xxxx\\\hline
+         Vertical flipping&  Create bigger dataset.\\\hline
+ Padding& Secure that image size is the same, så the images can be stacked.\\\hline
+         Gaussian blur&  Add diversity to the data.\\\hline
+         Gaussian noise&  Add diversity to the data.\\\hline
+         Brightness change&  Add diversity to the data.\\\hline
+ Resizing& Make the model scale-invariant, uses padding for smaller images.\\\hline
+ JPEG compression& Make the model robust to compression noise.\\ \hline
+    \end{tabular}
+    \caption{The different augmentations implemented}
+    \label{tab:augmentationtypes}
+\end{table}
+\noindent Because of the different ways of training Table \ref{tab:three_subtables}, present one baseline augmentation pipeline, one heavy and one for validation and test sets. This enables a comparison between the baseline and augmentation versions to verify the effect of the augmentation.
+
+\begin{table}[h]
+\centering
+\begin{subtable}[T]{0.32\linewidth}
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{0.9\linewidth}|}\hline
+\cellcolor[HTML]{D8E9F7} \textbf{Baseline}\\\hline
+\begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+    \item Normalization
+    \item Vertical flipping
+    \item Padding, if to small
+    \item Resizing, if to big
+    \vspace{6.1em}
+\end{itemize}
+\\ \hline\end{tabular}
+\caption{Augmentations used for baseline version of OSNet}
+\end{subtable}
+\hfill
+\begin{subtable}[T]{0.32\linewidth}
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{0.9\linewidth}|}\hline
+\cellcolor[HTML]{D8E9F7} \textbf{Heavy augmentation}\\\hline
+\begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+    \item Gaussian noise
+    \item Gaussian Blur
+    \item Brightness change
+    \item Resizing
+    \item JPEG compression
+    \item Normalization
+    \item Vertical flipping
+    \vspace{1em}
+\end{itemize}
+\\ \hline\end{tabular}
+\caption{Augmentation used for augmentation version of OSNet}
+\end{subtable}
+\hfill
+\begin{subtable}[T]{0.32\linewidth}
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{0.9\linewidth}|}\hline
+\cellcolor[HTML]{D8E9F7} \textbf{Name 3}\\\hline
+\begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+    \item Normalization
+    \vspace{11em}
+    \vspace{1mm}
+\end{itemize}
+\\ \hline\end{tabular}
+\caption{Augmentation used for validation and test sets}
+\end{subtable}
+
+\caption{The three different augmentations pipelines}
+\label{tab:three_subtables}
+\end{table}
+
+\noindent As described in \ref{outofdistributiontest}, the training data have likely already been compressed, making the affect of further compression unknown. 
+
+\section{Implementation of OSNet}
+Note: vi bruger x1 modellen, som er den største. 
+The architecture of the ReID model that is implemented is the same as described in Section \ref{lab:methodreid}.  The \ac{OSNet} implementation is based on the Torchreid libary, which comes with a pretrained OSNet model. However, to ensure full control over the training process and to 
+
+
+
+
+
+Husk at beskriv træning og test dataset, altså hvilke vi bruger.
+
+
+
+
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}\hline
+         \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Value}\\\hline
+         Nos. Images &  x\\\hline
+         Nos. epochs &  x\\\hline
+         Batch Size &  64 \\\hline
+         Optimizer &  SGD \\\hline
+         Learning Rate & 32 \\\hline
+         Learning Rate Scheduler &  x\\
+         \hline
+    \end{tabular}
+    \caption{The training hyperparameters and their value for training the OSNet.}
+    \label{tab:osnettrainingparameters}
+\end{table}
+
+
+\section{Implementation of EDSR}
+
+\section{Implementation of Sequential ReID and SR}
+To fully asses the impact of implementing a \ac{SR} system with \ac{ReID} a script was created to evaluate a sequential combination of the two models, where the data is first passed through the trained \ac{SR} model, whose output is then fed into the trained \ac{ReID} model. The efficiency of this setup is expressed with error metrics mAP and Rank-1, and can then be compared with other evaluation instances, such as the same \ac{ReID} model without the \ac{SR}. 
+\\\\
+This sequential evaluation script is made to test both \ac{ReID} alone and also in combination with \ac{SR}. It has been specifically made to fit only the OSNet and EDSR structure, as those are the main models used in this project. The dataloader discussed in \ref{imp_dataloading} has also been used in conjunction with this script, but mostly with a distinct emphasis on the evaluation part, such as query and gallery for the relevant \ac{ReID} datasets. 
+% Noget om forskellige sr scales prøvet. Batch sizes, num workers?
+% Baseline models tested (off the shelf måske?)
+% Den wrap ved "class IntPidCamDataset" kan også forklares hvis det er.
+% Noget om feature extraction måske?
+% Noget om alle de forskellige args?
+% 
+
+
+% Hvilket datasæt skal der lige med, dataloader.py bruger ikke duke mere?
+% Bruger vi dataloader.py fra annes mappe? Hvorfor er der så mange manglende filer som f.eks. "ourdata.json"?
+% Hvordan skal jeg lige skrive det her? Er det ligesom kap nedenunder?
+% Hvilke sr og ReID skal lige evalueres? Der er for mange i mapperne
+% 
+
+
+
+
+\section{Implementation of Joint ReID and SR}
+Since the \ac{SR} module is trained to upscale images, it is not specialized for the task of person \ac{ReID}. By combining the two modules end-to-end, the \ac{ReID} loss can flow back into the \ac{SR} module, forcing it to learn specific upscaling and cleaning operations which improve the final \ac{ReID} task. 
+\\\\
+To combine the two modules end to end, each model was downloaded from it’s respective github repository. The models were then wrapped in a function which builds the model with the configuration befitting it’s size. OSNet configuration can be seen in Table \ref{tab:osnet-config}, EDSR configuration can be seen in Table \ref{tab:edsr-config}, SwinIR configurations can be seen in Table X. 
+\begin{table}[H]
+    \centering
+    \caption{OSNet\_x1\_0 Configuration.}
+    \label{tab:osnet-config}
+    \begin{tabular}{|c|c|}\hline
+        \cellcolor[HTML]{D8E9F7} \textbf{Parameter} & \cellcolor[HTML]{D8E9F7} \textbf{Value} \\\hline
+        Number of classes (\texttt{num\_classes}) & \texttt{num\_classes} \\\hline
+        Block types (\texttt{blocks})             & [\texttt{OSBlock}, \texttt{OSBlock}, \texttt{OSBlock}] \\\hline
+        Layers per stage (\texttt{layers})        & [2, 2, 2] \\\hline
+        Channels per stage (\texttt{channels})    & [64, 256, 384, 512] \\\hline
+        Loss function (\texttt{loss})             & \texttt{loss parameter ('softmax' or 'triplet'} \\\hline
+    \end{tabular}
+\end{table}
+\begin{table}[H]
+    \centering
+    \caption{Baseline EDSR configuration.}
+    \label{tab:edsr-config}
+    \begin{tabular}{|c|c|}\hline
+        \cellcolor[HTML]{D8E9F7}\textbf{Parameter} & \cellcolor[HTML]{D8E9F7}\textbf{Value} \\\hline
+        Number of residual blocks (\texttt{n\_resblocks}) & 16 \\\hline
+        Number of feature maps (\texttt{n\_feats})        & 64 \\\hline
+        Upscaling factor (\texttt{scale})                 & [2] \\\hline
+        Number of input colors (\texttt{n\_colors})       & 3 \\\hline
+        Residual scaling factor (\texttt{res\_scale})     & 0.1 \\\hline
+    \end{tabular}
+\end{table}
+\noindent To allow for losses to backpropagate through both modules, a new class was created with a combined forward pass. The forward pass takes an image as input, forwards it through the \ac{SR} module first and then through the \ac{ReID} module, with the option of also returning the \ac{SR} output to increase operation transparency. The class also allows for each module to be initated with frozen weights, such that the possibility of the \ac{SR} module becoming a \ac{ReID} feature extractor is minimized. The frozen module can then be unfrozen with an unfreeze function.  
+
