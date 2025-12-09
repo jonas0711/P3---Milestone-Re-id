@@ -1,14 +1,8 @@
 \chapter{Experiments} \label{cha: experiments}
+In order to determine whether adding an SR module to the ReID model will add any notable value, several experiments are conducted to create a clear and fair method for comparison. In order to test if \ac{SR} is worth implementing in terms of adding extra parameters to the pipeline, it is first tested, if strong data augmentation can improve model performance in terms of generalization across different image scales and resolution. For that reason is both a baseline model and a model trained using strong augmentations firstly trained to determine the need for \ac{SR} implementation.
 
-In order to determine whether adding an SR module to the ReID model will add any notable value, several experiments are conducted to create a clear and fair method for comparison.
-
-\section{Baseline OSNet} \label{sec: baselineosnet}
-The OOD test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift in real-world deployment. To ensure a fair comparison, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on XXX. Flip augmentation is used to create more data. 
-
-\subsection{OOD Test on the Baseline OSNet} \label{sec: oodtestny}
-
+\section{OOD Test} \label{sec: oodtestny}
 Since the implemented person \acs{ReID} model is trained on the Market-1501 dataset, a new OOD test must be conducted to fulfill this project's definition of an OOD test, as described in Section \ref{outofdistributiontest}. This OOD test is conducted using the dataset DukeMTMC-ReID under three different conditions, as well as the dataset iLIDS-VID which is unknown to OSNet. They are presented in Table \ref{tab:newood_conditions}.
-
 \begin{table}[H]
 \centering
 \renewcommand{\arraystretch}{1.2}
@@ -45,14 +39,282 @@ iLIDS-VID \\
 \caption{Overview of the datasets used to evaluate OSNet under degraded and out-of-distribution conditions.}
 \label{tab:newood_conditions}
 \end{table}
+All models presented in this Chapter will be finally tested and compared using this test.
 
+\section{Baseline OSNet} \label{sec: baselineosnet}
+The OOD test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift in real-world deployment. To ensure a fair comparison with the augmentation trained model, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on DukeMTMC-ReID and ILIDS-vid. The light training augmentation pipeline, presented in \ref{tab:three_subtables}, is used for training of the baseline model. 
+\\\\
+While other training setups have been tried, the final model is trained with a batch size of 64 and a learning rate of \(1e-3\). The learning rate is reduced by a factor of 0.1 at epochs 100, 175, and 225 using a multi-step scheduler.
+
+The results of the OOD show, that the model fail XXXXX
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5&
+Scale 0.25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & 100 & Mild 75& Medium 50&
+Heavy 25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{mAP}    & \\ \hline
+\textbf{Rank-1} & \\ \hline
+\textbf{Rank-5} & \\ \hline
+\textbf{Rank-10}& \\ \hline
+\textbf{Rank-20}& \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
 
 \section{Robust OSNet} \label{sec: robustosnet}
-This experiment explores if training the person \acs{ReID} model on heavily augmentated data will produce a more robust model than the off-the-shelf baseline presented in Setion \ref{sec: baselineosnet}. The applied data augmentation is presented in Section \ref{sec: dataaugmentation}. 
+This experiment explores if training the person \acs{ReID} model on heavily augmented data will produce a more robust model than the baseline presented in Section \ref{sec: baselineosnet}. The applied data augmentation is presented in Table \ref{tab:three_subtables}. The model is trained same way as the baseline model to ensure fair comparison.
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5&
+Scale 0.25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
 
-\section{SR + Baseline OSNet} \label{sec: sr+baseline}
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & 100 & Mild 75& Medium 50&
+Heavy 25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{mAP}    & \\ \hline
+\textbf{Rank-1} & \\ \hline
+\textbf{Rank-5} & \\ \hline
+\textbf{Rank-10}& \\ \hline
+\textbf{Rank-20}& \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\section{EDSR and Baseline OSNet} \label{sec: sr+baseline}
 Based on the results presented in Section \ref{sec: robustosnet}, the problem of images being out of distribution is not adequately solved. Therefore, a second experiment is conducted. The baseline model presented in Section \ref{sec: baselineosnet} is combined with a chosen SR model. 
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5&
+Scale 0.25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
 
-\section{Joint SR and Baseline OSNet}
-The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the OSNet baseline model with SR in a joint end-to-end framework. 
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & 100 & Mild 75& Medium 50&
+Heavy 25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{mAP}    & \\ \hline
+\textbf{Rank-1} & \\ \hline
+\textbf{Rank-5} & \\ \hline
+\textbf{Rank-10}& \\ \hline
+\textbf{Rank-20}& \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\section{Joint EDSR and Baseline OSNet}
+The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the OSNet baseline model with EDSR in a joint end-to-end framework. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5&
+Scale 0.25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & 100 & Mild 75& Medium 50&
+Heavy 25\\ \hline
+\textbf{mAP}    & & & & \\ \hline
+\textbf{Rank-1} & & & & \\ \hline
+\textbf{Rank-5} & & & & \\ \hline
+\textbf{Rank-10}& & & & \\ \hline
+\textbf{Rank-20}& & & & \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{mAP}    & \\ \hline
+\textbf{Rank-1} & \\ \hline
+\textbf{Rank-5} & \\ \hline
+\textbf{Rank-10}& \\ \hline
+\textbf{Rank-20}& \\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}

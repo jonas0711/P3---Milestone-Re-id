@@ -3,11 +3,11 @@ This chapter will present and analyze the technical foundations of the problems 
 
 \section{Surveillance Equipment and Footage}
 \label{subsec:Surveillance_equipment_n_footage}
-As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. To tackle the project proposal regarding improving \ac{ReID}, it is beneficial to first understand the challenges of using surveillance footage as a data source.
+As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. To tackle the project proposal regarding improving person \ac{ReID}, it is beneficial to first understand the challenges of using surveillance footage as a data source.
  
 \subsection{Camera Technology}
 \label{subsubsec:How_cameras_work}
-Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement. The first step of creating these images is by focusing the light through a lens and onto an image sensor that is made up of millions of photosites (also known as pixels) which measure the intensity of light in the given frame. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
+Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement. The first step of creating these images is by focusing the light through a lens and onto an image sensor that is made up of millions of photosites which measure the intensity of light in the given frame. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
 \\\\
 There are many underlying elements that happens as well, which can differ in each camera. For example, digital processing like white balance correction, compression and exposure adjustments are used to manipulate the images into a desired look in the final image or video file \cite{unc_camera_pipeline}.
 An in-depth example of this process can be seen in Figure \ref{fig:camera_pipeline} were a complete pipeline of such a case is shown to highlight the many different components that impact the output of the camera.
@@ -107,7 +107,7 @@ Section \ref{subsec:Surveillance_equipment_n_footage} states the complications t
 \\\\
 The images might further be of inherently poor quality due to surveillance cameras typically covering a large area, have lower resolution, and compression due to storage limitations. Each person only occupies a small part of the whole image, leaving limited information available for analysis by the system. 
 \\\\
-In summary, the main challenge of a \ac{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the pre-processing step before the network performs embedding, with techniques such as \ac{SR} showing the potential to improve quality (Kan projektforslag bruges som kilde her?). 
+In summary, the main challenge of a \ac{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the pre-processing step before the network performs embedding, with techniques such as \ac{SR} showing the potential to improve quality 
 
 \subsection{Related Works}\label{subsec:reid_reworks}
 This related works section will focus on presenting different types of person \ac{ReID} networks, to get an overview of the field of work. 
@@ -218,10 +218,10 @@ iLIDS-VID \\
 
 \noindent Each pair is of the same individual captured by a different camera, structured such that one images serves as the query  and the other as the gallery sample. An example pair of gallery and query from the selected images is shown in Figure \ref{fig:test_images_outofdistribution}. All image names are listed in Appendix \ref{app:out-of-dis}, sorted into query and gallery.
 
-\begin{figure} [H]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{out_of_distribution_testimages.png}
-    \caption{Image examples from the test. The first row consists of gallery images, while the second row consists query images.}
+    \caption{Query images showing the different OOD configurations.}
     \label{fig:test_images_outofdistribution}
 \end{figure}
 
@@ -252,11 +252,11 @@ As the resolution is reduced, performance declines, most visible in the drop in 
 \rowcolor[HTML]{D8E9F7}
 {} & {Scale 1 (128x64)} & {Scale 0.75 (96x48)} & {Scale 0.5 (64x32)} &
 {Scale 0.25 (32x16)}\\ \hline
-\textbf{mAP}    & 63.4\%  & 57.5\%  & 46.4\% & 49.8\% \\ \hline
-\textbf{Rank-1} & 52.0\%  & 48.0\%  & 36.0\% & 40.0\% \\ \hline
-\textbf{Rank-5} & 76.0\%  & 64.0\%  & 72.0\% & 68.0\% \\ \hline
-\textbf{Rank-10}& 84.0\%  & 72.0\%  & 84.0\% & 72.0\% \\ \hline
-\textbf{Rank-20}& 100.0\% & 96.0\%  & 96.0\% & 96.0\% \\ \hline
+\textbf{mAP}    & 63.4\%  & 63.4\%  & 58.8\% & 44.4\% \\ \hline
+\textbf{Rank-1} & 52.0\%  & 52.0\%  & 44.0\% & 28.0\% \\ \hline
+\textbf{Rank-5} & 76.0\%  & 76.0\%  & 80.0\% & 56.0\% \\ \hline
+\textbf{Rank-10}& 84.0\%  & 84.0\%  & 88.0\% & 76.0\% \\ \hline
+\textbf{Rank-20}& 100.0\% & 100.0\%  & 96.0\% & 96.0\% \\ \hline
 \end{tabular}
 \caption{Scale test of OSNet on 25 pairs from Market-1501 dataset.}
 \label{tab:scaletest_result}
@@ -283,10 +283,10 @@ Applying JPEG compression to both the query and gallery affects the performance 
 \rowcolor[HTML]{D8E9F7}
 {} & 100 & Mild 75& Medium 50&
 Heavy 25\\ \hline
-\textbf{mAP}    & 63.4\%& 63.4\%& 59.2\%& 53.9\%\\ \hline
+\textbf{mAP}    & 63.4\%& 63.4\%& 59.3\%& 57.6\%\\ \hline
 \textbf{Rank-1} & 52.0\%& 52.0\%& 44.0\%& 44.0\%\\ \hline
-\textbf{Rank-5} & 76.0\%& 76.0\%& 80.0\%& 68.0\%             \\ \hline
-\textbf{Rank-10}& 84.0\%& 84.0\%& 92.0\%& 88.0\%\\ \hline
+\textbf{Rank-5} & 76.0\%& 76.0\%& 76.0\%& 72.0\%\\ \hline
+\textbf{Rank-10}& 84.0\%& 84.0\%& 88.0\%& 96.0\%\\ \hline
 \textbf{Rank-20}& 100.0\%& 100.0\%& 100.0\%& 100.0\%\\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
@@ -294,35 +294,34 @@ Heavy 25\\ \hline
 \end{table}
 
 
-\subsubsection{Abnormal and Unseen Data Test}
+\subsubsection{Unseen Data Test}
 
-Both the abnormal image subset and the subset of new images result in substantially lower mAP and Rank-1 to Rank-20 scores, compared to the unmodified images, as presented in Table \ref{tab:othertest_result}. This outcome is expected, as the abnormal samples only contain cropped or partially visible individuals, making matching significantly more difficult. Additionally, the iLIDS-VID dataset exclusively contains indoor scenes, whereas datasets used for training and evaluation consists primarily of outdoor images. This shift in domain is likely contributing to the reduced performance on the iLIDS-VID subset. 
+The subset of new images results in substantially lower mAP and Rank-1 to Rank-20 scores, compared to the unmodified images, as presented in Table \ref{tab:othertest_result}. This outcome is expected, as the iLIDS-VID dataset exclusively contains indoor scenes, whereas datasets used for training and evaluation consists primarily of outdoor images. This shift in domain is likely contributing to the reduced performance on the iLIDS-VID subset. 
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|>{\centering\arraybackslash}
-    p{0.17\linewidth} 
-    |>{\centering\arraybackslash}p{0.17\linewidth} 
+\begin{tabular}
+    {|>{\centering\arraybackslash}p{0.17\linewidth} 
     |>{\centering\arraybackslash}p{0.17\linewidth} 
     |>{\centering\arraybackslash}p{0.17\linewidth} 
     |}
 \hline
-\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Abnormal and Unseen Data}}\\\hline
+\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Abnormal and Unseen Data}}\\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & Unmodifed (Market-1501)& Abnormal (Market-1501)& New dataset (iLIDS-VID)\\ \hline
-\textbf{mAP}    & 63.4\%& 45.0\%& 35.1\%\\ \hline
-\textbf{Rank-1} & 52.0\%& 32.0\%& 16.0\%\\ \hline
-\textbf{Rank-5} & 76.0\%& 60.0\%& 60.0\%\\ \hline
-\textbf{Rank-10}& 84.0\%& 72.0\%& 76.0\%\\ \hline
-\textbf{Rank-20}& 100.0\%& 84.0\%& 96.0\%\\ \hline
+{} & Unmodifed (Market-1501)& New dataset (iLIDS-VID)\\ \hline
+\textbf{mAP}    & 63.4\%& 35.1\%\\ \hline
+\textbf{Rank-1} & 52.0\%& 16.0\%\\ \hline
+\textbf{Rank-5} & 76.0\%& 60.0\%\\ \hline
+\textbf{Rank-10}& 84.0\%& 76.0\%\\ \hline
+\textbf{Rank-20}& 100.0\%& 96.0\%\\ \hline
 \end{tabular}
-\caption{Abnormal and unseen data test of OSNet on 25 pairs from Market-1501 dataset, and iLIDS-VID dataset.}
+\caption{Unseen data test of OSNet on 25 pairs from iLIDS-VID dataset.}
 \label{tab:othertest_result}
 \end{table}
 
 \subsubsection{Summary}
 
-Overall, these results show a clear reduction in performance when OSNet is evaluated on data that is different than what it was primarily trained on. This highlights challenges with generalization, particularly regarding new data, person visibility/occlusion, scale, and resolution. The last two are areas that may improve with integration of \ac{SR}.
+Overall, these results show a clear reduction in performance when OSNet is evaluated on data that is different than what it was primarily trained on. This highlights challenges with generalization, particularly regarding new data, scale, and resolution. The last two are areas that may improve with integration of \ac{SR}.
 
 \section{Super-Resolution}
 \label{sec:SuperResolution}
@@ -358,10 +357,17 @@ To train a \ac{SR} network, pairs of \ac{HR} and \ac{LR} images of the same scen
 Another approach to achieve pairs of \ac{HR} and \ac{LR} images is to capture the same scene in different scales using different lenses. This method gives a real-world representation of the motive in both \ac{HR} and \ac{LR}, without introducing bias in the data through artificial down-sampling \cite{Cai2019RealSR,Wei2020DRealSR}. Further noise can be added through varying blur kernels, noise models, and compression distortions to create diverse training data that better simulate real camera pipelines \cite{Wang2021RealESRGAN}.
 
 \subsection{Perception–Distortion Trade-off and Evaluation}
+\label{subsec:perception-distortion-tradeoff}
 
-A central design principle for \ac{SR} is the perception–distortion trade-off, which establishes that minimizing distortion metrics such as \ac{PSNR} and \ac{SSIM} while maximizing perceptual quality cannot be achieved simultaneously \cite{Blau2018PerceptionDistortion}. Methods prioritizing distortion produce smooth outputs that minimize pixel-wise error but appear blurry. Methods prioritizing perceptual quality introduce realistic high-frequency details that satisfy the human eye but result in higher distortion scores.
-\\\\
-For \ac{ReID} applications, this presents a critical consideration. If \ac{SR} introduces perceptual improvements through hallucinated details that do not preserve discriminative features relevant to the \ac{ReID} model, performance may degrade despite improved visual quality \cite{Zhang2018LPIPS,Wang2004SSIM}.
+A central design principle for \ac{SR} is the perception–distortion trade-off, which establishes that minimizing distortion metrics such as \ac{PSNR} and \ac{SSIM} while maximizing perceptual quality cannot be achieved simultaneously \cite{Blau2018PerceptionDistortion}. Methods prioritizing distortion produce smooth outputs that minimize pixel-wise error but appear blurry. Methods prioritizing perceptual quality introduce realistic high-frequency details that satisfy the human eye but result in higher distortion scores. In simple terms, this trade-off can be defined as being between a picture which \textit{looks} real, or one which, ideally, only retains real information. \ac{GAN} models in particular excel at achieving high visual quality, which comes at the cost of low reconstruction accuracy. Figure \ref{fig:tradeoff-graph} represents this trade-off on a graph, showing how a model cannot excel at both simultaneously, with perfect quality without distortion being in an unachievable region. This is supported by the evaluation of 16 \ac{SR} algorithms, found in Appendix \ref{app:perception-distortion-graphs}, comparing their perception and distortion across 6 graphs. Based on these graphs, two clear conclusions can be drawn. The first is that one distinct area remains consistently out of reach. The second is that \ac{GAN} models systematically hover around the high distortion and high perception quadrant. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{perception_distortion_tradeoff.png}
+    \caption{Perception-distortion graph showing the possible and impossible areas. Figure taken from \cite{Blau2018PerceptionDistortion}.}
+    \label{fig:tradeoff-graph}
+\end{figure}
+\noindent For \ac{ReID} applications, this trade-off presents a critical consideration. If \ac{SR} introduces perceptual improvements through hallucinated details that do not preserve discriminative features relevant to the \ac{ReID} model, performance may degrade despite improved visual quality \cite{Zhang2018LPIPS,Wang2004SSIM}. 
+
 
 %mulige kilder til overordnet forklaring
 % https://www.e-consystems.com/blog/camera/technology/what-is-super-resolution/
@@ -378,16 +384,22 @@ From 2014, this paper proposes a method for single image \ac{SR} called \ac{SRCN
 \\\\
 Even though this method achieved superior performance to the state-of-the-art methods, it might not be a good idea to apply the \ac{SRCNN} to a \ac{ReID} problem. This is because \ac{SRCNN} does not know that the goal is \ac{ReID} and might distort useful features in the process of enhancing the image. An ideal \ac{SR} model for \ac{ReID} would enhance features useful for recognition, for example the edges around clothes\cite{SRCNN}. 
 
+\subsubsection{Enhanced Deep Residual Networks for Single Image Super-Resolution}
+A breakthrough paper from 2017. Built upon conventional residual networks by removing modules deemed to be unnecessary, and further improved performance by expanding model size and stabilizing training. The paper produced two models, EDSR and MDSR respectively. The former, \textbf{E}Ehanced \textbf{D}eep \textbf{S}uper-\textbf{R}esolution, is a single-scale model, and the later, \textbf{M}ulti-scale \textbf{D}eep \textbf{S}uper-\textbf{R}esolution, is a smaller model with fewer parameters, which achieved comparable performance to the single-scale architecture. EDSR also appears in \cite{Blau2018PerceptionDistortion}, and can be found in the graphs in Appendix \ref{app:perception-distortion-graphs}, from which EDSR consistently lands ahead of the other networks, when prioritizing low distortion.
+\\\\
+While the networks achieved state-of-the-art results at the time of its release, it has since been outperformed by modern architecture. The low distortion is useful for certain applications, but the low perception makes it undesirable for tasks where high visual acuity is intended. 
+
 \subsubsection{Second-order Attention Network for Single Image Super-Resolution}
 This paper from 2019 proposes a method for single image super resolution called Second-order Attention Network (SAN) \cite{SAN}. They developed a novel trainable second-order channel attention (SOCA) module for rescaling the channel-wise features to get more discriminative representations. A non-locally enhanced residual group (NLRG) structure incorporates non-local operations, that allow the network to gather information from distant regions of the image. This helps the model learn more detailed features. The model is evaluated through PSNR and SSIM metrics, against 11 state-of-the-art CNN-based \ac{SR} methods. 
 \\\\
 Despite SAN outperforming state-of-the-art results, the model is computationally expensive due to the SOCA module that introduces extra matrix operations to learn covariance relationships, and the non-local modules. 
 
 \subsection{Takeaways}
-The SRCNN paper demonstrated that deep learning could successfully learn mapping directly between low- and high-resolution images. Later research, specifically the SAN paper, improved on this by introducing attention-based techniques that model feature correlations and global image context. The two methods both evaluate their results through PSNR and SSIM metrics. This leaves the important takeaways as:
+The SRCNN paper demonstrated that deep learning could successfully learn mapping directly between low- and high-resolution images. The EDSR showed that removing unnecessary layers, along with deepening the model and stabilizing training, improved performance significantly. Later research, specifically the SAN paper, further improved the task by introducing attention-based techniques that model feature correlations and global image context. The three methods all evaluate their results through PSNR and SSIM metrics. This leaves the important takeaways as:
 
 \begin{itemize}
     \item Off-the-shelf \ac{SR} models should not be directly applied to a person \ac{ReID} problem.
+    \item Critically evaluating the effect and necessity of architectural decisions is vital.  
     \item Attention-based techniques improve feature representation and image details. 
     \item Evaluation is done using PSNR and SSIM metrics.
 \end{itemize}
@@ -417,9 +429,5 @@ Both papers address the challenge of person \ac{ReID} under different image reso
      \item The two methods use adaptive or task specific \ac{SR} modules. 
  \end{itemize} 
 
-\section{Overgang, vinkel}
-MANGLER  
-\\\\
-Vinkel, bare tanker: Deployed proof-of-concept person re-id system, combined with super res to enhance performance, because of bad image quality. This is because of compression (?) or else surveillance would be very expensive. A solution could therefore be super res. Focus is also generalizability. The models proposed by the papers we have read are not very generalizable, - check our test. It would be beneficial to create a model that can actually generalize - this gives it value in deployment. 
-\\\\
-Overgang til næste kapitel. Hvad er vores vinkel RIS OP. Generalisere til real-world deployment? 
+\section{Summary}
+This chapter explored the technical aspects regarding the person \acs{ReID} task in surveillance settings, highlighting both the capabilities and the limitations. The analysis shows that factors such as poor image quality, which can be caused by environment, equipment, and resolutions, pose a challenge for person \acs{ReID} systems. While approaches such as \acs{OSNet} have made advances in feature extraction methods, the performance degrades when confronted with low-resolution and out-of-distribution data. \acs{SR} techniques such as EDSR offer a promising solution to these issues, however integrating them effectively into a person \acs{ReID} system remains open for improvements.  

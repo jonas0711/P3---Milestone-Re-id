@@ -1,1 +1,47 @@
 \chapter{Discussion} \label{cha: discussion}
+
+\section{Data}
+
+
+\section{Experiments}
+- Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
+- Hvorfor tror vi resultaterne bliver som de gør? eg. hvorfor er det ikke nok bare at træne en robust osnet. 
+- Hvorfor er det bedre at træne joint?
+
+\section{Results}
+
+\subsection{OSNet}
+Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? 
+
+\subsubsection{Baseline}
+Opnåede vi det vi ville med baseline, er den lavet så den er fair til at bruge til sammenligning?
+
+\subsubsection{Robust}
+
+\subsection{EDSR}
+Var EDSR et godt valg? 
+
+\subsubsection{EDSR}
+
+\subsection{EDSR and Baseline}
+
+\subsection{Joint EDSR and Baseline}
+HVorfor implementeret  på den måde - hvad med auxilary loss?
+
+\section{Deployment}
+Er cloud deployment den optimale løsning for vores system? Hvad kunne man ellers have gjort?
+\\\\
+The choice to deploy the system in a cloud, is based on ethical considerations. If the system is incorporated directly into the local hardware, it would be implied that the captured footage is constantly being analyzed in real time. Such a design effectively normalizes monitoring the citizens at all times, which aligns with the definition of a surveillance state. Furthermore, it becomes more difficult to regulate and monitor how and whom uses the system, when it is embedded in hardware, which increases the risk of misuse. 
+\\\\
+On the contrary, if the system is deployed in the cloud, it remains inactive until invoked for a specific purpose. This ensures that footage is not automatically processed unless it is necessary and that access can be controlled via authentication and logs. 
+\\\\
+However, cloud deployment is not the only was
+ 
+
+
+\section{Ethical Considerations}
+Hvilke ethical constrains har vi haft på vores system? 
+
+
+\section{Future Work}
+Hvad mangler det for at blive realiseret system?

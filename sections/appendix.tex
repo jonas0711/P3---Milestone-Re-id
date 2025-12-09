@@ -91,3 +91,13 @@ cam2\_person316.png & cam2\_person294.png \\
 \caption{Query and gallery image pairs from the iLIDS-VID dataset. Each pair represents the same identity observed by two different cameras.}
 \label{tab:custom_camera_pairs}
 \end{table}
+
+\section{Graphs comparing perception-distortion tradeoff of SR models}
+\label{app:perception-distortion-graphs}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{tradeoff_model_comparison.png}
+    \caption{Perception-distortion evaluation of SR algorithms}
+    \label{fig:trade_model_comparison}
+\end{figure}
+Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer Michaeli \cite{Blau2018PerceptionDistortion}. 16 models were plotted against each other in 6 different graphs. All graphs had NIQE for measuring perception, and 6 different metrics were used to evaluate distortion.
