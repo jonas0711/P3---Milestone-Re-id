@@ -155,20 +155,109 @@ This adaptive validation strategy allows for more frequent monitoring as the tra
 
 
 \section{Implementation of EDSR}
-% henvis gerne til related works om SR hvor EDSR nævnes, eller "Perception-distortion trade-off", samt dens appendix. Ud fra det kan vi bruge argumentet at EDSR har meget lav distortion, sammenlignet med andet, og derfor giver et godt udgangspunkt i forlængelse af ReID.
+\label{sec:edsr_implementation}
+
+The \ac{EDSR} model was selected for the \ac{SR} module based on its low distortion characteristics, as discussed in Section \ref{sec:sr_methods}. This section describes the implementation details, including model architecture, data loading, augmentation strategies, and training procedures.
+
+\subsection{Model Architecture}
+The baseline \ac{EDSR} configuration was used, which provides a balance between computational efficiency and reconstruction quality. The architecture consists of an initial convolutional layer that expands the input from 3 RGB channels to the feature space, followed by a stack of residual blocks, and finally an upsampling module that produces the super-resolved output. Table \ref{tab:edsr-architecture} summarizes the architectural parameters.
+
 \begin{table}[H]
     \centering
-    \caption{Baseline EDSR configuration.}
-    \label{tab:edsr-config}
+    \caption{\acs{EDSR} baseline architecture configuration.}
+    \label{tab:edsr-architecture}
     \begin{tabular}{|c|c|}\hline
         \cellcolor[HTML]{D8E9F7}\textbf{Parameter} & \cellcolor[HTML]{D8E9F7}\textbf{Value} \\\hline
-        No. Residual blocks (\texttt{n\_resblocks}) & 16 \\\hline
-        No. Feature maps (\texttt{n\_feats})        & 64 \\\hline
-        Upscaling factor (\texttt{scale})                 & [2] \\\hline
-        No. Input colors (\texttt{n\_colors})       & 3 \\\hline
-        Residual scaling factor (\texttt{res\_scale})     & 0.1 \\\hline
+        Number of residual blocks (\texttt{n\_blocks}) & 16 \\\hline
+        Number of feature maps (\texttt{n\_feats}) & 64 \\\hline
+        Upscaling factor (\texttt{scale}) & 2 \\\hline
+        Input channels (\texttt{in\_ch}) & 3 \\\hline
+        Output channels (\texttt{out\_ch}) & 3 \\\hline
+        Residual scaling factor (\texttt{res\_scale}) & 1.0 \\\hline
     \end{tabular}
 \end{table}
+
+\noindent Each residual block consists of two 3×3 convolutional layers with ReLU activation between them. The residual scaling factor multiplies the output of each residual block before adding it to the skip connection, which helps stabilize training in deeper networks. For the baseline configuration with 64 feature maps, a residual scaling factor of 1.0 was used, as scaling is primarily needed for wider networks with 256 feature maps.
+
+The upsampling module uses a sub-pixel convolution approach (PixelShuffle), where a convolutional layer first expands the feature maps by a factor of $\text{scale}^2$, and the PixelShuffle operation then rearranges these features into the spatially upscaled output. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
+
+\subsection{Dataset and Data Loading}
+Two dataset classes were implemented to handle different data formats. The \texttt{SRDataset} class loads paired \ac{LR} and \ac{HR} images from separate directories, matching files by sorted order. This class was used for the RELLISUR dataset, where cropped person images were prepared at 64×128 pixels (\ac{LR}) and 128×256 pixels (\ac{HR}).
+
+The \texttt{DIV2KDataset} class handles the \ac{DIV2K} dataset format, where \ac{LR} images follow the naming convention \texttt{0001x2.png} corresponding to \ac{HR} images named \texttt{0001.png}. This class automatically matches \ac{LR} and \ac{HR} pairs based on filename parsing.
+
+Both dataset classes support synchronized augmentation through a \texttt{use\_sync\_aug} parameter. When enabled, the same random seed is used for both \ac{LR} and \ac{HR} images, ensuring that geometric transformations such as horizontal flipping are applied consistently to both images in a pair.
+
+\subsection{Data Augmentation}
+A set of data augmentation transforms was implemented to improve model robustness during training. The augmentation pipeline for \ac{SR} training included the following transforms:
+
+\begin{table}[H]
+    \centering
+    \caption{Data augmentation transforms for \acs{SR} training.}
+    \label{tab:sr-augmentation}
+    \begin{tabular}{|l|c|l|}\hline
+        \cellcolor[HTML]{D8E9F7}\textbf{Transform} & \cellcolor[HTML]{D8E9F7}\textbf{Probability} & \cellcolor[HTML]{D8E9F7}\textbf{Parameters} \\\hline
+        Horizontal Flip & 0.5 & - \\\hline
+        Brightness Change & 0.6 & Factor range: [0.3, 1.0] \\\hline
+        Gaussian Noise & 0.5 & Mean: 0.0, Std: 0.1 \\\hline
+        Gaussian Blur & 0.5 & Kernel size: 7, Sigma: [0.1, 2.0] \\\hline
+    \end{tabular}
+\end{table}
+
+\noindent Horizontal flip and brightness change were applied with synchronized random states between \ac{LR} and \ac{HR} images to maintain correspondence. Gaussian noise and Gaussian blur were applied independently to simulate realistic degradations. All images were normalized to the range [-1, 1] using mean and standard deviation of 0.5 per channel.
+
+For validation, no augmentation was applied. Images were converted to tensors and normalized using the same normalization parameters as training.
+
+\subsection{Training Configuration}
+Two training strategies were employed: training from scratch on RELLISUR, followed by finetuning the best model on \ac{DIV2K}.
+
+\subsubsection{Training from Scratch on RELLISUR}
+The model was first trained from scratch on cropped RELLISUR data with random weight initialization. The training configuration used an Adam optimizer with $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$. The learning rate was set to $1 \times 10^{-4}$ and kept constant throughout training. The best checkpoint was selected based on the highest validation \ac{PSNR}.
+
+\subsubsection{Finetuning on DIV2K}
+The best checkpoint from the scratch training (epoch 113) was used as the starting point for finetuning on the \ac{DIV2K} dataset. This finetuning step aimed to improve generalization by exposing the model to a more diverse set of high-quality images with varied content. For finetuning, the learning rate was reduced to $5 \times 10^{-6}$ to preserve the learned RELLISUR features while allowing adaptation to the broader \ac{DIV2K} distribution. The same Adam optimizer configuration was used.
+
+\subsubsection{Loss Function}
+The L1 loss (mean absolute error) was used as the training objective:
+\begin{equation}
+    \mathcal{L}_{L1} = \frac{1}{N} \sum_{i=1}^{N} |SR_i - HR_i|
+\end{equation}
+where $SR_i$ is the super-resolved output and $HR_i$ is the ground truth \ac{HR} image. L1 loss was chosen over L2 loss (mean squared error) as it produces sharper results and is less sensitive to outliers.
+
+\subsubsection{Model Selection}
+The best model checkpoint was selected based on the highest validation \ac{PSNR} rather than the lowest validation loss. This selection criterion was chosen to prioritize reconstruction quality as measured by \ac{PSNR}, which directly reflects the pixel-level accuracy of the super-resolved images.
+
+\subsection{Training Hyperparameters}
+Table \ref{tab:edsr-hyperparameters} summarizes the complete set of training hyperparameters for both training stages.
+
+\begin{table}[H]
+    \centering
+    \caption{Training hyperparameters for \acs{EDSR}.}
+    \label{tab:edsr-hyperparameters}
+    \begin{tabular}{|l|c|c|}\hline
+        \cellcolor[HTML]{D8E9F7}\textbf{Hyperparameter} & \cellcolor[HTML]{D8E9F7}\textbf{Scratch (RELLISUR)} & \cellcolor[HTML]{D8E9F7}\textbf{Finetuned (DIV2K)} \\\hline
+        Training Dataset & RELLISUR Cropped & DIV2K \\\hline
+        Initial Weights & Random & Best RELLISUR checkpoint \\\hline
+        Number of Epochs & 200 & 100 \\\hline
+        Batch Size & 16 & 16 \\\hline
+        Optimizer & Adam & Adam \\\hline
+        Learning Rate & $1 \times 10^{-4}$ & $5 \times 10^{-6}$ \\\hline
+        $\beta_1$, $\beta_2$ & 0.9, 0.999 & 0.9, 0.999 \\\hline
+        Loss Function & L1 Loss & L1 Loss \\\hline
+        LR Input Size & 64 × 128 & 64 × 128 \\\hline
+        HR Output Size & 128 × 256 & 128 × 256 \\\hline
+        Data Augmentation & Synchronized & Synchronized \\\hline
+        Model Selection & Best Val PSNR & Best Val PSNR \\\hline
+    \end{tabular}
+\end{table}
+
+\subsection{Validation Strategy}
+Validation was performed at the end of each epoch using the RELLISUR validation split. The validation pipeline computed both validation loss (L1) and validation \ac{PSNR} to monitor training progress. \ac{PSNR} was calculated by first denormalizing the images from [-1, 1] to [0, 1], then computing the mean squared error between super-resolved and ground truth images:
+\begin{equation}
+    \text{PSNR} = 20 \cdot \log_{10}\left(\frac{1}{\sqrt{\text{MSE}}}\right)
+\end{equation}
+Model checkpoints were saved every 10 epochs, and the best model based on validation \ac{PSNR} was saved separately for final evaluation.
+
 
 \section{Implementation of Sequential ReID and SR}
 To fully asses the impact of implementing a \ac{SR} system with \ac{ReID} a script was created to evaluate a sequential combination of the two models, where the data is first passed through the trained \ac{SR} model, whose output is then fed into the trained \ac{ReID} model. The efficiency of this setup is expressed with error metrics mAP and Rank-1, and can then be compared with other evaluation instances, such as the same \ac{ReID} model without the \ac{SR}. 

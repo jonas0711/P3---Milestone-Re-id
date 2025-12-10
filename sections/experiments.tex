@@ -250,6 +250,36 @@ Heavy 25\\ \hline
 \label{tab:compressiontest_result}
 \end{table}
 
+
+Based on the results presented in Section \ref{sec: robustosnet}, the problem of images being out of distribution is not adequately solved through data augmentation alone. Therefore, a second experiment was conducted where the baseline model presented in Section \ref{sec: baselineosnet} was combined with a \ac{SR} model. Before evaluating the sequential pipeline, the \ac{SR} module itself was trained and validated to ensure adequate reconstruction quality.
+
+\subsection{EDSR Training}
+Two training strategies were explored for the \ac{EDSR} model: training from scratch on RELLISUR data and finetuning a model pretrained on \ac{DIV2K}. Both models used the baseline configuration described in Section \ref{sec:edsr_implementation}.
+
+\subsubsection{Training from Scratch}
+The model trained from scratch on cropped RELLISUR data showed a typical learning progression. Training loss started at approximately 0.12 and decreased rapidly to around 0.095 within the first 25 epochs. The loss continued to decrease gradually and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved to approximately 25.3 dB within the first 25 epochs. The highest validation \ac{PSNR} of 25.72 dB was achieved at epoch 113. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, indicating that the model had converged.
+
+\subsubsection{Finetuning from DIV2K}
+The model pretrained on \ac{DIV2K} and finetuned on cropped RELLISUR data exhibited a different training pattern. Training loss started at approximately 0.078 and decreased only marginally to around 0.073 over the course of training. This low initial loss indicated that the pretrained weights already captured general \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.20 dB. This behavior suggested that continued training on the domain-specific data caused slight overfitting to the training distribution. A reduced learning rate of $5 \times 10^{-6}$ was used to prevent catastrophic forgetting of the pretrained features.
+
+\subsubsection{Comparison of Training Strategies}
+Figure \ref{fig:edsr_comparison} compares the training curves of both \ac{EDSR} models. The scratch model achieved higher validation \ac{PSNR} (25.72 dB versus 25.49 dB) but the finetuned model maintained lower training loss throughout. This apparent contradiction is explained by the different training distributions: the scratch model specialized heavily on the cropped validation images, while the finetuned model retained broader generalization capabilities from \ac{DIV2K} pretraining. The implications of this difference became evident when evaluating on the out-of-distribution test set, as presented in Chapter \ref{cha: results}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/images/cropped_models_comparison.png}
+    \caption{Comparison of training curves for \ac{EDSR} trained from scratch (blue) and \ac{EDSR} pretrained on \ac{DIV2K} and finetuned (green). Top left: Training loss. Top right: Validation loss. Bottom left: Validation \ac{PSNR}. Bottom right: Learning rate schedule.}
+    \label{fig:edsr_comparison}
+\end{figure}
+
+\subsection{SwinIR Baseline}
+In addition to the trained \ac{EDSR} models, three pretrained SwinIR models were evaluated without finetuning to establish a baseline comparison with a state-of-the-art transformer-based \ac{SR} architecture. SwinIR Classic and SwinIR Real (Medium) were trained for classical image \ac{SR}, while SwinIR Real (Large) was trained with complex degradation models intended for real-world artifacts. These models were evaluated directly on the RELLISUR test set to assess their zero-shot generalization capabilities.
+
+\subsection{Sequential Evaluation Setup}
+The sequential evaluation pipeline passed images through the trained \ac{SR} model before feeding the upscaled output to the \ac{ReID} model. This setup allowed direct comparison between the baseline \ac{ReID} performance and the \ac{SR}-enhanced pipeline under identical test conditions. The evaluation was conducted on the OOD test conditions described in Table \ref{tab:newood_conditions}.
+
+
+
 \section{Joint EDSR and Baseline OSNet}
 The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the OSNet baseline model with EDSR in a joint end-to-end framework. 
 
