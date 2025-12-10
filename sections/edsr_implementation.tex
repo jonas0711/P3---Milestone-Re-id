@@ -53,13 +53,13 @@ A set of data augmentation transforms was implemented to improve model robustnes
 For validation, no augmentation was applied. Images were converted to tensors and normalized using the same normalization parameters as training.
 
 \subsection{Training Configuration}
-Two training strategies were employed: training from scratch and finetuning from pretrained weights.
+Two training strategies were employed: training from scratch on RELLISUR, followed by finetuning the best model on \ac{DIV2K}.
 
-\subsubsection{Training from Scratch}
-The model trained from scratch was initialized with random weights and trained on cropped RELLISUR data. The training configuration used an Adam optimizer with $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$. The learning rate was set to $1 \times 10^{-4}$ and kept constant throughout training.
+\subsubsection{Training from Scratch on RELLISUR}
+The model was first trained from scratch on cropped RELLISUR data with random weight initialization. The training configuration used an Adam optimizer with $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$. The learning rate was set to $1 \times 10^{-4}$ and kept constant throughout training. The best checkpoint was selected based on the highest validation \ac{PSNR}.
 
-\subsubsection{Finetuning from DIV2K}
-The finetuned model started from weights pretrained on the \ac{DIV2K} dataset. For finetuning, the learning rate was reduced by a factor of 10 to $1 \times 10^{-5}$ to prevent catastrophic forgetting of the pretrained features. The same Adam optimizer configuration was used.
+\subsubsection{Finetuning on DIV2K}
+The best checkpoint from the scratch training (epoch 113) was used as the starting point for finetuning on the \ac{DIV2K} dataset. This finetuning step aimed to improve generalization by exposing the model to a more diverse set of high-quality images with varied content. For finetuning, the learning rate was reduced to $5 \times 10^{-6}$ to preserve the learned RELLISUR features while allowing adaptation to the broader \ac{DIV2K} distribution. The same Adam optimizer configuration was used.
 
 \subsubsection{Loss Function}
 The L1 loss (mean absolute error) was used as the training objective:
@@ -72,15 +72,16 @@ where $SR_i$ is the super-resolved output and $HR_i$ is the ground truth \ac{HR}
 The best model checkpoint was selected based on the highest validation \ac{PSNR} rather than the lowest validation loss. This selection criterion was chosen to prioritize reconstruction quality as measured by \ac{PSNR}, which directly reflects the pixel-level accuracy of the super-resolved images.
 
 \subsection{Training Hyperparameters}
-Table \ref{tab:edsr-hyperparameters} summarizes the complete set of training hyperparameters for both training strategies.
+Table \ref{tab:edsr-hyperparameters} summarizes the complete set of training hyperparameters for both training stages.
 
 \begin{table}[H]
     \centering
     \caption{Training hyperparameters for \acs{EDSR}.}
     \label{tab:edsr-hyperparameters}
     \begin{tabular}{|l|c|c|}\hline
-        \cellcolor[HTML]{D8E9F7}\textbf{Hyperparameter} & \cellcolor[HTML]{D8E9F7}\textbf{Scratch} & \cellcolor[HTML]{D8E9F7}\textbf{Finetuned} \\\hline
-        Training Dataset & RELLISUR Cropped & DIV2K + RELLISUR Cropped \\\hline
+        \cellcolor[HTML]{D8E9F7}\textbf{Hyperparameter} & \cellcolor[HTML]{D8E9F7}\textbf{Scratch (RELLISUR)} & \cellcolor[HTML]{D8E9F7}\textbf{Finetuned (DIV2K)} \\\hline
+        Training Dataset & RELLISUR Cropped & DIV2K \\\hline
+        Initial Weights & Random & Best RELLISUR checkpoint \\\hline
         Number of Epochs & 200 & 100 \\\hline
         Batch Size & 16 & 16 \\\hline
         Optimizer & Adam & Adam \\\hline

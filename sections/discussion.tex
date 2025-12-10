@@ -2,6 +2,25 @@
 
 \section{Data}
 
+\subsubsection{Data Augmentations}
+The data-augmentation is applied to improve model generalizability, by introducing diversity and simulate real-life data. The augmentation consists of the following:
+\begin{itemize}
+    \item Normalization 
+    \item JPEG compression
+    \item Horizontal flipping
+    \item Gaussian blur
+    \item Gaussian noise
+    \item Brightness change
+    \item Resizing
+    \item Padding
+\end{itemize}
+
+\noindent They are selected with the purpose of improving model performance. JPEG compression is used to simulate the compression applied on real-life surveillance footage. Horizontal flipping is used to create more data and is the only flip used, as vertical flipping would turn the image upside down, which is unnatural in surveillance settings. Gaussian blur and gaussian noise are used to make the images blurry and noisy, to simulate bad weather. Brightness change is used to simulate how the lightning can differ at different times of the day. The images are also resized to different scales, to simulate variations in distance, caused by people moving around or being captured by different cameras. Padding is only used to secure that the tensors are the same size for stacking. 
+\\\\
+var det de korrekte vi brugte? 
+
+\subsubsection{OOD Dataset}
+The OOD dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the iLIDS-VID dataset. 
 
 \section{Experiments}
 - Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
@@ -11,45 +30,51 @@
 \section{Results}
 
 \subsection{OSNet}
-Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? 
+Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? (nemmere kode, nødvendigt grundet deadline)
 
 \subsubsection{Baseline}
 Opnåede vi det vi ville med baseline, er den lavet så den er fair til at bruge til sammenligning?
 
-\subsubsection{Robust}
+\subsubsection{Augmentated}
 
 \subsection{EDSR}
 Var EDSR et godt valg? 
 
 \subsubsection{EDSR}
 
-\subsection{EDSR and Baseline}
+\subsection{Sequential EDSR and Baseline}
+Implementing both models sequentially effectively meant that only \acs{OSNet} had the chance to improve. By only inputting the \acs{HR} \acs{ReID} image, \acs{EDSR} could not learn more than it already knew about general upscaling. \acs{OSNet} learned how to extract useful embeddings from \acs{SR} images. Der skal mere til men pas lige nu.
 
 \subsection{Joint EDSR and Baseline}
-HVorfor implementeret  på den måde - hvad med auxilary loss?
+%Hvorfor implementeret  på den måde - hvad med auxilary loss?
+The joint implementation of the \acs{EDSR} and \acs{OSNet} models served it's purpose as intended. The combined forward pass allowed \acs{EDSR} to learn from \acs{OSNet}'s loss, and thereby specialize the upscaling to assists in better embeddings. However, having no \acs{SR} specific loss, limited this ability. Implementing an auxillary loss, by inputting downscaled \acs{ReID} data, and comparing it to the original \acs{HR} data, could have improved performance. Therefore this addition should be considered for future work. 
 
 \section{Deployment}
 
-The choice to deploy the system in a cloud, is based on ethical considerations. If the system is incorporated directly into the local hardware, it would be implied that the captured footage is constantly being analyzed in real time. Such a design effectively normalizes monitoring the citizens at all times, in line with the definition of a surveillance state. Furthermore, when the system is embedded in the hardware, it becomes more difficult to regulate and monitor how and by whom it is used, increasing the risk of misuse or unauthorized access.  
+The choice to cloud-deploy the system, is based on ethical considerations. If the system is incorporated directly unto local hardware, it would be implied that the captured footage is constantly being analyzed in real time. Such a design effectively normalizes monitoring the citizens at all times, in line with the definition of a surveillance state. Furthermore, when the system is embedded in local hardware, it becomes more difficult to regulate and monitor how and by whom it is used, increasing the risk of misuse or unauthorized access.
 \\\\
-On the contrary, if the system is deployed in the cloud, it remains inactive until invoked for a specific purpose. This ensures that footage is not automatically processed unless it is necessary and that access can be controlled through authentication and logs. 
+On the contrary, if the system is deployed in the cloud, it remains inactive until invoked for a specific purpose. This ensures that footage is not automatically processed unless it is necessary and that access can be controlled through authentication and logs.
 \\\\
-However, cloud deployment is not without limitations. It requires a stable and secure internet connection, that enables safe transmission of sensitive data, though this risk can be mitigated through encryption. An alternative deployment strategy could be XXX.
+However, cloud deployment is not without limitations. It requires a stable and secure internet connection, that enables safe transmission of sensitive data, though this risk can be mitigated through encryption. An alternative deployment strategy could be tis numse.
  
 
 \section{Ethical Considerations}
-Hvilke ethical constrains har vi haft på vores system? 
+%Hvilke ethical constrains har vi haft på vores system?
+The development and deployment of person \acs{ReID} systems raises several ethical concerns. These concerns are defined and discussed as follows:
 \\\\
-The development and deployment of person \acs{ReID} systems raises several ethical concerns. 
+These systems handle sensitive visual data of individuals, often without their explicit consent, which can impact the right to privacy, and freedom of movement. Therefore, ethical constrains were considered in the design and deployment phase. %lidt gentagelse imo
 
 \subsubsection{Privacy and Consent}
-
+Surveillance of public areas challenges the concept of informed consent, as individuals are often unaware of the monitoring, and do not have the choice of not being recorded. Therefore, such footage must be handled carefully, and person \acs{ReID} systems should be designed to only be activated when specific requirements are met, such as for the purpose of investigating crime. 
 
 \subsubsection{Transparency}
+The public should be informed about where, how, and why person \acs{ReID} systems are used. The cloud deployment strategy supports transparency as it allows for monitoring the usage of the systems. 
 
 \subsubsection{Misuse}
+One of the more serious issues regarding person \acs{ReID} systems is the potential for misuse. In the wrong hands, such a system can be used to target innocent people based on their race, religion, or political opinions. It can also be used in a surveillance state, which negatively impacts the citizens freedom of speech and freedom of movement. This risk is reduced through the use of authentication and logs.
 
 \subsubsection{Data Security}
+As the system handles potentially sensitive data, it is important to ensure data security. This can be done through encryption, and should be applied when storing the data as well as for transmitting the data. Furthermore, data should only be kept for as long as necessary, with access limited to authorized and relevant personnel. 
 
 
 \section{Future Work}

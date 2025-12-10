@@ -4,21 +4,21 @@
 This section presents the results from training and evaluating the \ac{SR} models. The evaluation was conducted on the RELLISUR NLHR test set, which consists of 85 native low-resolution images. This test set represents a realistic out-of-distribution scenario, as the models were trained on cropped image pairs but evaluated on full native low-resolution images.
 
 \subsection{Training Results}
-Two \ac{EDSR} models were trained with different strategies: one trained from scratch on cropped RELLISUR data and one pretrained on \ac{DIV2K} followed by finetuning on the same RELLISUR data. Both models used the baseline \ac{EDSR} configuration with 16 residual blocks, 64 feature maps, and a 2× upscaling factor.
+Two \ac{EDSR} models were trained with different strategies: one trained from scratch on cropped RELLISUR data, and one where the best scratch model was subsequently finetuned on the \ac{DIV2K} dataset. Both models used the baseline \ac{EDSR} configuration with 16 residual blocks, 64 feature maps, and a 2× upscaling factor.
 
 \subsubsection{EDSR Trained from Scratch}
 The model trained from scratch on cropped RELLISUR data showed a typical learning progression. Training loss started at approximately 0.12 and decreased rapidly to around 0.095 within the first 25 epochs. The loss continued to decrease gradually and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved quickly to approximately 25.3 dB within the first 25 epochs. The highest validation \ac{PSNR} of 25.72 dB was achieved at epoch 113. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, indicating that the model had converged. A constant learning rate of $1 \times 10^{-4}$ was used throughout training.
 
 \subsubsection{EDSR DIV2K-Finetuned}
-The model pretrained on \ac{DIV2K} and finetuned on cropped RELLISUR data exhibited a different training pattern. Training loss started at approximately 0.078 and decreased only marginally to around 0.073 over the course of training. This low initial loss indicates that the pretrained weights already captured general \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.20 dB. This behavior suggests that continued training on the domain-specific data caused slight overfitting to the training distribution. A learning rate of $5 \times 10^{-6}$ was used for finetuning to prevent catastrophic forgetting of the pretrained features.
+The best checkpoint from the scratch model (epoch 113) was used as the starting point for finetuning on the \ac{DIV2K} dataset. This finetuning strategy aimed to improve the model's generalization by exposing it to a more diverse set of high-quality images. Training loss started at approximately 0.078 and decreased only marginally to around 0.073 over the course of training. This low initial loss indicates that the RELLISUR-pretrained weights already captured relevant \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.20 dB. This behavior suggests that continued training on the diverse \ac{DIV2K} data caused a trade-off between in-distribution validation performance and broader generalization. A learning rate of $5 \times 10^{-6}$ was used for finetuning to preserve the learned features while allowing adaptation to the new data distribution.
 
 \subsubsection{Comparison of Training Behavior}
-Figure \ref{fig:edsr_comparison} compares the training curves of both \ac{EDSR} models. The scratch model achieved higher validation \ac{PSNR} but lower validation loss, while the finetuned model showed the opposite pattern. This apparent contradiction is explained by the different training distributions: the scratch model specialized heavily on the cropped validation images, while the finetuned model retained broader generalization capabilities from \ac{DIV2K} pretraining.
+Figure \ref{fig:edsr_comparison} compares the training curves of both \ac{EDSR} models. The scratch model achieved higher validation \ac{PSNR} but lower validation loss, while the finetuned model showed the opposite pattern. This apparent contradiction is explained by the different training distributions: the scratch model specialized heavily on the cropped validation images, while the finetuned model gained broader generalization capabilities from \ac{DIV2K} finetuning at the cost of slightly lower validation scores on RELLISUR.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/images/cropped_models_comparison.png}
-    \caption{Comparison of training curves for \ac{EDSR} trained from scratch (blue) and \ac{EDSR} pretrained on \ac{DIV2K} and finetuned (green). Top left: Training loss. Top right: Validation loss. Bottom left: Validation \ac{PSNR}. Bottom right: Learning rate schedule.}
+    \caption{Comparison of training curves for \ac{EDSR} trained from scratch (blue) and \ac{EDSR} finetuned on \ac{DIV2K} (green). Top left: Training loss. Top right: Validation loss. Bottom left: Validation \ac{PSNR}. Bottom right: Learning rate schedule.}
     \label{fig:edsr_comparison}
 \end{figure}
 
@@ -47,9 +47,9 @@ All models were evaluated on the RELLISUR NLHR test set consisting of 85 native 
 \end{table}
 
 \subsubsection{EDSR Performance}
-The \ac{EDSR} model pretrained on \ac{DIV2K} and finetuned on RELLISUR achieved the best overall performance with an average \ac{PSNR} of 33.30 dB and \ac{SSIM} of 0.970. The model trained from scratch achieved an average \ac{PSNR} of 31.77 dB and \ac{SSIM} of 0.962. The 1.53 dB difference in \ac{PSNR} represents a meaningful improvement in reconstruction quality. Individual image \ac{PSNR} values ranged from approximately 20 dB to 42 dB, with variation depending on image content, lighting conditions, and the resolution of the original capture.
+The \ac{EDSR} model finetuned on \ac{DIV2K} achieved the best overall performance with an average \ac{PSNR} of 33.30 dB and \ac{SSIM} of 0.970. The model trained only on RELLISUR from scratch achieved an average \ac{PSNR} of 31.77 dB and \ac{SSIM} of 0.962. The 1.53 dB difference in \ac{PSNR} represents a meaningful improvement in reconstruction quality. Individual image \ac{PSNR} values ranged from approximately 20 dB to 42 dB, with variation depending on image content, lighting conditions, and the resolution of the original capture.
 
-The performance difference between in-distribution validation and out-of-distribution testing is noteworthy. While the scratch model achieved a higher validation \ac{PSNR} (25.72 dB versus 25.49 dB), the finetuned model substantially outperformed on the test set. This indicates that the diversity of the \ac{DIV2K} dataset provided the finetuned model with better generalization capabilities, enabling it to handle the native low-resolution test images that differ from the cropped training distribution.
+The performance difference between in-distribution validation and out-of-distribution testing is noteworthy. While the scratch model achieved a higher validation \ac{PSNR} (25.72 dB versus 25.49 dB), the finetuned model substantially outperformed on the test set. This indicates that finetuning on the diverse \ac{DIV2K} dataset improved the model's ability to generalize to native low-resolution test images that differ from the cropped training distribution.
 
 \subsubsection{SwinIR Performance}
 Three pretrained SwinIR models were evaluated without additional finetuning on RELLISUR. SwinIR Classic achieved a \ac{PSNR} of 27.23 dB, which is 6.07 dB lower than the best \ac{EDSR} model. The relatively high \ac{SSIM} of 0.969 despite the lower \ac{PSNR} suggests that SwinIR Classic produced over-smoothed outputs that preserved structural similarity but lacked fine detail reconstruction.
@@ -59,10 +59,10 @@ SwinIR Real, which was trained with more complex degradation models to handle re
 SwinIR Real (Large) performed poorly with a \ac{PSNR} of 13.19 dB and \ac{SSIM} of 0.042. The model produced severe artifacts and hallucinations, making its outputs unusable. This failure was caused by an architectural mismatch between the model's expected input characteristics and the RELLISUR images.
 
 \subsection{Summary}
-The evaluation demonstrated that the \ac{EDSR} model pretrained on \ac{DIV2K} and finetuned on RELLISUR achieved the best performance on the out-of-distribution NLHR test set. The key findings from the \ac{SR} experiments are:
+The evaluation demonstrated that the \ac{EDSR} model trained on RELLISUR and subsequently finetuned on \ac{DIV2K} achieved the best performance on the out-of-distribution NLHR test set. The key findings from the \ac{SR} experiments are:
 
 \begin{itemize}
-    \item Pretraining on diverse data (\ac{DIV2K}) followed by domain-specific finetuning yielded better generalization than training from scratch, despite the scratch model achieving higher validation scores.
+    \item Training on domain-specific data (RELLISUR) followed by finetuning on diverse data (\ac{DIV2K}) yielded better generalization than training only on RELLISUR, despite the scratch model achieving higher validation scores.
     \item The difference between validation performance (in-distribution) and test performance (out-of-distribution) highlighted the importance of diverse training data for \ac{SR} models intended for realistic scenarios.
     \item Off-the-shelf SwinIR models, without finetuning on domain-specific data, did not achieve competitive performance compared to the finetuned \ac{EDSR} models.
 \end{itemize}

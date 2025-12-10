@@ -16,7 +16,7 @@ A classic way to improve performance and generalization is through augmentations
     \begin{tabular}{|>{\centering\arraybackslash}p{0.18\linewidth}|>{\centering\arraybackslash}p{0.78\linewidth}|}\hline
          \cellcolor[HTML]{D8E9F7} \textbf{Augmentation}&  \cellcolor[HTML]{D8E9F7} \textbf{Purpose}\\\hline
          Normalization&  Standardize pixel intensity values to improve training.\\\hline
-         Vertical flipping&  Increase size bigger dataset.\\\hline
+         Horizontal flipping&  Increase size bigger dataset.\\\hline
  Gaussian blur&Improve robustness to low-quality and blured images.\\\hline
  Gaussian noise&Enhance generalization to imperfect and noisy images.\\\hline
  Brightness change&Increase resilience to varying lighting conditions.\\\hline
@@ -36,9 +36,9 @@ A classic way to improve performance and generalization is through augmentations
 \cellcolor[HTML]{D8E9F7} \textbf{Light Training Augmentation}\\\hline
 \begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
     \item Normalization
-    \item Vertical flipping
-    \item Padding, if to small
-    \item Resizing, if to big
+    \item Horizontal flipping
+    \item Padding, if too small
+    \item Resizing, if too big
     \vspace{6.1em}
 \end{itemize}
 \\ \hline\end{tabular}
@@ -56,7 +56,7 @@ A classic way to improve performance and generalization is through augmentations
     \item Resizing
     \item JPEG compression
     \item Normalization
-    \item Vertical flipping
+    \item Horizontal flipping
     \vspace{1em}
 \end{itemize}
 \\ \hline\end{tabular}
@@ -88,11 +88,11 @@ The architecture of the person \acs{ReID} model that is implemented is the same 
     \centering
     \begin{tabular}{|c|c|}\hline
         \cellcolor[HTML]{D8E9F7} \textbf{Parameter} & \cellcolor[HTML]{D8E9F7} \textbf{Value} \\\hline
-        Number of classes (\texttt{num\_classes}) & \texttt{num\_classes} \\\hline
+        No. Classes (\texttt{num\_classes}) & \texttt{num\_classes} \\\hline
         Block types (\texttt{blocks})             & [\texttt{OSBlock}, \texttt{OSBlock}, \texttt{OSBlock}] \\\hline
         Layers per stage (\texttt{layers})        & [2, 2, 2] \\\hline
         Channels per stage (\texttt{channels})    & [64, 256, 384, 512] \\\hline
-        Loss function (\texttt{loss})             & \texttt{loss parameter ('softmax' or 'triplet'} \\\hline
+        Loss function (\texttt{loss})             & \texttt{loss parameter ('softmax' or 'triplet')} \\\hline
     \end{tabular}
         \caption{OSNet\_x1\_0 Configuration.}
     \label{tab:osnet-config}
@@ -105,8 +105,7 @@ The \acs{OSNet} x1 variant is used, which is the largest base \acs{OSNet} model 
 The model is trained on the combination of Market-1501, MSMT17 and CUHK03 train split, resulting in 2,117 unique identities. The person ID mapping strategy described in Section \ref{imp_dataloading} ensures that identities remain unique across the combined dataset and preventing ID conflicts between datasets, while ensuring a continues range of id, optimal for training using softmax.
 
 \subsubsection{Hyperparameters}
-The complete set of training hyperparameters is presented in Table \ref{tab:osnettrainingparameters}. The model is trained by using \ac{SGD} with momentum of 0.9 and weight decay of 0.0005  for regularization. The initial learning rate is set to 0,001. The loss function used is CrossEntropyLoss with a label smoothing of 0.1. Label smoothing is a regularization technique that prevents the model for becoming overconfident in its predictions by softening the target labels. Instead of using one-hot encoded labels. This is particularly beneficial for person ReID, as it addresses the challenge of limited training samples per identity. By preventing extreme confidence on training identities, label smoothing encourages the model to learn more robust features that generalize better to unseen test identities.  ********
-
+The complete set of training hyper parameters is presented in Table \ref{tab:osnettrainingparameters}. The model is trained by using \ac{SGD} with momentum of 0.9 and weight decay of 0.0005  for regularization. The initial learning rate is set to 0,001. The loss function used is CrossEntropyLoss with a label smoothing of 0.1. Label smoothing is a regularization technique that prevents the model for becoming overconfident in its predictions by softening the target labels. Instead of using one-hot encoded labels. This is particularly beneficial for person ReID, as it addresses the challenge of limited training samples per identity. By preventing extreme confidence on training identities, label smoothing encourages the model to learn more robust features that generalize better to unseen test identities, a critical requirement for the open-set nature of person ReID. Unlike many person ReID approaches, no triplet loss is incorporated in this implementation.
 A \texttt{MultiStepLR} scheduler controls the learning rate throughout training, reducing it by a factor of 0.1 at epoch 60, 120, and 180. The results of the learning rate schedule:
 
 \begin{itemize}
@@ -117,8 +116,6 @@ A \texttt{MultiStepLR} scheduler controls the learning rate throughout training,
 
 \end{itemize}
 Training runs for a total of 350 epochs without early stopping, though the best 
-
-\subsubsection{Loss Function and Label Smoothing}
 
 
 \subsubsection{Validation Strategy}
@@ -135,8 +132,8 @@ This adaptive validation strategy allows for more frequent monitoring as the tra
     \centering
     \begin{tabular}{|c|c|}\hline
          \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Value}\\\hline
-         Nos. Images &  2117\\\hline
-         Nos. epochs &  350\\\hline
+         No. Images &  2117\\\hline
+         No. epochs &  350\\\hline
          Batch Size &  64 \\\hline
          Optimizer &  SGD \\\hline
          Momentum&0.9\\\hline
@@ -165,10 +162,10 @@ This adaptive validation strategy allows for more frequent monitoring as the tra
     \label{tab:edsr-config}
     \begin{tabular}{|c|c|}\hline
         \cellcolor[HTML]{D8E9F7}\textbf{Parameter} & \cellcolor[HTML]{D8E9F7}\textbf{Value} \\\hline
-        Number of residual blocks (\texttt{n\_resblocks}) & 16 \\\hline
-        Number of feature maps (\texttt{n\_feats})        & 64 \\\hline
+        No. Residual blocks (\texttt{n\_resblocks}) & 16 \\\hline
+        No. Feature maps (\texttt{n\_feats})        & 64 \\\hline
         Upscaling factor (\texttt{scale})                 & [2] \\\hline
-        Number of input colors (\texttt{n\_colors})       & 3 \\\hline
+        No. Input colors (\texttt{n\_colors})       & 3 \\\hline
         Residual scaling factor (\texttt{res\_scale})     & 0.1 \\\hline
     \end{tabular}
 \end{table}
