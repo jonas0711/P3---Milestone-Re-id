@@ -1,9 +1,16 @@
 \chapter{Discussion} \label{cha: discussion}
 
 \section{Data}
+In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This higlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, CUHK03, and MSMT17 datasets are all recorded at different universities in different regions of China, while the DukeMTMC-ReID dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The ILIDS-VIDS dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
+\\\\
+The data was split so that the models were trained on the Market-1501, MSMT17, and CUHK03 datasets, and final testing was performed on the ILIDS-VID and DukeMTMC-ReID datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch likely impacts performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
+\\\\
+Furthermore, the datasets are not balanced in size. For example the MSMT17 dataset contains almost three times more identities and nearly ten times more images than CUHK03, which may cause the model to overfit to the dominant dataset and under-represent features from the smaller datasets. In future work, a more structured training strategy could be explored, such as training on each dataset separately, balancing datasets in each batch, or incorporating datasets with diverse cultural, environmental and geographical conditions during training, to improve cross-domain generalization and fairness. 
+\\\\
+Finally it is important to note that the datasets represent relative controlled environments, with no cases of extreme weather, very low-light conditions, or highly crowded events, which are expected to appear in real-world surveillance footage. 
 
 \subsubsection{Data Augmentations}
-The data-augmentation is applied to improve model generalizability, by introducing diversity and simulate real-life data. The augmentation consists of the following:
+Data-augmentation is applied to improve model generalizability, by introducing diversity and simulating real-world circumstances. The augmentation pipeline is as follows:
 \begin{itemize}
     \item Normalization 
     \item JPEG compression
@@ -15,12 +22,16 @@ The data-augmentation is applied to improve model generalizability, by introduci
     \item Padding
 \end{itemize}
 
-\noindent They are selected with the purpose of improving model performance. JPEG compression is used to simulate the compression applied on real-life surveillance footage. Horizontal flipping is used to create more data and is the only flip used, as vertical flipping would turn the image upside down, which is unnatural in surveillance settings. Gaussian blur and gaussian noise are used to make the images blurry and noisy, to simulate bad weather. Brightness change is used to simulate how the lightning can differ at different times of the day. The images are also resized to different scales, to simulate variations in distance, caused by people moving around or being captured by different cameras. Padding is only used to secure that the tensors are the same size for stacking. 
+\noindent These augmentations were selected with the purpose of improving model performance. JPEG compression is used to simulate the quality loss often seen in real-world surveillance footage, caused by camera hardware and storage limitations. Standard flipping was used to inflate data. Only horizontal flipping was applied, as vertical flipping would not add meaningful information for the real-word domain of \acs{ReID}. Gaussian blur and noise were applied to simulate visual degradation caused by environmental conditions or surveillance hardware. Brightness change was used to simulate lighting conditions at different times of the day. The images were also resized to different scales, and filled with black padding, to simulate variations in distance and camera quality. Padding is only used to secure that the tensors are the same size for stacking. Overall. The augmentations fulfill their purpose and are appropriate for the domain, but datasets with real degradations and a clean ground truth should be used if available. 
 \\\\
-var det de korrekte vi brugte? 
+Despite this, if all the augmentations happened to be applied heavily to a single image, quality may degrade to a point where it is too difficult for the model to extract meaningful features. This highlights the importance of balancing data augmentation, so realism is preserved without compromising the visual information. During implementation, the Python \texttt{random} library was used to apply random transformations. However, it would have been more appropriate to use PyTorch's own random functions, as they share the same seeding used throughout the framework, and are compatible with GPU training. This ensures better reproducibility and consistency across experiments, especially when using multiple workers and different hardware setups. 
 
 \subsubsection{OOD Dataset}
-The OOD dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the iLIDS-VID dataset. 
+The OOD dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the iLIDS-VID dataset. The
+
+
+
+
 
 \section{Experiments}
 - Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
@@ -51,11 +62,11 @@ The joint implementation of the \acs{EDSR} and \acs{OSNet} models served it's pu
 
 \section{Deployment}
 
-The choice to cloud-deploy the system, is based on ethical considerations. If the system is incorporated directly unto local hardware, it would be implied that the captured footage is constantly being analyzed in real time. Such a design effectively normalizes monitoring the citizens at all times, in line with the definition of a surveillance state. Furthermore, when the system is embedded in local hardware, it becomes more difficult to regulate and monitor how and by whom it is used, increasing the risk of misuse or unauthorized access.
+The choice to cloud-deploy the system, is based on ethical considerations. If the system is incorporated directly into local hardware, it would be implied that the captured footage is constantly being analyzed in real time. Such a design effectively normalizes monitoring the citizens at all times, in line with the definition of a surveillance state. Furthermore, when the system is embedded in local hardware, it becomes more difficult to regulate and monitor how and by whom it is used, increasing the risk of misuse or unauthorized access.
 \\\\
 On the contrary, if the system is deployed in the cloud, it remains inactive until invoked for a specific purpose. This ensures that footage is not automatically processed unless it is necessary and that access can be controlled through authentication and logs.
 \\\\
-However, cloud deployment is not without limitations. It requires a stable and secure internet connection, that enables safe transmission of sensitive data, though this risk can be mitigated through encryption. An alternative deployment strategy could be tis numse.
+However, cloud deployment is not without limitations. It requires a stable and secure internet connection, that enables safe transmission of sensitive data, though this risk can be mitigated through encryption. An alternative deployment strategy could be XXX.
  
 
 \section{Ethical Considerations}
@@ -79,3 +90,5 @@ As the system handles potentially sensitive data, it is important to ensure data
 
 \section{Future Work}
 Hvad mangler det for at blive realiseret system?
+
+- The gap between training data and deployment environments should be addressed in future works. 

@@ -122,7 +122,7 @@ Despite outperforming state-of-the-art methods at the time, this solution has se
 
 \subsubsection{Omni-Scale Feature Learning for Person Re-Identification}\label{sec:omniscale}
 
-This research from 2019 presents a novel deep \ac{ReID} \ac{CNN}, termed Omni-Scale Network (OSNet), designed for person \ac{ReID} \cite{OSNet}. The main idea is that discriminative features for \ac{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight. The model is evaluated using Rank-1 and mAP metrics, against 20 different state-of-the-art methods. 
+This research from 2019 presents a novel deep \ac{ReID} \ac{CNN}, termed Omni-Scale Network (OSNet), designed for person \ac{ReID} \cite{OSNet}. The main idea is that discriminative features for \ac{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight. The model is evaluated using Rank-1 and \ac{mAP} metrics, against 20 different state-of-the-art methods. 
 \\\\
 While OSNet presents a lightweight architecture with state-of-the-art achieved performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
 
@@ -151,7 +151,7 @@ CUHK03& 78.7\%& 52.9\%\\\hline
 
 \subsubsection{Applying Deep Learning Image Enhancement Methods to Improve Person Re-Identification}
  
-The most recent paper from 2024 proposes a pipeline where low-light image enhancements are introduced before embedding-features on night-time images \cite{enhancementimprovereid}. The motivation behind it is that other Re-Id models assume images are captured in good lighting and of high quality, in contrast to real-world scenarios where image conditions may be degraded by poor lighting and other noise. The pipeline achieves significant improvements on performance of the Re-Id model, demonstrating that image enhancement as a pre-processing step can boost Re-ID performance when working with challenging image quality conditions, such as video-surveillance. The model is evaluated through the metrics mAP and Rank-1, against seven different state-of-the-art methods.  
+The most recent paper from 2024 proposes a pipeline where low-light image enhancements are introduced before embedding-features on night-time images \cite{enhancementimprovereid}. The motivation behind it is that other Re-Id models assume images are captured in good lighting and of high quality, in contrast to real-world scenarios where image conditions may be degraded by poor lighting and other noise. The pipeline achieves significant improvements on performance of the Re-Id model, demonstrating that image enhancement as a pre-processing step can boost Re-ID performance when working with challenging image quality conditions, such as video-surveillance. The model is evaluated through the metrics \ac{mAP} and Rank-1, against seven different state-of-the-art methods.  
 \\\\
 However, this method introduces image enhancements as a separate preprocessing step, rather than integrating the enhancement into the \ac{ReID} pipeline. This separation means that enhanced images are treated as fixed inputs, preventing the model from adapting the enhancement process jointly with the embedding learning. 
 
@@ -159,23 +159,23 @@ However, this method introduces image enhancements as a separate preprocessing s
 
 \subsection{Takeaways} \label{subsec:takeawayspreid}
 
-Early studies showed that deep-learning could replace hand-crafting features for \ac{ReID} tasks, by automatically learning features directly from image data. Later research, specifically the Omniscale paper, introduced a lightweight architecture that could capture features across different scales, combining global and local features. The more recent study from 2024 emphasized how image quality plays a critical role in \ac{ReID} accuracy. All three papers use either Rank-1, mAP or both to measure accuracy. This leaves the important takeaways as:
+Early studies showed that deep-learning could replace hand-crafting features for \ac{ReID} tasks, by automatically learning features directly from image data. Later research, specifically the Omniscale paper, introduced a lightweight architecture that could capture features across different scales, combining global and local features. The more recent study from 2024 emphasized how image quality plays a critical role in \ac{ReID} accuracy. All three papers use either Rank-1, \ac{mAP} or both to measure accuracy. This leaves the important takeaways as:
 
 \begin{itemize}
     \item \ac{ReID} systems must learn robust features that generalize across different camera environments and conditions.
     \item Image quality should be addressed when working with \ac{ReID}.
-    \item Rank-1 and mAP is used for accuracy. 
+    \item Rank-1 and \ac{mAP} is used for accuracy. 
 \end{itemize}
 
 \subsection{Out-of-Distribution Test of OSNet}\label{outofdistributiontest}
 
-An out-of-distribution (OOD) test is defined as the models ability to perform on data that is significantly different from the data it was trained on \cite{OOD}. The difference is determined as significant by measures such as image vs. cartoon, all outdoor vs. indoor, and farm animals vs. wild animals. This project determines the OOD test as data that is abnormal to the model, in the form of augmentated images and unseen data from a different environment.
+An \acf{OOD} test is defined as the models ability to perform on data that is significantly different from the data it was trained on \cite{OOD}. The difference is determined as significant by measures such as image vs. cartoon, all outdoor vs. indoor, and farm animals vs. wild animals. This project determines the \ac{OOD} test as data that is abnormal to the model, in the form of augmentated images and unseen data from a different environment.
 \\\\
-As discussed in Section \ref{subsec:reid_reworks}, OSNet appears to be the most promising network, as it is omni-scale and thus scale-invariant. However, the authors of the paper conducted an experiment of testing the model on images reduced with a scale factor 0.25, corresponding to a 64x32 image \cite{OSNet}. Its performance showed a drop in Rank-1 accuracy from 94.8\% to 86.9\% , while the mAP decreases from 84.9\% to 67.3\% on the Market-1501 dataset. These results indicate that OSNet is sensitive to changes in the scale of the image, despite the omni-scale architecture.
+As discussed in Section \ref{subsec:reid_reworks}, OSNet appears to be the most promising network, as it is omni-scale and thus scale-invariant. However, the authors of the paper conducted an experiment of testing the model on images reduced with a scale factor 0.25, corresponding to a 64x32 image \cite{OSNet}. Its performance showed a drop in Rank-1 accuracy from 94.8\% to 86.9\%, while the \ac{mAP} decreases from 84.9\% to 67.3\% on the Market-1501 dataset. It is important to highlight that both training and evaluation were performed on upsampled inputs 256×128, even though the standard Market-1501 resolution is 128×64. These results indicate that OSNet is sensitive to changes in the scale of the image, despite the omni-scale architecture.
 \\\\
-OSNet has also been evaluated on two difficult \ac{ReID} datasets, VIPeR and GRID, which have a small amount of images, containing only two instances/examples of each individual. Although the test achieved state-of-the-art results, the Rank-1 accuracies remained relatively low at 68.0\% and 38.2\% respectively. This further suggests that OSNet struggles to generalize to other and more difficult datasets.
-\\\\
-For these reasons, OSNet will be evaluated further to confirm or deny the assumption that existing \ac{ReID} algorithms have difficulties identifying people when the image resolution is poor due to scale or compression in surveillance. The OOD test is conducted using a small subset of images from the dataset Market-1501 under five different conditions, as well as a subset from the dataset iLIDS-VID which is unknown to OSNet. These subsets are presented in Table \ref{tab:ood_conditions}.
+For this reasons, OSNet will be evaluated further to confirm or deny the assumption that existing \ac{ReID} algorithms have difficulties identifying people when the image resolution is poor due to scale or compression in surveillance. 
+\\\\ 
+The \ac{OOD} test is conducted as a one-shot test on cross domain datasets, meaning that gallery only contains one image per person and that the dataset have not been used in training of the model. The test is using a small subset of images from the dataset Market-1501 under four different conditions, as well as a subset from the dataset iLIDS-VID, which is unknown to OSNet. These subsets are presented in Table \ref{tab:ood_conditions}.
 
 \begin{table}[H]
 \centering
@@ -216,8 +216,7 @@ iLIDS-VID \\
 \label{tab:ood_conditions}
 \end{table}
 
-\noindent Each pair is of the same individual captured by a different camera, structured such that one images serves as the query  and the other as the gallery sample. An example pair of gallery and query from the selected images is shown in Figure \ref{fig:test_images_outofdistribution}. All image names are listed in Appendix \ref{app:out-of-dis}, sorted into query and gallery.
-
+\noindent Each pair is of the same individual captured by a different camera, structured such that one images serves as the query and the other as the gallery sample. The modifications are only made on query, to mirror real-life use of ReID, where gallery often is better quality due to more material. An example query from the selected images is shown in Figure \ref{fig:test_images_outofdistribution}. All file names are listed in Appendix \ref{app:out-of-dis}, sorted into query and gallery.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{out_of_distribution_testimages.png}
@@ -225,34 +224,31 @@ iLIDS-VID \\
     \label{fig:test_images_outofdistribution}
 \end{figure}
 
-\noindent The test is conducted using the \texttt{Torchreid} library, which provides integrated data managers, model loading, and evaluation tools. This enables quick testing of existing models, although it limits insight in the underlying process. However, this is found sufficient for this initial evaluation. \\
-Link: \texttt{https://kaiyangzhou.github.io/deep-person-reid/index.html}
+\noindent The test is conducted using the \texttt{Torchreid} library, which provides integrated data managers, model loading, and evaluation tools. This enables quick testing of existing models, although it limits insight in the underlying process. However, this is found sufficient for this initial evaluation \cite{TorchReIDM1501}. 
 \\\\
-The selected model is \texttt{osnet\_x1\_0}, the largest and highest performing base OSNet variant, consisting of 22 million parameters and 0.98G FLOPs. It is pretrained on MSMT17, DukeMTMC-reID and CUHK03, and evaluated on Market-1501. Among the options of pretrained OSNet models, which are trained and evaluated across different dataset, this version has a good baseline performance of 72.5 Rank-1 and 44.2 mAP. Training has used cosine distance, softmax classifier and max epoch of training sat at 50.
+The selected model is \texttt{osnet\_x1\_0}, the largest and highest performing base OSNet variant, consisting of 22 million parameters and 0.98G FLOPs. It is pretrained on MSMT17, DukeMTMC-reID and CUHK03, and evaluated on Market-1501. Among the options of pretrained OSNet models, which are trained and evaluated across different dataset, this version has a good baseline performance of 72.5 Rank-1 and 44.2 \ac{mAP}. Training has used cosine distance and softmax classifier.
+
+As the test is performed as a one-shot evaluation, the evaluation uses the metrics: Rank-1, Rank-5, Rank-10 and Rank-20, as \ac{mAP} is not meaningful when only one positive match exists per query. 
 
 \subsubsection{Unmodified Images Test}
-
-The model achieves a Rank-1 accuracy of 52.0\% and a mAP of 63.4\% on the unmodified images. These results are notably lower than the performance reported in the original OSNet paper. This discrepancy may be attributed to the small sample size and differences in data selection and evaluation setup.
+The model achieves a Rank-1 accuracy of 52.0\% on the unmodified images, see Table \ref{tab:scaletest_result}. These results are notably lower than the performance reported in the original OSNet paper. This discrepancy may be attributed to the small sample size and differences in data selection and the one-shot evaluation setup.
 
 \subsubsection{Different Scale Test}
-
-As the resolution is reduced, performance declines, most visible in the drop in mAP and Rank-1 accuracy, with the results presented in Table \ref{tab:scaletest_result}. This confirms that OSNet is sensible to changes in scale, confirming the assumption, that \ac{ReID} models struggle when presented with low resolution surveillance data.
-
+As the resolution is reduced, performance declines, most visible in the drop in Rank-1 accuracy, with the results presented in Table \ref{tab:scaletest_result}. This confirms that OSNet is sensible to changes in scale, confirming the assumption, that \ac{ReID} models struggle when presented with low resolution surveillance data.
 \begin{table}[H]
 \centering
-\begin{tabular}{|
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    }
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & {Scale 1 (128x64)} & {Scale 0.75 (96x48)} & {Scale 0.5 (64x32)} &
+{} & {Unmodified (128x64)}& {Scale 0.75 (96x48)} & {Scale 0.5 (64x32)} &
 {Scale 0.25 (32x16)}\\ \hline
-\textbf{mAP}    & 63.4\%  & 63.4\%  & 58.8\% & 44.4\% \\ \hline
 \textbf{Rank-1} & 52.0\%  & 52.0\%  & 44.0\% & 28.0\% \\ \hline
 \textbf{Rank-5} & 76.0\%  & 76.0\%  & 80.0\% & 56.0\% \\ \hline
 \textbf{Rank-10}& 84.0\%  & 84.0\%  & 88.0\% & 76.0\% \\ \hline
@@ -262,28 +258,24 @@ As the resolution is reduced, performance declines, most visible in the drop in 
 \label{tab:scaletest_result}
 \end{table}
 
-
 \subsubsection{Different Quality Test}
-
-The compressed images are generated using the two functions: \texttt{encode\_jpeg} and \texttt{decode\_jpeg} from \texttt{torchvision.io} library. The compression level is controlled by an integer parameter between 0-100, where 100 and 0 respectively represent maximal and minimal quality preservation, effectively interpretable as minimum and maximum compression.
+The compressed images are generated using the two functions: \texttt{encode\_jpeg} and \texttt{decode\_jpeg} from \texttt{torchvision.io} library. The compression level is controlled by an integer parameter between 0-100, where 100 and 0 respectively represent maximal and minimal quality preservation, effectively interpretable as minimum and maximum compression. It is worth noting that the Market-1501 images were already subject to JPEG compression. Therefore the compression performed for this test is in addition to prior compression, and does not necessarily simulate real-world conditions.
 \\\\
-Applying JPEG compression to both the query and gallery affects the performance of OSNet, as can be seen in Table \ref{tab:compressiontest_result}. The mild compression 75 does not change the performance, whereas increased compression, 50 and 25, leads to a clear decline in accuracy. These results show that image compression negatively impacts model performance, particularly at lower quality levels. It is worth noting that the Market-1501 images were already subject to JPEG compression. Therefore the compression performed for this test is in addition to prior compression, and does not necessarily simulate real-world conditions.
-
+Applying JPEG compression to the query affects the performance of OSNet, as can be seen in Table \ref{tab:compressiontest_result}. The mild compression 75 does not change the performance, whereas increased compression, 50 and 25, leads to a clear decline in accuracy in Rank-1 and Rank-5. Although Rank-10 increases when the quality is reduced to 50 and 25, which is counter-intuitive when comparing to the decrease in Rank-1, this could be because compression noise slightly perturbs the ranking, pushing some correct matches out of Rank-1 and Rank-5 while keeping them within the top-10, and with a limited number of queries this can cause Rank-10 to fluctuate in a way that does not reflect a real improvement. Even though the changes in results both positively and negatively, it is clear from this test, that compression impacts model performance, particularly at lower quality levels.
 \begin{table}[H]
 \centering
-\begin{tabular}{|
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    }
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & 100 & Mild 75& Medium 50&
-Heavy 25\\ \hline
-\textbf{mAP}    & 63.4\%& 63.4\%& 59.3\%& 57.6\%\\ \hline
+{} & \makecell{Unmodified\\ (Q = 100)} &   \makecell{Mild \\ (Q = 75)}& \makecell{Medium \\ (Q = 50)}&
+\makecell{Heavy \\ (Q=25)}\\ \hline
 \textbf{Rank-1} & 52.0\%& 52.0\%& 44.0\%& 44.0\%\\ \hline
 \textbf{Rank-5} & 76.0\%& 76.0\%& 76.0\%& 72.0\%\\ \hline
 \textbf{Rank-10}& 84.0\%& 84.0\%& 88.0\%& 96.0\%\\ \hline
@@ -293,39 +285,32 @@ Heavy 25\\ \hline
 \label{tab:compressiontest_result}
 \end{table}
 
-
 \subsubsection{Unseen Data Test}
-
-The subset of new images results in substantially lower mAP and Rank-1 to Rank-20 scores, compared to the unmodified images, as presented in Table \ref{tab:othertest_result}. This outcome is expected, as the iLIDS-VID dataset exclusively contains indoor scenes, whereas datasets used for training and evaluation consists primarily of outdoor images. This shift in domain is likely contributing to the reduced performance on the iLIDS-VID subset. 
-
+The subset of new images results in low results across Rank-1 to Rank-20 scores, as presented in Table \ref{tab:othertest_result}. This outcome is expected, as the iLIDS-VID dataset exclusively contains indoor scenes, whereas datasets used for training and evaluation consists primarily of outdoor images. This shift in domain is likely contributing to the reduced performance on the iLIDS-VID subset. 
 \begin{table}[H]
 \centering
-\begin{tabular}
-    {|>{\centering\arraybackslash}p{0.17\linewidth} 
-    |>{\centering\arraybackslash}p{0.17\linewidth} 
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
     |>{\centering\arraybackslash}p{0.17\linewidth} 
     |}
 \hline
-\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Abnormal and Unseen Data}}\\\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Unseen Data}}\\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & Unmodifed (Market-1501)& New dataset (iLIDS-VID)\\ \hline
-\textbf{mAP}    & 63.4\%& 35.1\%\\ \hline
-\textbf{Rank-1} & 52.0\%& 16.0\%\\ \hline
-\textbf{Rank-5} & 76.0\%& 60.0\%\\ \hline
-\textbf{Rank-10}& 84.0\%& 76.0\%\\ \hline
-\textbf{Rank-20}& 100.0\%& 96.0\%\\ \hline
+{} & New dataset (iLIDS-VID)\\ \hline
+\textbf{Rank-1} & 16.0\%\\ \hline
+\textbf{Rank-5} & 60.0\%\\ \hline
+\textbf{Rank-10}& 76.0\%\\ \hline
+\textbf{Rank-20}& 96.0\%\\ \hline
 \end{tabular}
 \caption{Unseen data test of OSNet on 25 pairs from iLIDS-VID dataset.}
 \label{tab:othertest_result}
 \end{table}
 
 \subsubsection{Summary}
-
-Overall, these results show a clear reduction in performance when OSNet is evaluated on data that is different than what it was primarily trained on. This highlights challenges with generalization, particularly regarding new data, scale, and resolution. The last two are areas that may improve with integration of \ac{SR}.
+Even though the test is conducted on small datasets of only 25 query and 25 gallery images, these results show a clear reduction in performance when OSNet is evaluated on data that is different than what it was primarily trained on. This highlights challenges with generalization, particularly regarding new data, scale, and resolution. The last two are areas that may improve with integration of \ac{SR}.
 
 \section{Super-Resolution}
 \label{sec:SuperResolution}
-
 As stated in Section \ref{subsec:challenges-ReID}, surveillance images often suffer from poor quality, which results in fine-grained details to be lost. This can be mitigated through \acf{SR} integration. \ac{SR} is an image processing technique that reconstructs a \ac{HR} image from one or more \ac{LR} images. The main challenge is that multiple \ac{HR} images can result in the same \ac{LR} image, making \ac{SR} an inverse problem with no unique solution \cite{srhallucination}.
 \\\\
 Classical image up-sampling consists of interpolation, where the spatial dimensions are increased, achieving a smoother and more visually appealing picture. The fallback of these method's is the inherent smoothness produced, which causes fine-grained details to be lost in the process. As stated in Section \ref{imagebasedreid}, the task of accurately re-identifying the same individual requires identifiable features which can distinguish different individuals. Deep learning has revolutionized this task, as it offers methods which can scale the spatial dimension up, without over-smoothing and consequently loose information. 

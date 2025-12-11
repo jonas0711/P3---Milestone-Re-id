@@ -1,8 +1,10 @@
 \chapter{Experiments} \label{cha: experiments}
 In order to determine whether adding an SR module to the ReID model will add any notable value, several experiments are conducted to create a clear and fair method for comparison. In order to test if \ac{SR} is worth implementing in terms of adding extra parameters to the pipeline, it is first tested, if strong data augmentation can improve model performance in terms of generalization across different image scales and resolution. For that reason is both a baseline model and a model trained using strong augmentations firstly trained to determine the need for \ac{SR} implementation.
 
-\section{OOD Test} \label{sec: oodtestny}
-Since the implemented person \acs{ReID} model is trained on the Market-1501 dataset, a new OOD test must be conducted to fulfill this project's definition of an OOD test, as described in Section \ref{outofdistributiontest}. This OOD test is conducted using the dataset DukeMTMC-ReID under three different conditions, as well as the dataset iLIDS-VID which is unknown to OSNet. They are presented in Table \ref{tab:newood_conditions}.
+\section{Out-of-Distribution Test} \label{sec: oodtestny}
+Since the implemented person \acs{ReID} model is trained on the Market-1501 dataset, a new \ac{OOD} test must be conducted to fulfill this project's definition of an \ac{OOD} test, as described in Section \ref{outofdistributiontest}. This \ac{OOD} test is conducted using the test set from DukeMTMC-ReID under three different conditions, as well as the entire dataset iLIDS-VID which is unknown to OSNet. They are presented in Table \ref{tab:newood_conditions}.
+\\\\
+The test on DukeMTMC-ReID has 2,228 query and 17,661 gallery images, while iLIDS-VID is using the 300 images from camera 1 for query and the other 300 images from camera 2 for gallery. This increase in data increases the XXXXX of this evaluation. Because iLIDS-VID contains only two images per identity, the evaluation remains one-shot setting. In contrast, DukeMTMC-ReID includes multiple gallery images per identity, making it a multi-shot evaluation. Therefore, DukeMTMC-ReID is evaluated using Rank-k accuracy and \ac{mAP}, while iLIDS-VID is evaluated Rank-k accuracy only.
 \begin{table}[H]
 \centering
 \renewcommand{\arraystretch}{1.2}
@@ -39,37 +41,54 @@ iLIDS-VID \\
 \caption{Overview of the datasets used to evaluate OSNet under degraded and out-of-distribution conditions.}
 \label{tab:newood_conditions}
 \end{table}
-All models presented in this Chapter will be finally tested and compared using this test.
+
+\noindent The results of the \ac{OOD} test is presented in this chapter, because it captures if \ref{SR} is necessary, while the rest of the results will be included in the Chapter \ref{cha: results}. All models presented in this Chapter will be evaluated and compared using this test.
 
 \section{Baseline OSNet} \label{sec: baselineosnet}
-The OOD test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift in real-world deployment. To ensure a fair comparison with the augmentation trained model, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on DukeMTMC-ReID and ILIDS-vid. The light training augmentation pipeline, presented in \ref{tab:three_subtables}, is used for training of the baseline model. 
+The \ac{OOD} test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift in real-world deployment. To ensure a fair comparison with the augmentation trained model, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on DukeMTMC-ReID and ILIDS-vid. The light training augmentation pipeline, presented in \ref{tab:three_subtables}, is used for training of the baseline model. 
 \\\\
-While other training setups have been tried, the final model is trained with a batch size of 64 and a learning rate of \(1e-3\). The learning rate is reduced by a factor of 0.1 at epochs 100, 175, and 225 using a multi-step scheduler.
+While other training setups have been tried, the final model is trained as described in Section \ref{sec:implementationosnet}. The full training can be seen on Figure \ref{fig:baseaugtrain} with the model with augmentations. The training has been repeated in order to save model states at peak validation result at epoch 81 for both the baseline and augmentation model, see Figure \ref{fig:baseaugvalmap}. The epoch is chosen from the validation results across xx, xx and xx. The retraining has changed the result a bit, because xxxx, but the effect is not so important.
+\begin{figure}[h!]
+    \centering
+    
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{baseaugtrain.png}
+        \caption{First image caption}
+        \label{fig:baseaugtrain}
+    \end{subfigure}
+    \hfill % adds space between
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{baseaugvalmap.png}
+        \caption{Second image caption}
+        \label{fig:baseaugvalmap}
+    \end{subfigure}
 
-The results of the OOD show, that the model fail XXXXX
+    \caption{Overall figure caption}
+    \label{fig:double_demo}
+\end{figure}
+The results of the \ac{OOD} show, that the model fail XXXXX
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    }
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
 \hline
-\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & Scale 1& Scale 0.75& Scale 0.5&
-Scale 0.25\\ \hline
-\textbf{mAP}    & & & & \\ \hline
-\textbf{Rank-1} & & & & \\ \hline
-\textbf{Rank-5} & & & & \\ \hline
-\textbf{Rank-10}& & & & \\ \hline
-\textbf{Rank-20}& & & & \\ \hline
+{} & Unmodified Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 2.83\%& 3.21\%&  1.55\%\\ \hline
+\textbf{Rank-1} & 6.10\%& 7.45\%& 4.13\%\\ \hline
+\textbf{Rank-5} & 13.51\%& 14.77\%& 8.30\%\\ \hline
+\textbf{Rank-10}& 17.68\%& 19.12\%& 11.45\%\\ \hline
+\textbf{Rank-20}& 22.62\%&  23.92\%& 16.07\% \\ 
+\hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\label{tab:scale_ood2test_result}
 \end{table}
 
 \begin{table}[H]
@@ -84,18 +103,17 @@ Scale 0.25\\ \hline
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & 100 & Mild 75& Medium 50&
-Heavy 25\\ \hline
-\textbf{mAP}    & & & & \\ \hline
-\textbf{Rank-1} & & & & \\ \hline
-\textbf{Rank-5} & & & & \\ \hline
-\textbf{Rank-10}& & & & \\ \hline
-\textbf{Rank-20}& & & & \\ \hline
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Heavy \\ (Q = 25)}&
+\makecell{Extra heavy \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 2.83\%& 2.79\%& 2.74\%& 2.65\%\\ \hline
+\textbf{Rank-1} & 6.10\%& 5.66\%& 5.92\%& 5.66\%\\ \hline
+\textbf{Rank-5} & 13.51\%& 13.60\%& 13.29\%& 1.32\%\\ \hline
+\textbf{Rank-10}& 17.68\%& 17.19\%& 17.64\%& 15.98\%\\ \hline
+\textbf{Rank-20}&  22.62\%& 22.22\%& 22.8\%& 21.41\%\\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\label{tab:compressiontest_ood2_result}
 \end{table}
-
 \begin{table}[H]
 \centering
 \begin{tabular}{|>{\centering\arraybackslash}
@@ -104,11 +122,10 @@ Heavy 25\\ \hline
     |}
 \hline
 \multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
-\textbf{mAP}    & \\ \hline
-\textbf{Rank-1} & \\ \hline
-\textbf{Rank-5} & \\ \hline
-\textbf{Rank-10}& \\ \hline
-\textbf{Rank-20}& \\ \hline
+\textbf{Rank-1} & 7\%\\ \hline
+\textbf{Rank-5} & 12.33\%\\ \hline
+\textbf{Rank-10}& 19\%\\ \hline
+\textbf{Rank-20}& 25.33\%\\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_result}
@@ -118,23 +135,21 @@ Heavy 25\\ \hline
 This experiment explores if training the person \acs{ReID} model on heavily augmented data will produce a more robust model than the baseline presented in Section \ref{sec: baselineosnet}. The applied data augmentation is presented in Table \ref{tab:three_subtables}. The model is trained same way as the baseline model to ensure fair comparison.
 \begin{table}[H]
 \centering
-\begin{tabular}{|
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    >{\centering\arraybackslash}p{0.17\linewidth} |
-    }
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
 \hline
-\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}} \\\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & Scale 1& Scale 0.75& Scale 0.5&
-Scale 0.25\\ \hline
-\textbf{mAP}    & & & & \\ \hline
-\textbf{Rank-1} & & & & \\ \hline
-\textbf{Rank-5} & & & & \\ \hline
-\textbf{Rank-10}& & & & \\ \hline
-\textbf{Rank-20}& & & & \\ \hline
+{} & Unmodified Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 2.24\%& 6.51\%& 3.59\%\\ \hline
+\textbf{Rank-1} & 5.07\%& 12.34\%& 7.41\%\\ \hline
+\textbf{Rank-5} & 10.55\%&  15.62\%& 9.83\%\\ \hline
+\textbf{Rank-10}& 14.27\%& 20.06\%& 13.73\%\\ \hline
+\textbf{Rank-20}& 19.17\%&  2.54\%& 1.35\%\\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_result}
@@ -152,16 +167,16 @@ Scale 0.25\\ \hline
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & 100 & Mild 75& Medium 50&
-Heavy 25\\ \hline
-\textbf{mAP}    & & & & \\ \hline
-\textbf{Rank-1} & & & & \\ \hline
-\textbf{Rank-5} & & & & \\ \hline
-\textbf{Rank-10}& & & & \\ \hline
-\textbf{Rank-20}& & & & \\ \hline
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Heavy \\ (Q = 25)}&
+\makecell{Extra heavy \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 2.24\%& 2.25\%& 2.26\%& 2.20\%\\ \hline
+\textbf{Rank-1} & 5.07\%& 5.16\%& 5.21\%& 4.67\%\\ \hline
+\textbf{Rank-5} & 10.55\%& 10.82\%& 11.36\%& 10.55\%\\ \hline
+\textbf{Rank-10}& 14.27\%& 14.41\%&  14.32\%& 13.51\%\\ \hline
+\textbf{Rank-20}&   19.17\%& 19.39\%& 18.94\%& 18.40\%\\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\label{tab:compressiontest_ood2_result}
 \end{table}
 
 \begin{table}[H]
@@ -172,11 +187,10 @@ Heavy 25\\ \hline
     |}
 \hline
 \multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
-\textbf{mAP}    & \\ \hline
-\textbf{Rank-1} & \\ \hline
-\textbf{Rank-5} & \\ \hline
-\textbf{Rank-10}& \\ \hline
-\textbf{Rank-20}& \\ \hline
+\textbf{Rank-1} & 2.67\%\\ \hline
+\textbf{Rank-5} & 7.33\%\\ \hline
+\textbf{Rank-10}& 11.67\%\\ \hline
+\textbf{Rank-20}& 18.67\%\\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_result}
@@ -249,36 +263,27 @@ Heavy 25\\ \hline
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_result}
 \end{table}
-
-
-Based on the results presented in Section \ref{sec: robustosnet}, the problem of images being out of distribution is not adequately solved through data augmentation alone. Therefore, a second experiment was conducted where the baseline model presented in Section \ref{sec: baselineosnet} was combined with a \ac{SR} model. Before evaluating the sequential pipeline, the \ac{SR} module itself was trained and validated to ensure adequate reconstruction quality.
-
 \subsection{EDSR Training}
-Two training strategies were explored for the \ac{EDSR} model: training from scratch on RELLISUR data and finetuning a model pretrained on \ac{DIV2K}. Both models used the baseline configuration described in Section \ref{sec:edsr_implementation}.
-
-\subsubsection{Training from Scratch}
-The model trained from scratch on cropped RELLISUR data showed a typical learning progression. Training loss started at approximately 0.12 and decreased rapidly to around 0.095 within the first 25 epochs. The loss continued to decrease gradually and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved to approximately 25.3 dB within the first 25 epochs. The highest validation \ac{PSNR} of 25.72 dB was achieved at epoch 113. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, indicating that the model had converged.
-
-\subsubsection{Finetuning from DIV2K}
-The model pretrained on \ac{DIV2K} and finetuned on cropped RELLISUR data exhibited a different training pattern. Training loss started at approximately 0.078 and decreased only marginally to around 0.073 over the course of training. This low initial loss indicated that the pretrained weights already captured general \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.20 dB. This behavior suggested that continued training on the domain-specific data caused slight overfitting to the training distribution. A reduced learning rate of $5 \times 10^{-6}$ was used to prevent catastrophic forgetting of the pretrained features.
-
-\subsubsection{Comparison of Training Strategies}
-Figure \ref{fig:edsr_comparison} compares the training curves of both \ac{EDSR} models. The scratch model achieved higher validation \ac{PSNR} (25.72 dB versus 25.49 dB) but the finetuned model maintained lower training loss throughout. This apparent contradiction is explained by the different training distributions: the scratch model specialized heavily on the cropped validation images, while the finetuned model retained broader generalization capabilities from \ac{DIV2K} pretraining. The implications of this difference became evident when evaluating on the out-of-distribution test set, as presented in Chapter \ref{cha: results}.
+Two training strategies were explored for the \ac{EDSR} model. The first approach trained the model from scratch on RELLISUR data. The second approach took the best checkpoint from this model and finetuned it on \ac{DIV2K} to improve generalization. Both models used the baseline configuration described in Section \ref{sec:edsr_implementation}.
+\\\\
+The model trained from scratch on RELLISUR showed a typical learning progression. Training loss started at approximately 0.12 and decreased rapidly to around 0.095 within the first 25 epochs. The loss continued to decrease gradually and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved to approximately 25.3 dB within the first 25 epochs, with the highest validation \ac{PSNR} of 25.72 dB achieved at epoch 113. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, indicating that the model had converged.
+\\\\
+The best checkpoint from the scratch model was then finetuned on \ac{DIV2K} to expose the model to more diverse image content. This finetuning exhibited a different training pattern. Training loss started at approximately 0.078, which is notably lower than the initial scratch training, and decreased only marginally to around 0.073 over the course of training. This low initial loss indicated that the RELLISUR-trained weights already captured useful \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.20 dB. This behavior suggested that continued training on \ac{DIV2K} shifted the model away from the RELLISUR validation distribution. A reduced learning rate of $5 \times 10^{-6}$ was used to prevent catastrophic forgetting of the features learned on RELLISUR.
+\\\\
+Figure \ref{fig:edsr_comparison} compares the training curves of both models. The scratch model achieved higher validation \ac{PSNR} but the finetuned model maintained lower training loss throughout. This apparent contradiction is explained by the different training distributions. The scratch model specialized heavily on the cropped RELLISUR validation images, while the finetuned model gained broader generalization capabilities from the diverse \ac{DIV2K} data. The implications of this difference became evident when evaluating on the out-of-distribution test set, as presented in Chapter \ref{cha: results}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/images/cropped_models_comparison.png}
-    \caption{Comparison of training curves for \ac{EDSR} trained from scratch (blue) and \ac{EDSR} pretrained on \ac{DIV2K} and finetuned (green). Top left: Training loss. Top right: Validation loss. Bottom left: Validation \ac{PSNR}. Bottom right: Learning rate schedule.}
+    \caption{Comparison of training curves for \ac{EDSR} trained from scratch on RELLISUR (blue) and the same model finetuned on \ac{DIV2K} (green). Top left shows training loss, top right shows validation loss, bottom left shows validation \ac{PSNR}, and bottom right shows the learning rate schedule.}
     \label{fig:edsr_comparison}
 \end{figure}
 
 \subsection{SwinIR Baseline}
-In addition to the trained \ac{EDSR} models, three pretrained SwinIR models were evaluated without finetuning to establish a baseline comparison with a state-of-the-art transformer-based \ac{SR} architecture. SwinIR Classic and SwinIR Real (Medium) were trained for classical image \ac{SR}, while SwinIR Real (Large) was trained with complex degradation models intended for real-world artifacts. These models were evaluated directly on the RELLISUR test set to assess their zero-shot generalization capabilities.
+In addition to the trained \ac{EDSR} models, three pretrained SwinIR models were evaluated without finetuning to establish a baseline comparison with a transformer-based \ac{SR} architecture. SwinIR Classic and SwinIR Real Medium were trained for classical image \ac{SR}, while SwinIR Real Large was trained with complex degradation models intended for real-world artifacts. These models were evaluated directly on the RELLISUR test set to assess their zero-shot generalization capabilities.
 
-\subsection{Sequential Evaluation Setup}
+\subsection{Sequential Evaluation}
 The sequential evaluation pipeline passed images through the trained \ac{SR} model before feeding the upscaled output to the \ac{ReID} model. This setup allowed direct comparison between the baseline \ac{ReID} performance and the \ac{SR}-enhanced pipeline under identical test conditions. The evaluation was conducted on the OOD test conditions described in Table \ref{tab:newood_conditions}.
-
-
 
 \section{Joint EDSR and Baseline OSNet}
 The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the OSNet baseline model with EDSR in a joint end-to-end framework. 

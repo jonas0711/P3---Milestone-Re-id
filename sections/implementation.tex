@@ -3,9 +3,9 @@ This Chapter presents the implementation of the SR and ReID together with the ov
 
 \section{Dataloaders}
 \label{imp_dataloading}
-Both of the data loaders are built using the Dataset and DataLoader classes from torch.utils.data. They are designed to generate batches of data samples for training, validation and test. Special for the \ac{ReID} data loader is that validation and test is split into query and gallery splits. 
+Both of the data loaders are built using the \texttt{Dataset} and \texttt{DataLoader} classes from \texttt{torch.utils.data}. They are designed to generate batches of data samples for training, validation and test. Special for the \ac{ReID} data loader is that validation and test is split into query and gallery splits. 
 \\\\
-For the \ac{ReID} datasets, three datasets are used for training: MSMT17, Market1501 and CUHK03. The data loader is combining these datasets, enabling joint training across all of them. To prevent any person-id conflict, in case where the same person-id is appearing in multiple dataset, and ensure continues id-values a json file with mappings is created. This maps from the old id, with a dataset specific prefix in front, to a new continues value. It ensures that all person IDs remain unique across dataset, while preserving person-id for each person and introducing continues values for which a softmax can be trained on. In the process of creating the json file, every 10th new person-id are pulled into a validation set. In the data loader, one sample per person ID is added to the query set. The remaining samples are categorized for the gallery set: any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery.
+For the \ac{ReID} datasets, three datasets are used for training: MSMT17, Market1501 and CUHK03. The data loader is combining these datasets, enabling joint training across all of them. To prevent any person-id conflict, in cases where the same person-id is appearing in multiple datasets, and ensure continues ID-values, a \texttt{JSON} file with mappings is created. This maps from the old ID, with a dataset specific prefix in front, to a new continues value. It ensures that all peoples ID's remain unique across datasets, while preserving person-ID for each person and introducing continues values for which a softmax can be trained on. In the process of creating the \texttt{JSON} file, every 10th new person-ID are pulled into a validation set. In the data loader, one sample per person-ID is added to the query set. The remaining samples are categorized for the gallery set: Any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery.
 \\\\
 The data loader for the SR datasets simply splits the images into input and target images, and creates batches. The images from DIV2K and RELLISUR dataset are kept separate.
 
@@ -81,7 +81,7 @@ A classic way to improve performance and generalization is through augmentations
 \end{table}
 \noindent The three augmentations pipelines will be used in Chapter \ref{cha: experiments}.
 
-\section{Implementation of OSNet}
+\section{Implementation of OSNet}\label{sec:implementationosnet}
 %Note: vi bruger x1 modellen, som er den største. 
 The architecture of the person \acs{ReID} model that is implemented is the same as described in Section \ref{lab:methodreid}. The \acf{OSNet} implementation is taken from the \texttt{Torchreid} library, which comes with a pretrained \acs{OSNet} model. However, to ensure full control over the training process and to train from scratch, a custom training script is made. 
 \begin{table}[H]
@@ -106,7 +106,7 @@ The model is trained on the combination of Market-1501, MSMT17 and CUHK03 train 
 
 \subsubsection{Hyperparameters}
 The complete set of training hyper parameters is presented in Table \ref{tab:osnettrainingparameters}. The model is trained by using \ac{SGD} with momentum of 0.9 and weight decay of 0.0005  for regularization. The initial learning rate is set to 0,001. The loss function used is CrossEntropyLoss with a label smoothing of 0.1. Label smoothing is a regularization technique that prevents the model for becoming overconfident in its predictions by softening the target labels. Instead of using one-hot encoded labels. This is particularly beneficial for person ReID, as it addresses the challenge of limited training samples per identity. By preventing extreme confidence on training identities, label smoothing encourages the model to learn more robust features that generalize better to unseen test identities, a critical requirement for the open-set nature of person ReID. Unlike many person ReID approaches, no triplet loss is incorporated in this implementation.
-A \texttt{MultiStepLR} scheduler controls the learning rate throughout training, reducing it by a factor of 0.1 at epoch 60, 120, and 180. The results of the learning rate schedule:
+A \texttt{MultiStepLR} scheduler controls the learning rate throughout training, reducing it by a factor of 0.1 at epoch 100, 175, and 225. The results of the learning rate schedule:
 
 \begin{itemize}
     \item Epochs 0-100: LR =0.001
@@ -125,7 +125,7 @@ The models performance is monitored through periodic validation:
     \item For epochs 201 - 350: validation frequency increases to every 5 epoch
 \end{itemize}
 
-This adaptive validation strategy allows for more frequent monitoring as the training and the model approaches convergence.
+\noindent This adaptive validation strategy allows for more frequent monitoring as the training and the model approaches convergence.
 
 %Info om LR, Få mere info i næste afsnit.
 \begin{table}[H]
@@ -157,10 +157,10 @@ This adaptive validation strategy allows for more frequent monitoring as the tra
 \section{Implementation of EDSR}
 \label{sec:edsr_implementation}
 
-The \ac{EDSR} model was selected for the \ac{SR} module based on its low distortion characteristics, as discussed in Section \ref{sec:sr_methods}. This section describes the implementation details, including model architecture, data loading, augmentation strategies, and training procedures.
+This section describes the implementation details, including model architecture, data loading, augmentation strategies, and training procedures.
 
 \subsection{Model Architecture}
-The baseline \ac{EDSR} configuration was used, which provides a balance between computational efficiency and reconstruction quality. The architecture consists of an initial convolutional layer that expands the input from 3 RGB channels to the feature space, followed by a stack of residual blocks, and finally an upsampling module that produces the super-resolved output. Table \ref{tab:edsr-architecture} summarizes the architectural parameters.
+The baseline \ac{EDSR} configuration was used, which provides a balance between computational efficiency and reconstruction quality. Table \ref{tab:edsr-architecture} summarizes the architectural parameters.
 
 \begin{table}[H]
     \centering
@@ -178,14 +178,14 @@ The baseline \ac{EDSR} configuration was used, which provides a balance between 
 \end{table}
 
 \noindent Each residual block consists of two 3×3 convolutional layers with ReLU activation between them. The residual scaling factor multiplies the output of each residual block before adding it to the skip connection, which helps stabilize training in deeper networks. For the baseline configuration with 64 feature maps, a residual scaling factor of 1.0 was used, as scaling is primarily needed for wider networks with 256 feature maps.
-
-The upsampling module uses a sub-pixel convolution approach (PixelShuffle), where a convolutional layer first expands the feature maps by a factor of $\text{scale}^2$, and the PixelShuffle operation then rearranges these features into the spatially upscaled output. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
-
+\\\\
+The upsampling module uses a sub-pixel convolution approach (\texttt{PixelShuffle}), where a convolutional layer first expands the feature maps by a factor of $\text{scale}^2$, and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
+\\\\
 \subsection{Dataset and Data Loading}
 Two dataset classes were implemented to handle different data formats. The \texttt{SRDataset} class loads paired \ac{LR} and \ac{HR} images from separate directories, matching files by sorted order. This class was used for the RELLISUR dataset, where cropped person images were prepared at 64×128 pixels (\ac{LR}) and 128×256 pixels (\ac{HR}).
-
+\\\\
 The \texttt{DIV2KDataset} class handles the \ac{DIV2K} dataset format, where \ac{LR} images follow the naming convention \texttt{0001x2.png} corresponding to \ac{HR} images named \texttt{0001.png}. This class automatically matches \ac{LR} and \ac{HR} pairs based on filename parsing.
-
+\\\\
 Both dataset classes support synchronized augmentation through a \texttt{use\_sync\_aug} parameter. When enabled, the same random seed is used for both \ac{LR} and \ac{HR} images, ensuring that geometric transformations such as horizontal flipping are applied consistently to both images in a pair.
 
 \subsection{Data Augmentation}
@@ -205,7 +205,7 @@ A set of data augmentation transforms was implemented to improve model robustnes
 \end{table}
 
 \noindent Horizontal flip and brightness change were applied with synchronized random states between \ac{LR} and \ac{HR} images to maintain correspondence. Gaussian noise and Gaussian blur were applied independently to simulate realistic degradations. All images were normalized to the range [-1, 1] using mean and standard deviation of 0.5 per channel.
-
+\\\\
 For validation, no augmentation was applied. Images were converted to tensors and normalized using the same normalization parameters as training.
 
 \subsection{Training Configuration}
@@ -275,6 +275,27 @@ This sequential evaluation script is made to test both \ac{ReID} alone and also 
 \section{Implementation of Joint ReID and SR}
 Since the \ac{SR} module is trained to upscale images, it is not specialized for the task of person \ac{ReID}. By combining the two modules end-to-end, the \ac{ReID} loss can flow back into the \ac{SR} module, forcing it to learn specific upscaling and cleaning operations which improve the final \ac{ReID} task. 
 \\\\
-To combine the two modules end to end, each model was downloaded from it’s respective github repository. The models were then wrapped in a function which builds the model with the configuration befitting it’s size. OSNet configuration can be seen in Table \ref{tab:osnet-config}, EDSR configuration can be seen in Table \ref{tab:edsr-config}.
+To combine the two modules end to end, each model was downloaded from it’s respective Github repository. The models were then wrapped in a function which builds the model with the configuration befitting it’s size. OSNet configuration can be seen in Table \ref{tab:osnet-config}, EDSR configuration can be seen in Table \ref{tab:edsr-config}.
+\\\\
+To allow for losses to backpropagate through both modules, a new class was created with a combined forward pass. The forward pass takes an image as input, forwards it through the \ac{SR} module first and then through the \ac{ReID} module, with the option of also returning the \ac{SR} output to increase operation transparency. The class also allows for each module to be initated with frozen weights, such that the possibility of the \ac{SR} module becoming a \ac{ReID} feature extractor is minimized. The frozen module can then be unfrozen with an unfreeze function.
 
-\noindent To allow for losses to backpropagate through both modules, a new class was created with a combined forward pass. The forward pass takes an image as input, forwards it through the \ac{SR} module first and then through the \ac{ReID} module, with the option of also returning the \ac{SR} output to increase operation transparency. The class also allows for each module to be initated with frozen weights, such that the possibility of the \ac{SR} module becoming a \ac{ReID} feature extractor is minimized. The frozen module can then be unfrozen with an unfreeze function.
+\section{Deployment}
+\label{deployment}
+As the \ac{ReID} system was made with the intention to be employed in a real-world setting, a script has been created that allows it to be used on a third-party system, with API probabilities that enables it to be used by external systems and users if needed.
+\\\\
+To ensure a more streamlined implementation of the system in future uses, the deployment was made with a Docker containerization setup. This ensures that relevant libraries, dependencies, and any other version-specific parameters needed to run the script are present and being used. Furthermore, a requirements text file with used libraries and corresponding versions has also been included to allow reproducibility of the container or another virtual environment if needed.
+\\\\
+The deployment script utilizes the \texttt{FastAPI} library as its core framework for web related communication. This is specifically used because of its easy to use, yet powerful foundation and tools. As deployment was not the primary focus point of this project, only a simple \texttt{GET} and \texttt{POST} request method has been integrated in the script, which runs through hard-coded image directories located in the server, with little to no front end in mind. If implementation on a real system was the end-goal of this project, more work would have been done on the front-and backend of the system to achieve an industry standard.
+\\\\
+The backend pipeline of the deployment script works by first processing and encoding the gallery and query image(s) from a \texttt{.JPG} filetype to a base64 encoding, and a tensor that fits the image structure. The tensor is the original image, normalized and preprocessed as to work with the model and its architecture, while the base64 encoding is used to keep the original non preprocessed image, which can be returned to the front end later. This is done for each image, both 
+
+
+%docker
+%base64 and tensor
+%html code
+%fastapi
+%hardcoded paths
+%uvicorn
+%requirements
+%post/get?
+%

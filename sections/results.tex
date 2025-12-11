@@ -1,16 +1,13 @@
-\chapter{Results} \label{cha: results}
+\chapter{Results} \label{cha: results}\chapter{Results} \label{cha: results}
 
-This chapter presents the final evaluation results for all trained models. The models were tested both in-distribution on standard \ac{ReID} benchmarks and out-of-distribution using the conditions described in Section \ref{sec: baselineosnet}.
+This chapter presents the final evaluation results for all trained models. The models were tested both in-distribution on standard \ac{ReID} benchmarks and out-of-distribution using the conditions described in Section \ref{sec: oodtestny}.
 
 \section{Super-Resolution Results}
 \label{sec:sr_test_results}
 
-The \ac{SR} models were evaluated on the RELLISUR NLHR test set, which consists of 85 native low-resolution images. This test set represents a realistic out-of-distribution scenario, as the models were trained on cropped image pairs but evaluated on full native low-resolution images. Table \ref{tab:sr_test_results} summarizes the \ac{PSNR} and \ac{SSIM} metrics for all evaluated models.
-
+The \ac{SR} models were evaluated on the RELLISUR NLHR test set, which consists of 85 native low-resolution images. This test set represents a realistic out-of-distribution scenario, as the models were trained on cropped image pairs but evaluated on full native low-resolution images. Table \ref{tab:sr_test_results} summarizes the results.
 \begin{table}[H]
     \centering
-    \caption{Test results on RELLISUR NLHR test set (85 images). Metrics computed between super-resolved and ground truth high-resolution images.}
-    \label{tab:sr_test_results}
     \begin{tabular}{|l|c|c|c|c|}
         \hline
         \cellcolor[HTML]{D8E9F7}\textbf{Model} & \cellcolor[HTML]{D8E9F7}\textbf{PSNR (dB)} & \cellcolor[HTML]{D8E9F7}\textbf{PSNR Std} & \cellcolor[HTML]{D8E9F7}\textbf{SSIM} & \cellcolor[HTML]{D8E9F7}\textbf{SSIM Std} \\
@@ -26,14 +23,15 @@ The \ac{SR} models were evaluated on the RELLISUR NLHR test set, which consists 
         SwinIR Real (Large) & 13.19 & - & 0.042 & - \\
         \hline
     \end{tabular}
+    \caption{Test results on RELLISUR NLHR test set consisting of 85 images. Metrics were computed between super-resolved and ground truth high-resolution images.}
+    \label{tab:sr_test_results}
 \end{table}
-
-The \ac{EDSR} model pretrained on \ac{DIV2K} and finetuned on RELLISUR achieved the best overall performance with an average \ac{PSNR} of 33.30 dB and \ac{SSIM} of 0.970. The model trained from scratch achieved 31.77 dB \ac{PSNR} and 0.962 \ac{SSIM}. The 1.53 dB difference represents a meaningful improvement in reconstruction quality. Individual image \ac{PSNR} values ranged from approximately 20 dB to 42 dB, with variation depending on image content, lighting conditions, and the resolution of the original capture.
-
-The performance difference between in-distribution validation and out-of-distribution testing was notable. While the scratch model achieved higher validation \ac{PSNR} during training (25.72 dB versus 25.49 dB), the finetuned model substantially outperformed on the test set. This indicated that the diversity of the \ac{DIV2K} dataset provided the finetuned model with better generalization capabilities for native low-resolution images that differ from the cropped training distribution.
-
-The pretrained SwinIR models performed considerably worse without domain-specific finetuning. SwinIR Classic achieved 27.23 dB \ac{PSNR}, which is 6.07 dB lower than the best \ac{EDSR} model. SwinIR Real (Large) failed entirely with a \ac{PSNR} of 13.19 dB and \ac{SSIM} of 0.042, producing severe artifacts due to an architectural mismatch with the RELLISUR image characteristics.
-
+\noindent The \ac{EDSR} model trained on RELLISUR and finetuned on \ac{DIV2K} achieved the best overall performance with an average \ac{PSNR} of 33.30 dB and \ac{SSIM} of 0.970. The model trained only on RELLISUR achieved 31.77 dB and 0.962 respectively. The 1.53 dB difference represents a meaningful improvement in reconstruction quality.
+\\\\
+The performance difference between in-distribution validation and out-of-distribution testing was notable. While the scratch model achieved higher validation \ac{PSNR} during training, the \ac{DIV2K}-finetuned model substantially outperformed on the test set. This indicated that the diversity of the \ac{DIV2K} dataset provided the finetuned model with better generalization capabilities for native low-resolution images.
+\\\\
+The pretrained SwinIR models performed considerably worse without domain-specific finetuning. SwinIR Classic achieved 27.23 dB, which is 6.07 dB lower than the best \ac{EDSR} model. SwinIR Real Large failed entirely with a \ac{PSNR} of 13.19 dB and \ac{SSIM} of 0.042, producing severe artifacts due to a mismatch between expected and actual input characteristics.
+\\\\
 Based on these results, the \ac{EDSR} \ac{DIV2K}-finetuned model was selected for integration with the \ac{ReID} pipeline.
 
 \section{ReID Results}
@@ -43,33 +41,31 @@ The \ac{ReID} models were evaluated both in-distribution on standard benchmarks 
 \subsection{In-Distribution Performance}
 
 Table \ref{tab:reid_indist} presents the in-distribution performance of all model configurations on the MSMT17, Market-1501, and CUHK03 datasets.
-
 \begin{table}[H]
     \centering
-    \caption{In-distribution test results for all model configurations.}
-    \label{tab:reid_indist}
     \begin{tabular}{|c|c|c|c|c|c|c|}\hline
         \multicolumn{7}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{In-Distribution Test}}\\\hline
         \rowcolor[HTML]{D8E9F7}
          & \multicolumn{2}{c|}{\textbf{MSMT17}} & \multicolumn{2}{c|}{\textbf{Market-1501}} & \multicolumn{2}{c|}{\textbf{CUHK03}} \\\hline
         \rowcolor[HTML]{D8E9F7}
          & Rank-1 & mAP & Rank-1 & mAP & Rank-1 & mAP \\\hline
-         Baseline & & & & & & \\\hline
-         Augmented & & & & & & \\\hline
+         Baseline & & & 50.53\%& 29.16\%& 2.64\%& 2.68\%\\\hline
+         Augmented & & & 30.64\%& 16.23\%& 0.43\%& 0.93\%\\\hline
          Sequential & & & & & & \\\hline
          Joint & & & & & & \\\hline
     \end{tabular}
+    \caption{In-distribution test results for all model configurations.}
+    \label{tab:reid_indist}
 \end{table}
 
 \subsection{Out-of-Distribution Performance}
-
 
 The models are not only tested and evaluated using the OOD test, but also tested on the dataset in distribution, in order to determine how the models is in general. 
 
 \begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}\hline
- \multicolumn{7}{|c|}{In Distrubution Test}\\\hline
+ \multicolumn{7}{|c|}{Out Distrubution Test}\\\hline
          &  \multicolumn{2}{|c|}{MSMT}&  \multicolumn{2}{|c|}{Market}&  \multicolumn{2}{|c|}{CUHK}\\\hline
          &  Rank-1&  mAP&  Rank-1&  mAP&  Rank-1& mAP\\\hline
          Baseline&  &  &  &  &  & \\\hline

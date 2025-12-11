@@ -24,20 +24,13 @@ This process is repeated until the fourth convolution stage, which is followed b
 
 
 \section{EDSR}
-The \acf{EDSR} and \acs{MDSR} are \acs{ResNet} based architectures for single image \acs{SR} designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{edsr related works}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a preprocessing unit for the task of \acs{ReID}. \acs{EDSR} can be viewed as a simplified yet substantially deepened and widened successor to  \acs{SRResNET}. The architecture consists of a convolutional layer, a deep stack of residual blocks and a upsampling module that produces the super-resolution output for a given scaling factor. A key design is the removal of batch normalization layers from the residual blocks. In low level vision tasks, batch normalization has been observed to degrade image quality and unnecessarily constrain the dynamic range of feature representations while also increasing memory usage. By excluding batch normalization, \acs{EDSR} can use more feature channels and more layers within the same resource budget, which in practice leads to an improvement in \acs{PSNR} and \acs{SSIM} on standard \acs{SR} benchmarks.
-\\\\
-To support very deep and wide models, \acs{EDSR} uses residual scaling, where the output of each residual block is multiplied by a small factor (typically 0,1) before being added to the skip connection. This simple mechanism helps to keep the training process numerically stable. The upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, so only the final layers project the feature maps to high resolution. 
-\\\\
-The \acs{MDSR} architecture extends this idea to multiple scaling factors by introducing a shared "main branch" of residual blocks combined with small scale specific prepossessing and upsampling modules for each scale (2x, 3x, 4x). In this way a single model can support multiple upscaling factors, with a relatively low parameter count and without a substantial loss in performance  compared to separate single scale models. As a result \acs{EDSR} and \acs{MDSR} constitute a general and well established architectural option for learning based \acs{SR} and have frequently been used as a reference or starting point in subsequent work \cite{lim2017edsr}.
-
+\acf{EDSR} and is a \acs{ResNet} based architectures for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{edsr related works}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}. \acs{EDSR} can be viewed as a simplified yet substantially deepened and widened successor to \acs{SRResNET}. The architecture consists of a convolutional layer, a deep stack of residual blocks and a upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, the internal flow of each resblock is illustrated in Figure \ref{fig:resblockpipeline}, and the process inside the final upsample block can be seen in Figure \ref{fig:upsampleblockpipeline}. 
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{edsrpipeline.drawio.png}
     \caption{An overview of the ESDR pipeline.}
     \label{fig:edsrpipeline}
 \end{figure}
-
-
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{resblockpipeline.drawio.png}
@@ -45,10 +38,37 @@ The \acs{MDSR} architecture extends this idea to multiple scaling factors by int
     \label{fig:resblockpipeline}
 \end{figure}
 
+
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{upsampleblockpipeline.drawio.png}
     \caption{An overview of the internal process of the upsample block.}
     \label{fig:upsampleblockpipeline}
 \end{figure}
+\noindent A key design to improve reconstruction quality is the removal of batch normalization layers from the residual blocks. In low level vision tasks, batch normalization has been observed to degrade image quality and unnecessarily constrain the dynamic range of feature representations while also increasing memory usage. By excluding batch normalization, \acs{EDSR} can use more feature channels and more layers within the same resource budget, which in practice leads to an improvement in \acs{PSNR} and \acs{SSIM} on standard \acs{SR} benchmarks\cite{lim2017edsr}.
+\\\\
+As \acs{EDSR} is a deep and wide model, residual scaling is used such that the output of each residual block is multiplied by a small factor before being added to the skip connection, in order to stabilize the training. The upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. 
+\\\\
+As a result \acs{EDSR} constitutes a general and well established architectural option for learning based \acs{SR} and has frequently been used as a reference or starting point in subsequent work \cite{lim2017edsr}. 
 
+
+\section{Loss Functions}
+
+
+\subsubsection{Cross-Entropy Loss}
+
+\subsubsection{Triplet Loss}
+The triplet loss function works on three objects at a time: 
+\begin{itemize}
+    \item \texttt{anchor}
+    \item \texttt{postive}, a sample with the same label as the \texttt{anchor} 
+    \item \texttt{negative}, a sample with a different label than the \texttt{anchor}
+\end{itemize}
+
+
+
+\section{Evaluation Metrics}
+
+\subsubsection{Rank}
+
+\subsubsection{mAP}
