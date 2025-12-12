@@ -1,10 +1,13 @@
 \chapter{Experiments} \label{cha: experiments}
-In order to determine whether adding an SR module to the ReID model will add any notable value, several experiments are conducted to create a clear and fair method for comparison. In order to test if \ac{SR} is worth implementing in terms of adding extra parameters to the pipeline, it is first tested, if strong data augmentation can improve model performance in terms of generalization across different image scales and resolution. For that reason is both a baseline model and a model trained using strong augmentations firstly trained to determine the need for \ac{SR} implementation.
+
+In order to determine whether adding an SR module to the ReID model added any notable value, several experiments were conducted to create a clear and fair method for comparison. In order to test if \ac{SR} is worth implementing in terms of adding extra parameters to the pipeline, it is first tested, if strong data augmentation during training can improve model performance in terms of generalization across different domains, image scales and resolution. For that reason both a baseline model (without augmentations) and a model trained  with strong augmentations were trained to determine the need for \ac{SR} implementation.
 
 \section{Out-of-Distribution Test} \label{sec: oodtestny}
-Since the implemented person \acs{ReID} model is trained on the Market-1501 dataset, a new \ac{OOD} test must be conducted to fulfill this project's definition of an \ac{OOD} test, as described in Section \ref{outofdistributiontest}. This \ac{OOD} test is conducted using the test set from DukeMTMC-ReID under three different conditions, as well as the entire dataset iLIDS-VID which is unknown to OSNet. They are presented in Table \ref{tab:newood_conditions}.
+
+Since the implemented person \acs{ReID} model was trained on the Market-1501 dataset, a new \ac{OOD} test had to be designed to fulfill this project's definition of an \ac{OOD} test, as described in Section \ref{outofdistributiontest}. This \ac{OOD} test was conducted using the test set from DukeMTMC-ReID under three different conditions, as well as the entire iLIDS-VID dataset which is unknown to OSNet. They are presented in Table \ref{tab:newood_conditions}.
 \\\\
-The test on DukeMTMC-ReID has 2,228 query and 17,661 gallery images, while iLIDS-VID is using the 300 images from camera 1 for query and the other 300 images from camera 2 for gallery. This increase in data increases the XXXXX of this evaluation. Because iLIDS-VID contains only two images per identity, the evaluation remains one-shot setting. In contrast, DukeMTMC-ReID includes multiple gallery images per identity, making it a multi-shot evaluation. Therefore, DukeMTMC-ReID is evaluated using Rank-k accuracy and \ac{mAP}, while iLIDS-VID is evaluated Rank-k accuracy only.
+The test on DukeMTMC-ReID has 2,228 query and 17,661 gallery images, while iLIDS-VID uses the 300 images from camera 1 for query and the other 300 images from camera 2 for gallery. This increase in data increases the XXXXX of this evaluation. Since iLIDS-VID contains only two images per identity, the evaluation remains a one-shot setting. In contrast, DukeMTMC-ReID includes multiple gallery images per identity, making it a multi-shot evaluation. Therefore, DukeMTMC-ReID was evaluated using Rank-k accuracy and \ac{mAP}, while iLIDS-VID is evaluated using Rank-k accuracy only.
+
 \begin{table}[H]
 \centering
 \renewcommand{\arraystretch}{1.2}
@@ -42,31 +45,53 @@ iLIDS-VID \\
 \label{tab:newood_conditions}
 \end{table}
 
-\noindent The results of the \ac{OOD} test is presented in this chapter, because it captures if \ref{SR} is necessary, while the rest of the results will be included in the Chapter \ref{cha: results}. All models presented in this Chapter will be evaluated and compared using this test.
+\noindent The results of the \ac{OOD} test are presented in this chapter, because it shows if \acs{SR} is necessary, while the results from final testing will be included in Chapter \ref{cha: results}. All models presented in this Chapter will be evaluated and compared using the \ac{OOD} test.
 
 \section{Baseline OSNet} \label{sec: baselineosnet}
-The \ac{OOD} test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift in real-world deployment. To ensure a fair comparison with the augmentation trained model, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on DukeMTMC-ReID and ILIDS-vid. The light training augmentation pipeline, presented in \ref{tab:three_subtables}, is used for training of the baseline model. 
+
+The \ac{OOD} test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf OSNet model fails when confronted with images that are heavily augmented and simulate the domain shift encountered in real-world deployment. To ensure a fair comparison with the augmentation trained model, a baseline model is trained from scratch, using the three datasets presented in Chapter \ref{cha:data}, and tested on DukeMTMC-ReID and ILIDS-vid. The light training augmentation pipeline, presented in \ref{tab:three_subtables}, is used for training of the baseline model. 
 \\\\
-While other training setups have been tried, the final model is trained as described in Section \ref{sec:implementationosnet}. The full training can be seen on Figure \ref{fig:baseaugtrain} with the model with augmentations. The training has been repeated in order to save model states at peak validation result at epoch 81 for both the baseline and augmentation model, see Figure \ref{fig:baseaugvalmap}. The epoch is chosen from the validation results across xx, xx and xx. The retraining has changed the result a bit, because xxxx, but the effect is not so important.
-\begin{figure}[h!]
+While different training setups were tried, the final model is trained as described in Section \ref{sec:implementationosnet}. The full training of the model with augmentations can be seen in Figure \ref{fig:baseaugtrain}. The training was repeated in order to save model states at peak validation result at epoch 81 for both the baseline and augmentation model, see Figure \ref{fig:augbaseloggings}. The epoch was chosen from the mean validation results Figure \ref{fig:baseaugvalaverage}. The retraining resulted in a slightly different performance, which is presumed to stem from the random augmentations applied. This shortcoming is acknowledged in Section \ref{sec: Dataaugmentation discussion}. 
+
+\begin{figure}[H]
     \centering
     
-    \begin{subfigure}[b]{0.4\textwidth}
+    \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{baseaugtrain.png}
-        \caption{First image caption}
+        \caption{Training loss for baseline and augmentation model}
         \label{fig:baseaugtrain}
     \end{subfigure}
     \hfill % adds space between
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{baseaugvalmap.png}
-        \caption{Second image caption}
+        \caption{Mean Average Precision for baseline and augmentation model}
         \label{fig:baseaugvalmap}
     \end{subfigure}
-
-    \caption{Overall figure caption}
-    \label{fig:double_demo}
+    \vfill % adds space between
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{augbaserank.png}
+        \caption{Rank-1 for baseline and augmentation model}
+        \label{fig:baseaugvalrank}
+    \end{subfigure}
+    \hfill
+\begin{subfigure}[b]
+{0.49\textwidth}
+        \includegraphics[width=\textwidth]{baseaugaverage.png}
+        \caption{Mean validation result for baseline and augmentation model}
+        \label{fig:baseaugvalaverage}
+    \end{subfigure}
+    \caption{Training and validation results for baseline and augmentation model}
+    \label{fig:augbaseloggings}
 \end{figure}
-The results of the \ac{OOD} show, that the model fail XXXXX
+\noindent Even though the validation results is not showing anything close to state-of-the-art performance, the test results can still be compared between the models presented in this chapter.
+
+\subsection*{Out-of-Distribution Test on DukeMTMC-ReID}
+The baseline model has a \acf{mAP} of 2.83\% and Rank-1 of 6.1\% on the test with the unmodified images from DukeMTMC-ReID. Compared to the validation results, this performance is substantially lower. However, a drop in performance is not unexpected given the domain shift introduced by the new dataset. 
+
+\subsection*{Out-of-Distribution Scale Test}
+Inspecting the result of the \acs{OOD} scale test, all metrics increase with the scale reduction of 0.75 compared to the unmodified images. 
+\\\\
+This is assumed to be caused by the presence of differently sized images in the new dataset compared to those used during training. Since the model is trained with a maximum image size of 128×64, it is not fully equipped to handle the larger or differently scaled images. As expected performance drop again across all metrics, when testing on scale 0.5.
 
 \begin{table}[H]
 \centering
@@ -87,9 +112,12 @@ The results of the \ac{OOD} show, that the model fail XXXXX
 \textbf{Rank-20}& 22.62\%&  23.92\%& 16.07\% \\ 
 \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\caption{Results for scaletest test on DukeMTMC-ReID dataset for the baseline model.}
 \label{tab:scale_ood2test_result}
 \end{table}
+
+\subsection*{Out-of-Distribution Compression Test}
+The compression test show a clear drop in performance with reduction of quality, except in Rank-5 accuracy for quality 50 and in Rank-20 for quality 25, this is although small differences. This is not seen as meaningful improvement but as fluctuations. Overall, the decrease in accuracy remains modest, yet it indicates that the model is sensitive to compression, particularly at very low quality level.
 
 \begin{table}[H]
 \centering
@@ -103,17 +131,24 @@ The results of the \ac{OOD} show, that the model fail XXXXX
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Heavy \\ (Q = 25)}&
-\makecell{Extra heavy \\ (Q = 15)}\\ \hline
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
 \textbf{mAP}    & 2.83\%& 2.79\%& 2.74\%& 2.65\%\\ \hline
 \textbf{Rank-1} & 6.10\%& 5.66\%& 5.92\%& 5.66\%\\ \hline
-\textbf{Rank-5} & 13.51\%& 13.60\%& 13.29\%& 1.32\%\\ \hline
+\textbf{Rank-5} & 13.51\%& 13.60\%& 13.29\%& 13.15\%\\ \hline
 \textbf{Rank-10}& 17.68\%& 17.19\%& 17.64\%& 15.98\%\\ \hline
 \textbf{Rank-20}&  22.62\%& 22.22\%& 22.8\%& 21.41\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\caption{Results for compression test on DukeMTMC-ReID dataset for the baseline model.}
 \label{tab:compressiontest_ood2_result}
 \end{table}
+
+\subsection*{Out-of-Distribution Test on iLIDS-VID}
+
+The results for the test on the iLIDS-VID dataset is better than those on DukeMTMC-ReID, except for Rank-5. These results can although not be compared fairly one to one, because of the difference in test setups, where DukeMTMC-ReID has a big test set and is multi-shot evaluation while iLIDS-VID is much smaller and one-shot learning, making the tests very different. 
+\\\\
+The results for iLIDS-VID is although far from the validations results, showing that the model has difficulty generalizing to this new and different dataset. As mentioned in Section \ref{outofdistributiontest} iLIDS-VID different than the datasets used for training, this contribute to this decrease in performance.
+
 \begin{table}[H]
 \centering
 \begin{tabular}{|>{\centering\arraybackslash}
@@ -127,12 +162,23 @@ The results of the \ac{OOD} show, that the model fail XXXXX
 \textbf{Rank-10}& 19\%\\ \hline
 \textbf{Rank-20}& 25.33\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\caption{Results for test on iLIDS-VID dataset for the baseline model.}
 \label{tab:compressiontest_result}
 \end{table}
 
+\noindent Overall, the results of the \acs{OOD} test are not impressive for the baseline model, but they can serve as a useful reference point for comparison with the alternative model configurations presented in this chapter.
+
 \section{Robust OSNet} \label{sec: robustosnet}
-This experiment explores if training the person \acs{ReID} model on heavily augmented data will produce a more robust model than the baseline presented in Section \ref{sec: baselineosnet}. The applied data augmentation is presented in Table \ref{tab:three_subtables}. The model is trained same way as the baseline model to ensure fair comparison.
+This experiment explored if training the person \acs{ReID} model on heavily augmented data would produce a more robust model, than the baseline presented in Section \ref{sec: baselineosnet}. The applied data augmentation is presented in Table \ref{tab:three_subtables}. The model was trained under the same configuration as the baseline model to ensure fair comparison.
+
+\subsection*{Out-of-Distribution Test on DukeMTMC-ReID}
+
+The robust \acs{OSNet} achieves a \acs{mAP} of 2.24\% and Rank-1 of 5.07\% on the unmodifed dataset, see Table \ref{tab:compressiontest_result_robust}. Compared to the baseline model, it underperforms by respectively 0.59\% and 1.03\%. This suggests that the heavy augmentation may have hindered the model's ability to learn discriminative features, instead of improved generalization as originally intended. 
+
+\subsection*{Out-of-Distribution Scale Test}
+
+As seen with the baseline model, performance increases when the images are slightly down-scaled to 0.75, to an \acs{mAP} of 2.54\% and a Rank-1 of 6.51\%, see Table \ref{tab:compressiontest_result_robust}. However, the robust model again underperforms compared to the baseline model, by respectively 0.67\% and 0.94\%. The consistent underperformance suggests that the strong augmentations did not improve the model's tolerance for scale variations. On the contrary, the baseline model demonstrated better generalization under these conditions, despite not being trained on augmented data. 
+
 \begin{table}[H]
 \centering
 \begin{tabular}{|>{\centering\arraybackslash}
@@ -145,15 +191,20 @@ This experiment explores if training the person \acs{ReID} model on heavily augm
 \multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
 \rowcolor[HTML]{D8E9F7}
 {} & Unmodified Scale 1& Scale 0.75& Scale 0.5\\ \hline
-\textbf{mAP}    & 2.24\%& 6.51\%& 3.59\%\\ \hline
-\textbf{Rank-1} & 5.07\%& 12.34\%& 7.41\%\\ \hline
-\textbf{Rank-5} & 10.55\%&  15.62\%& 9.83\%\\ \hline
-\textbf{Rank-10}& 14.27\%& 20.06\%& 13.73\%\\ \hline
-\textbf{Rank-20}& 19.17\%&  2.54\%& 1.35\%\\ \hline
+\textbf{mAP}    & 2.24\%& 2.54\%& 1.35\%\\ \hline
+\textbf{Rank-1} & 5.07\%& 6.51\%& 3.59\%\\ \hline
+\textbf{Rank-5} & 10.55\%&  12.34\%& 7.41\%\\ \hline
+\textbf{Rank-10}& 14.27\%& 15.62\%& 9.83\%\\ \hline
+\textbf{Rank-20}& 19.17\%&  20.06\%& 13.73\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\caption{Results for scale test on DukeMTMC-ReID dataset for the robust model.}
+\label{tab:compressiontest_result_robust}
 \end{table}
+
+
+\subsection*{Out-of-Distribution Compression Test}
+
+The model had very similar performance across all compression strengths. The performance is overall very poor, and having such low results makes it difficult to draw meaningful conclusions when comparing across compression strengths. Comparing the performance to that of the baseline model, a clear drop is visible. This indicates that training the model with strong augmentations led to a decrease in what the model learned, instead of an increase in robustness.
 
 \begin{table}[H]
 \centering
@@ -167,17 +218,23 @@ This experiment explores if training the person \acs{ReID} model on heavily augm
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Heavy \\ (Q = 25)}&
-\makecell{Extra heavy \\ (Q = 15)}\\ \hline
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low\\ (Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
 \textbf{mAP}    & 2.24\%& 2.25\%& 2.26\%& 2.20\%\\ \hline
 \textbf{Rank-1} & 5.07\%& 5.16\%& 5.21\%& 4.67\%\\ \hline
 \textbf{Rank-5} & 10.55\%& 10.82\%& 11.36\%& 10.55\%\\ \hline
 \textbf{Rank-10}& 14.27\%& 14.41\%&  14.32\%& 13.51\%\\ \hline
 \textbf{Rank-20}&   19.17\%& 19.39\%& 18.94\%& 18.40\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\caption{Results for compression test on DukeMTMC-ReID dataset for the robust model.}
 \label{tab:compressiontest_ood2_result}
 \end{table}
+
+
+
+\subsection*{Out-of-Distribution Test on iLIDS-VID}
+
+Compared to the Rank-1 results on the other tests, the robust model achieves the lowest Rank-1 in this test, of only 2.67\%, see Table \ref{tab:ilidsvid_result_robust}. This is opposite of the baseline model, that achieves the highest Rank-1 of 7\%, out of all its results. The robust model underperforms by 4.33\%.
 
 \begin{table}[H]
 \centering
@@ -192,12 +249,14 @@ This experiment explores if training the person \acs{ReID} model on heavily augm
 \textbf{Rank-10}& 11.67\%\\ \hline
 \textbf{Rank-20}& 18.67\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the robust model.}
+\label{tab:ilidsvid_result_robust}
 \end{table}
 
+\noindent The attempt at creating a robust model did not succeed, as it was significantly worse than the baseline model on all tests. 
+
 \section{EDSR and Baseline OSNet} \label{sec: sr+baseline}
-Based on the results presented in Section \ref{sec: robustosnet}, the problem of images being out of distribution is not adequately solved. Therefore, a second experiment is conducted. The baseline model presented in Section \ref{sec: baselineosnet} is combined with a chosen SR model. 
+Based on the results presented in Section \ref{sec: robustosnet}, the problem of images being out of distribution was not adequately solved. Therefore, a second experiment was conducted. The baseline model presented in Section \ref{sec: baselineosnet} was combined with a chosen SR model. 
 \begin{table}[H]
 \centering
 \begin{tabular}{|
@@ -234,16 +293,16 @@ Scale 0.25\\ \hline
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & 100 & Mild 75& Medium 50&
-Heavy 25\\ \hline
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
 \textbf{mAP}    & & & & \\ \hline
 \textbf{Rank-1} & & & & \\ \hline
 \textbf{Rank-5} & & & & \\ \hline
 \textbf{Rank-10}& & & & \\ \hline
-\textbf{Rank-20}& & & & \\ \hline
+\textbf{Rank-20}&  & & & \\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\label{tab:compressiontest_ood2_result}
 \end{table}
 
 \begin{table}[H]
@@ -263,14 +322,13 @@ Heavy 25\\ \hline
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_result}
 \end{table}
+
 \subsection{EDSR Training}
-Two training strategies were explored for the \ac{EDSR} model. The first approach trained the model from scratch on RELLISUR data. The second approach took the best checkpoint from this model and finetuned it on \ac{DIV2K} to improve generalization. Both models used the baseline configuration described in Section \ref{sec:edsr_implementation}.
+Two training strategies were tested for the \ac{EDSR} model. The first approach trained the model from scratch on RELLISUR data. The second approach took the best checkpoint from this model and finetuned it on \ac{DIV2K} to improve generalization. Both models used the baseline configuration described in Section \ref{sec:edsr_implementation}.
 \\\\
-The model trained from scratch on RELLISUR showed a typical learning progression. Training loss started at approximately 0.12 and decreased rapidly to around 0.095 within the first 25 epochs. The loss continued to decrease gradually and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved to approximately 25.3 dB within the first 25 epochs, with the highest validation \ac{PSNR} of 25.72 dB achieved at epoch 113. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, indicating that the model had converged.
+The model trained from scratch on RELLISUR showed a normal learning progression. Training loss started at approximately 0.12 and decreased quickly to around 0.095 within the first 25 epochs. The loss continued to decrease slowly and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved to approximately 25.3 dB within the first 25 epochs. The highest validation \ac{PSNR} of 25.72 dB was achieved at epoch 82, and the best model checkpoint was saved at epoch 113 based on validation \ac{PSNR}. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, showing that the model had converged. Based on the training curves shown in Figure \ref{fig:edsr_comparison}, the model might have achieved slightly better results with additional training epochs, but the current training duration was good enough to show how the approach works and how the model learns from the data.
 \\\\
-The best checkpoint from the scratch model was then finetuned on \ac{DIV2K} to expose the model to more diverse image content. This finetuning exhibited a different training pattern. Training loss started at approximately 0.078, which is notably lower than the initial scratch training, and decreased only marginally to around 0.073 over the course of training. This low initial loss indicated that the RELLISUR-trained weights already captured useful \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.20 dB. This behavior suggested that continued training on \ac{DIV2K} shifted the model away from the RELLISUR validation distribution. A reduced learning rate of $5 \times 10^{-6}$ was used to prevent catastrophic forgetting of the features learned on RELLISUR.
-\\\\
-Figure \ref{fig:edsr_comparison} compares the training curves of both models. The scratch model achieved higher validation \ac{PSNR} but the finetuned model maintained lower training loss throughout. This apparent contradiction is explained by the different training distributions. The scratch model specialized heavily on the cropped RELLISUR validation images, while the finetuned model gained broader generalization capabilities from the diverse \ac{DIV2K} data. The implications of this difference became evident when evaluating on the out-of-distribution test set, as presented in Chapter \ref{cha: results}.
+The best checkpoint from the scratch model (epoch 113) was then finetuned on \ac{DIV2K} to give the model more diverse image content. This finetuning showed a different training pattern. Training loss started at approximately 0.078, which is much lower than the initial scratch training, and decreased only slightly over the course of training. This low initial loss showed that the RELLISUR-trained weights already learned useful \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.18 dB. This shows that training on \ac{DIV2K} moved the model away from the RELLISUR validation distribution. A reduced learning rate of $5 \times 10^{-6}$ was used to prevent the model from forgetting what it learned on RELLISUR.
 
 \begin{figure}[H]
     \centering
@@ -279,8 +337,9 @@ Figure \ref{fig:edsr_comparison} compares the training curves of both models. Th
     \label{fig:edsr_comparison}
 \end{figure}
 
-\subsection{SwinIR Baseline}
-In addition to the trained \ac{EDSR} models, three pretrained SwinIR models were evaluated without finetuning to establish a baseline comparison with a transformer-based \ac{SR} architecture. SwinIR Classic and SwinIR Real Medium were trained for classical image \ac{SR}, while SwinIR Real Large was trained with complex degradation models intended for real-world artifacts. These models were evaluated directly on the RELLISUR test set to assess their zero-shot generalization capabilities.
+\noindent Figure \ref{fig:edsr_comparison} compares the training curves of both models. The scratch model achieved higher validation \ac{PSNR} but the finetuned model had lower training loss throughout. This difference can be explained by the different training distributions. The scratch model focused heavily on the cropped RELLISUR validation images, while the finetuned model learned to work better on new data from the diverse \ac{DIV2K} dataset.
+\\\\
+When tested on the RELLISUR NLHR test set (85 native low-resolution images), the finetuned model achieved an average \ac{PSNR} of 33.30 dB, while the scratch model achieved 31.77 dB. This 1.53 dB improvement shows that the finetuning strategy worked as intended. Interestingly, while the scratch model had higher validation \ac{PSNR} during training (25.72 dB vs 25.49 dB), it performed worse on the test set. This shows that validation performance on cropped images does not always show how well the model will work on full native low-resolution images. Training on diverse \ac{DIV2K} content helped the finetuned model work better on the test set. Both models reached a \ac{PSNR} above 30 dB on average, which shows that the models are useful for the \ac{SR} task and can produce super-resolved images with good enough quality for later use in applications such as \ac{ReID}. Individual test images showed \ac{PSNR} values ranging from approximately 20 dB to 42 dB. This variation depends on image content, lighting conditions, and the original capture resolution.
 
 \subsection{Sequential Evaluation}
 The sequential evaluation pipeline passed images through the trained \ac{SR} model before feeding the upscaled output to the \ac{ReID} model. This setup allowed direct comparison between the baseline \ac{ReID} performance and the \ac{SR}-enhanced pipeline under identical test conditions. The evaluation was conducted on the OOD test conditions described in Table \ref{tab:newood_conditions}.
@@ -324,16 +383,16 @@ Scale 0.25\\ \hline
 \hline
 \multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
 \rowcolor[HTML]{D8E9F7}
-{} & 100 & Mild 75& Medium 50&
-Heavy 25\\ \hline
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
 \textbf{mAP}    & & & & \\ \hline
 \textbf{Rank-1} & & & & \\ \hline
 \textbf{Rank-5} & & & & \\ \hline
 \textbf{Rank-10}& & & & \\ \hline
-\textbf{Rank-20}& & & & \\ \hline
+\textbf{Rank-20}&  & & & \\ \hline
 \end{tabular}
 \caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
-\label{tab:compressiontest_result}
+\label{tab:compressiontest_ood2_result}
 \end{table}
 
 \begin{table}[H]

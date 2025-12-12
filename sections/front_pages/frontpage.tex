@@ -26,23 +26,28 @@
         }\\[1cm]
 
         % --- SUBTITLE ---
-        {\Large - A Project in Collaboration with Milestone Systems -}
+       \textit{ {\Large - A Project in Collaboration with Milestone Systems -}}
 
-        % --- SPACING BEFORE REPORT INFO ---
         \vspace{7cm}
 
-        % --- REPORT INFO ---
-        {\large Project Report}\\[0.3cm]
-        {\Large Group 1 DAKI3}
-
-        % --- PUSH UNI TEXT TO BOTTOM ---
-        \vfill
-
-        % --- UNIVERSITY TEXT ---
-        {\large
-        Aalborg University\\
-        The Technical Faculty of IT and Design}\\[0.4cm]
+        {\Large Project Report}\\[0.4cm]
+        {\Large 3rd Semester - Group 1}
 
     \end{center}
 
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[
+            anchor=south,
+            yshift=1.2cm,
+            align=center,
+            text=white
+        ] 
+        at (current page.south)
+        {
+            Aalborg University\\
+            The Technical Faculty of IT and Design
+        };
+    \end{tikzpicture}
+
 \end{titlepage}
+

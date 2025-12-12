@@ -1,11 +1,11 @@
-\chapter{Results} \label{cha: results}\chapter{Results} \label{cha: results}
+\chapter{Results} \label{cha: results}
 
 This chapter presents the final evaluation results for all trained models. The models were tested both in-distribution on standard \ac{ReID} benchmarks and out-of-distribution using the conditions described in Section \ref{sec: oodtestny}.
 
 \section{Super-Resolution Results}
 \label{sec:sr_test_results}
 
-The \ac{SR} models were evaluated on the RELLISUR NLHR test set, which consists of 85 native low-resolution images. This test set represents a realistic out-of-distribution scenario, as the models were trained on cropped image pairs but evaluated on full native low-resolution images. Table \ref{tab:sr_test_results} summarizes the results.
+The \ac{SR} models were evaluated on the RELLISUR NLHR test set, which consists of 85 native low-resolution images. This test set represents the target domain for the \ac{SR} application: real surveillance footage with native low-resolution characteristics. While the models were trained on cropped image pairs, evaluating on full native low-resolution images tests how well the models work on the actual use case. Table \ref{tab:sr_test_results} summarizes the results.
 \begin{table}[H]
     \centering
     \begin{tabular}{|l|c|c|c|c|}
@@ -16,23 +16,17 @@ The \ac{SR} models were evaluated on the RELLISUR NLHR test set, which consists 
         \hline
         EDSR Scratch & 31.77 & 4.02 & 0.962 & 0.059 \\
         \hline
-        SwinIR Classic (Medium) & 27.23 & - & 0.969 & - \\
-        \hline
-        SwinIR Real (Medium) & 26.49 & - & 0.966 & - \\
-        \hline
-        SwinIR Real (Large) & 13.19 & - & 0.042 & - \\
-        \hline
     \end{tabular}
     \caption{Test results on RELLISUR NLHR test set consisting of 85 images. Metrics were computed between super-resolved and ground truth high-resolution images.}
     \label{tab:sr_test_results}
 \end{table}
-\noindent The \ac{EDSR} model trained on RELLISUR and finetuned on \ac{DIV2K} achieved the best overall performance with an average \ac{PSNR} of 33.30 dB and \ac{SSIM} of 0.970. The model trained only on RELLISUR achieved 31.77 dB and 0.962 respectively. The 1.53 dB difference represents a meaningful improvement in reconstruction quality.
+\noindent The \ac{EDSR} model trained on RELLISUR and finetuned on \ac{DIV2K} achieved the best overall performance with an average \ac{PSNR} of 33.30 dB and \ac{SSIM} of 0.970. The model trained only on RELLISUR achieved 31.77 dB and 0.962 respectively. The 1.53 dB difference represents a meaningful improvement in reconstruction quality. Both models achieved high \ac{SSIM} values above 0.96, which shows that the super-resolved images maintain good structural similarity to the ground truth high-resolution images. This is important for the \ac{ReID} task, as it means that important visual features and structures are preserved in the upscaled images.
 \\\\
-The performance difference between in-distribution validation and out-of-distribution testing was notable. While the scratch model achieved higher validation \ac{PSNR} during training, the \ac{DIV2K}-finetuned model substantially outperformed on the test set. This indicated that the diversity of the \ac{DIV2K} dataset provided the finetuned model with better generalization capabilities for native low-resolution images.
+The performance difference between in-distribution validation and out-of-distribution testing was notable. While the scratch model achieved higher validation \ac{PSNR} during training (25.72 dB vs 25.49 dB), the \ac{DIV2K}-finetuned model performed much better on the test set (33.30 dB vs 31.77 dB). This shows that validation performance on cropped images does not always show how well the model will work on full native low-resolution images. The diversity of the \ac{DIV2K} dataset helped the finetuned model work better on new native low-resolution images that differ from the training distribution.
 \\\\
-The pretrained SwinIR models performed considerably worse without domain-specific finetuning. SwinIR Classic achieved 27.23 dB, which is 6.07 dB lower than the best \ac{EDSR} model. SwinIR Real Large failed entirely with a \ac{PSNR} of 13.19 dB and \ac{SSIM} of 0.042, producing severe artifacts due to a mismatch between expected and actual input characteristics.
+Individual test images showed \ac{PSNR} values ranging from approximately 20 dB to 42 dB, with standard deviations of 4.62 dB for the finetuned model and 4.02 dB for the scratch model. This variation shows that model performance depends on image characteristics such as content complexity, lighting conditions, and the original capture resolution. Images with better initial quality and clearer details tend to achieve higher \ac{PSNR} values, while images with more noise or compression artifacts show lower values. Despite this variation, both models consistently produced useful results, with most images achieving \ac{PSNR} values above 25 dB.
 \\\\
-Based on these results, the \ac{EDSR} \ac{DIV2K}-finetuned model was selected for integration with the \ac{ReID} pipeline.
+Based on these results, the \ac{EDSR} \ac{DIV2K}-finetuned model was selected for integration with the \ac{ReID} pipeline, as it provided the best balance between reconstruction quality and generalization to real-world surveillance footage.
 
 \section{ReID Results}
 
@@ -49,8 +43,8 @@ Table \ref{tab:reid_indist} presents the in-distribution performance of all mode
          & \multicolumn{2}{c|}{\textbf{MSMT17}} & \multicolumn{2}{c|}{\textbf{Market-1501}} & \multicolumn{2}{c|}{\textbf{CUHK03}} \\\hline
         \rowcolor[HTML]{D8E9F7}
          & Rank-1 & mAP & Rank-1 & mAP & Rank-1 & mAP \\\hline
-         Baseline & & & 50.53\%& 29.16\%& 2.64\%& 2.68\%\\\hline
-         Augmented & & & 30.64\%& 16.23\%& 0.43\%& 0.93\%\\\hline
+         Baseline & 1.72\%& 0.51\%& 50.53\%& 29.16\%& 2.64\%& 2.68\%\\\hline
+         Augmented & 1.24\%& 0.39\%& 30.64\%& 16.23\%& 0.43\%& 0.93\%\\\hline
          Sequential & & & & & & \\\hline
          Joint & & & & & & \\\hline
     \end{tabular}

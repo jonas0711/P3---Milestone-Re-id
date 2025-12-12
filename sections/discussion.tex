@@ -9,7 +9,7 @@ Furthermore, the datasets are not balanced in size. For example the MSMT17 datas
 \\\\
 Finally it is important to note that the datasets represent relative controlled environments, with no cases of extreme weather, very low-light conditions, or highly crowded events, which are expected to appear in real-world surveillance footage. 
 
-\subsubsection{Data Augmentations}
+\subsubsection{Data Augmentations} \label{sec: Dataaugmentation discussion}
 Data-augmentation is applied to improve model generalizability, by introducing diversity and simulating real-world circumstances. The augmentation pipeline is as follows:
 \begin{itemize}
     \item Normalization 
@@ -27,11 +27,7 @@ Data-augmentation is applied to improve model generalizability, by introducing d
 Despite this, if all the augmentations happened to be applied heavily to a single image, quality may degrade to a point where it is too difficult for the model to extract meaningful features. This highlights the importance of balancing data augmentation, so realism is preserved without compromising the visual information. During implementation, the Python \texttt{random} library was used to apply random transformations. However, it would have been more appropriate to use PyTorch's own random functions, as they share the same seeding used throughout the framework, and are compatible with GPU training. This ensures better reproducibility and consistency across experiments, especially when using multiple workers and different hardware setups. 
 
 \subsubsection{OOD Dataset}
-The OOD dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the iLIDS-VID dataset. The
-
-
-
-
+The OOD dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the iLIDS-VID dataset. It fulfills the purpose of showing the model's performance on unseen data, outside of its distribution. An argument for using IlIDS-VID during training, instead of testing, could be made, as adding a completely different environment could decrease the model's specialization to Chinese campus environments. However, this was not chosen in this project, as the iLIDS-VID data is small, and therefore more suitable for evaluation purposes.
 
 \section{Experiments}
 - Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
@@ -51,10 +47,8 @@ Opnåede vi det vi ville med baseline, er den lavet så den er fair til at bruge
 \subsection{EDSR}
 Var EDSR et godt valg? 
 
-\subsubsection{EDSR}
-
 \subsection{Sequential EDSR and Baseline}
-Implementing both models sequentially effectively meant that only \acs{OSNet} had the chance to improve. By only inputting the \acs{HR} \acs{ReID} image, \acs{EDSR} could not learn more than it already knew about general upscaling. \acs{OSNet} learned how to extract useful embeddings from \acs{SR} images. Der skal mere til men pas lige nu.
+Implementing both models sequentially effectively meant that only \acs{OSNet} had the chance to improve. By only inputting the \acs{HR} \acs{ReID} image, \acs{EDSR} could not learn more than it already knew about general upscaling. \acs{OSNet} learned how to extract useful embeddings from \acs{SR} images. %Der skal mere til men pas lige nu.
 
 \subsection{Joint EDSR and Baseline}
 %Hvorfor implementeret  på den måde - hvad med auxilary loss?
@@ -91,4 +85,44 @@ As the system handles potentially sensitive data, it is important to ensure data
 \section{Future Work}
 Hvad mangler det for at blive realiseret system?
 
-- The gap between training data and deployment environments should be addressed in future works. 
+%- The gap between training data and deployment environments should be addressed in future works. 
+
+This project adresses the problem statement of designing a proof of concept system person \ac{Reid} system improved through \ac{SR} Integration. The results demostrates ? ***** 
+
+%Dataset
+%Flere forskellige kulturer, religoner i træning for at undgå bias. 
+%Evt selv lave et dataset
+%Dataset med udfordrende vejr. eller lav belysning
+\subsubsection{Dataset improvements}
+The training datasets used in this project is primarily consists of ** vi ved det ikke helt **  Chinese and American university campus environments, which introduces cultural, geographical,, and environmental bias. Future work should incorporate datasets with diverse populations, clothing styles and demographics representations to ensure fair and robust performance across different deployment contexts. Additionally, datasets capturing challenging real-world scenarios such as extreme weather, heavy rain, fog, and very low-light scenarios should be included to better prepare the model for actual surveillance conditions. Finally, creating a custom dataset specifically designed to match the target deployment environment would allow for more accurate evaluation of system performance under realistic conditions.
+
+
+%SR forbedringer
+%Implementere auxiliary loss i joint training så SR også optimeres på reconstruction quality
+%Fokus på at SR forbedre specifikke tøj detaljer 
+%Undersøg multi scale SR Der tager forskellige input resolutions 
+The \ac{SR} module could be improved through several approaches. Implementing an auxiliary loss during joint training would allow the SR module to optimize for both reconstruction quality and \ac{ReID} perfomence at the same time, rather then only learning from only learning from the \ac{ReID} loss. The \ac{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
+
+
+
+%ReID forbedringer
+The ReID module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person ReID. Investigating different freezing strategies during joint training, such as trying unfreezing layers or trying different learning rates for SR or Reid modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
+
+Deployment and System Integration
+
+
+
+
+%Sammenligne loss functions ?? Har vi skrevet om det før ?
+
+%Undersøge forskellige freezing strategier i jont train.
+%Systematisk hyperparemeter tuning
+
+%Deployment
+Deployment and System Integration
+
+%Real-time inference 
+%Edge deployment
+%Logging system af bruger - Etik
+%Feedback loop fra praktisk brug
+%Encryptions

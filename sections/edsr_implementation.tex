@@ -23,7 +23,6 @@ The baseline \ac{EDSR} configuration was used, which provides a balance between 
 
 \noindent Each residual block consists of two 3×3 convolutional layers with ReLU activation between them. The residual scaling factor multiplies the output of each residual block before adding it to the skip connection, which helps stabilize training in deeper networks. For the baseline configuration with 64 feature maps, a residual scaling factor of 1.0 was used, as scaling is primarily needed for wider networks with 256 feature maps.
 
-The upsampling module uses a sub-pixel convolution approach (PixelShuffle), where a convolutional layer first expands the feature maps by a factor of $\text{scale}^2$, and the PixelShuffle operation then rearranges these features into the spatially upscaled output. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
 
 \subsection{Dataset and Data Loading}
 Two dataset classes were implemented to handle different data formats. The \texttt{SRDataset} class loads paired \ac{LR} and \ac{HR} images from separate directories, matching files by sorted order. This class was used for the RELLISUR dataset, where cropped person images were prepared at 64×128 pixels (\ac{LR}) and 128×256 pixels (\ac{HR}).

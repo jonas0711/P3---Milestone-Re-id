@@ -32,17 +32,17 @@ CUHK03 (labeled / detected) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Ma
 \noindent Market-1501 is one of the most widely used datasets for person \ac{ReID}. It is recorded at Tsinghua University in Beijing using six surveillance cameras: five in HD and one in SD resolution. The dataset contains 32,668 cropped images of 1,501 unique individuals, each appearing in at least two camera views. Bounding boxes are generated automatically with a Deformable Part Model detector, and the resulting person crops are resized (normalized) to a fixed resolution of 128x64 pixels. In the released dataset, all images are therefore provided at this normalized resolution of 128x64 pixels. Because the detections are automatic, some bounding boxes are misaligned or partially cropped, which makes the dataset realistic for providing material under real world surveillance conditions \cite{Zheng2015ICCV}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/images/Dataset_visu/Market-1501_examples_v4.png}
+    \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/Market-1501_examples_v4.png}
     \caption{Market-1501}
     \label{fig:market_1501_pic}
 \end{figure}
 
 \subsection*{MSMT17}
-\ac{MSMT17} was recorded by a network of 15 surveillance cameras deployed across indoor and outdoor environments, capturing video footage over an extended period. The dataset was designed to address real-world challenges in person \ac{ReID} including complex lighting variations, diverse viewpoint changes, and the scale requirements of large camera networks. It contains 126,441 annotated bounding boxes of 4,101 unique identities. Pedestrian bounding boxes are detected automatically using a Faster R-CNN detector, and the resulting person crops are typically resized (normalized) to a fixed input resolution of 256x128 pixels for training, so that all input images have the same size. The raw videos were captured during 12 different time slots throughout the day, spanning about 180 hours of footage in total. This temporal coverage results in lighting variations, ranging from bright daylight to low light evening conditions, which closely mirrors the operational conditions of real-world surveillance systems. The combination of indoor and outdoor scenes, long-duration recording, and diverse environmental conditions enables \ac{ReID} models trained on MSMT17 to better generalize to real-world surveillance scenarios with varying lighting, viewpoints, and scale \cite{wei2018person}.
+\ac{MSMT17} was recorded by a network of 15 surveillance cameras, on an university campus,  deployed across indoor and outdoor environments, capturing video footage over an extended period. The dataset was designed to address real-world challenges in person \ac{ReID} including complex lighting variations, diverse viewpoint changes, and the scale requirements of large camera networks. It contains 126,441 annotated bounding boxes of 4,101 unique identities. Pedestrian bounding boxes are detected automatically using a Faster R-CNN detector, and the resulting person crops are typically resized (normalized) to a fixed input resolution of 256x128 pixels for training, so that all input images have the same size. The raw videos were captured during 12 different time slots throughout the day, spanning about 180 hours of footage in total. This temporal coverage results in lighting variations, ranging from bright daylight to low light evening conditions, which closely mirrors the operational conditions of real-world surveillance systems. The combination of indoor and outdoor scenes, long-duration recording, and diverse environmental conditions enables \ac{ReID} models trained on MSMT17 to better generalize to real-world surveillance scenarios with varying lighting, viewpoints, and scale \cite{wei2018person}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/images/Dataset_visu/MSMT17_examples_v4.png}
+    \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/MSMT17_examples_v4.png}
     \caption{MSMT17}
     \label{fig:MSMT17_pic}
 \end{figure}
@@ -72,7 +72,7 @@ The data capture diverse viewpoints, lighting variations, and scales from close-
 \end{figure}
 
 \subsection*{ILIDS-VIDS}
-The \ac{iLIDS-VID} dataset is captured in an airport arrival hall under a multi camera CCTV network. The dataset consists of 600 image sequences capturing 300 distinct individuals, with one pair of image sequences from two non overlapping camera views for each person. The dataset is provided in two versions, a static images version where single frames are randomly selected from each sequence, and an image sequences version for video-based ReID evaluation. For this project, the image version will be used. \ac{iLIDS-VID} is considered highly challenging due to several factors like clothing similarities among individuals, significant lighting and viewpoint variations across camera views, cluttered backgrounds with heavy occlusion and the airport environment. These characteristics make the dataset particularly valuable for evaluating ReID methods under realistic surveillance conditions, where temporal information from video sequences can help overcome the visual vagueness present in single frame matching \cite{wang2014person}.
+The \ac{iLIDS-VID} dataset is captured in an airport arrival hall under a multi camera CCTV network. The dataset consists of 600 image sequences capturing 300 distinct individuals, with one pair of image sequences from two non overlapping camera views for each person. The dataset is provided in two versions, a static images version where single frames are randomly selected from each sequence, and an image sequences version for video-based \acs{ReID} evaluation. For this project, the static image based version will be used to maintain consistency with the other datasets. \ac{iLIDS-VID} is considered highly challenging due to several factors like clothing similarities among individuals, significant lighting and viewpoint variations across camera views, cluttered backgrounds with heavy occlusion and the airport environment. These characteristics make the dataset particularly valuable for evaluating ReID methods under realistic surveillance conditions. \cite{wang2014person}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/iLIDS-VID_examples_v1.png}
@@ -80,18 +80,21 @@ The \ac{iLIDS-VID} dataset is captured in an airport arrival hall under a multi 
     \label{fig:ILIDS-VIDS_pic}
 \end{figure}
 
-%har to udgaver: en med hele videosekvenser og en med kun et enkelt billede fra hver sekvens.
 %Jeg skulle aldrig have foreslået den her datasæt. Den er bare træls!
 
 \section{Choice of Dataset}
-The three datasets complement each other. They cover multi-camera setups, varied viewpoints, and include both manual and detector-generated crops. \textit{Market-1501} contributes realistic detector noise, \textit{CUHK03} provides a clean labeled split plus a detected split that mirrors real pipelines, \textit{DukeMTMC-ReID} adds clear scale variation, where the same person appears both near and far. Together, they offer a solid basis for training and testing across camera changes, viewpoint shifts, and moderate lighting differences.
-\\\\
-The coverage of culture, weather, and geography is narrow. All datasets are from single university campuses (two in East Asia, one in the United States), mainly in daytime. There is little variation in season and weather (e.g., rain, snow, fog) and limited night scenes. Clothing styles and demographics reflect local contexts rather than global diversity. Automatic boxes improve realism but can include background clutter and partial crops. Manual boxes are cleaner but less like real pipelines. In short, the datasets are strong benchmarks for comparable settings. For use in other places—different cities, climates, or cultural contexts—models may need domain adaptation or a small amount of local data.
+\subsubsection{Training Strategy}
+The model is trained on the combination of Market-1501, MSMT17 and CUHK03, providing 2,117 unique identities across diverse surveillance conditions. This multi dataset approach ensures the model learns generalizable features rather than dataset patterns. Each dataset contributes distinct characteristics: Market -1501 provides realistic detector noise, CUHK03 offers both manual and automatic detected annotations, and MSMT17 contributes with 15 cameras across indoor and outdoor scenes captured at different times of day.
+
+\subsubsection{Evaluation Strategy}
+Evaluation follows a two stage approach, In distribution testing om MSMT17, Market-1501, and CUHK03 establishes a baseline performance. The primary focus is \ac{OOD} testing using DukeMTMC-ReID serves as a same domain \ac{OOD} test with outdoor university surveillance similar to training datasets, but different individuals and environments.  iLIDS-VID provides a cross domain test with indoor airport footage, evaluating whether the model learned truly discrimanative features or over fitted to outdoor characteristics. Beyond dataset shifts, controlled degradations are applied to DukeMTMC-ReID: (0.75, 0.5, 0.25) and JPEG compression (quality 50, 25, 15). These simulate realistic survellliance challenges where persons appear at varying distances or footage is compressed for storage, directly testing the projects core hypothesis \ac{SR} can reduce resolution degradation effects on ReID performance.  
+
+
 
 \section{Super Resolution Datasets}
 
 \subsection*{Div2K}
-\ac{DIV2K} was introduced as part of the NTIRE 2017 Challenge on Single Image Super-Resolution \cite{Agustsson_2017_CVPR_Workshops}. The dataset consists of 1,000 high-quality RGB images manually collected from the Internet, with careful attention to image quality, diversity of sources, content variety, and specially copyright considerations. Images are of 2K resolution. The dataset is split into 800 training images and 100 validation images, with an additional 100 test images. For each HR image, corresponding LR images are provided at downscaling factors of ×2, ×3, and ×4, generated using bicubic interpolation. Additionally unknown degradation track provides LR images created with hidden degradation operators to try to simulate realistic scenarios. The images were selected to achieve balanced distribution across visual content bit-per-pixel compression rates. featuring diverse content including normal scenes, textures, objects, and patterns. This diversity and high quality make \acs{DIV2K} widely used benchmarks for training and evaluating \acs{SR} algorithms \cite{Agustsson_2017_CVPR_Workshops}.
+\ac{DIV2K} was introduced as part of the NTIRE 2017 Challenge on Single Image Super-Resolution \cite{Agustsson_2017_CVPR_Workshops}. The dataset consists of 1,000 high-quality RGB images manually collected from the Internet, with careful attention to image quality, diversity of sources, content variety, and specially copyright considerations. Images are of 2K resolution. The dataset is split into 800 training images and 100 validation images, with an additional 100 test images. For each HR image, corresponding LR images are provided at downscaling factors of \textit{×2}, \textit{×3}, and \textit{×4}, generated using bicubic interpolation. Additionally unknown degradation track provides LR images created with hidden degradation operators to try to simulate realistic scenarios. The images were selected to achieve balanced distribution across visual content bit-per-pixel compression rates. featuring diverse content including normal scenes, textures, objects, and patterns. This diversity and high quality make \acs{DIV2K} widely used benchmarks for training and evaluating \acs{SR} algorithms \cite{Agustsson_2017_CVPR_Workshops}.
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/div2k_zoom_comparison.png}
@@ -101,8 +104,7 @@ The coverage of culture, weather, and geography is narrow. All datasets are from
 
 \subsection*{RELLISUR}
 \noindent
-RELLISUR was collected by Aalborg University focused on image resolution, not digital downsampling. Each of the 850 scenes are recorded in 3 different scales. X1 scale, X2 scale and X4 scale are made by changing the focal length. This difference in resolution originates from the optical settings and not made by bicubic manipulation. The dataset contains of a low light and a normal light part. This project uses the normal light consisting of 2,550 images split into test, train and validation. RELLISUR covers indoor and outdoor environments, and consists of different kinds of structures, materials, and distances to the objects to enhance usability for \ac{SR} in realistic environments \cite{aakerberg2021rellisur}.
-
+RELLISUR was collected by Aalborg University focused on image resolution, not digital downsampling. Each of the 850 scenes are recorded in 3 different scales. \textit{X1} scale, \textit{X2} scale and \textit{X4} scale are made by changing the focal length. This difference in resolution originates from the optical settings and not made by bicubic manipulation. The dataset contains of a low light and a normal light part. This project uses the normal light consisting of 2,550 images split into test, train and validation. RELLISUR covers indoor and outdoor environments, and consists of different kinds of structures, materials, and distances to the objects to enhance usability for \ac{SR} in realistic environments \cite{aakerberg2021rellisur}.
 
 
 
@@ -110,5 +112,5 @@ RELLISUR was collected by Aalborg University focused on image resolution, not di
     \centering
     \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/RELLISURE_with_original.png}
     \caption{Enter Caption}
-    \label{fig:placeholder}
+    \label{fig:RELLISUR_data}
 \end{figure}
