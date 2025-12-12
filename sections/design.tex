@@ -1,11 +1,11 @@
-\chapter{Methods} \label{cha: methods}
+\chapter{Design} \label{cha: design}
 
 \section{OSNet} \label{lab:methodreid}
 
-The OSNet model presented in Section \ref{sec:omniscale} demonstrates strong performance across several person re-identification benchmarks. The model is chosen as the \acs{ReID} module for this project based on this performance and the lightweight architecture, allowing for competitive accuracy on limited hardware. The details of the architecture are presented in this section, based on Figure \ref{fig:osnetpipeline}. 
+The OSNet model \cite{OSNet} presented in Section \ref{sec:omniscale} demonstrates strong performance across several person re-identification benchmarks. The model is chosen as the \acs{ReID} module for this project based on this performance and the lightweight architecture, allowing for competitive accuracy on limited hardware. The details of the architecture are presented in this section, based on Figure \ref{fig:osnetpipeline}. 
 \begin{figure} [H]
     \centering
-    \includegraphics[width=1\linewidth]{osnetpipelinebud.drawio.png}
+    \includegraphics[width=1\linewidth]{osnetpipelinebud.png}
     \caption{An overview of the pipeline for the OSNet module.}
     \label{fig:osnetpipeline}
 \end{figure}
@@ -13,7 +13,7 @@ The OSNet model presented in Section \ref{sec:omniscale} demonstrates strong per
 
 \begin{figure} [H]
     \centering
-    \includegraphics[width=1\linewidth]{osblockpipeline.drawio.png}
+    \includegraphics[width=1\linewidth]{osblockpipeline.png}
     \caption{An overview of the process inside the OSBlocks.}
     \label{fig:osblockpipeline}
 \end{figure}
@@ -25,9 +25,10 @@ This process is repeated until the fourth convolution stage, which is followed b
 
 \section{EDSR}
 \acf{EDSR} and is a \acs{ResNet} based architectures for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}. \acs{EDSR} can be viewed as a simplified yet substantially deepened and widened successor to \acs{SRResNET}. The architecture consists of a convolutional layer, a deep stack of residual blocks and a upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, the internal flow of each resblock is illustrated in Figure \ref{fig:resblockpipeline}, and the process inside the final upsample block can be seen in Figure \ref{fig:upsampleblockpipeline}. 
+
 \begin{figure} [H]
     \centering
-    \includegraphics[width=0.75\linewidth]{edsrpipeline.drawio.png}
+    \includegraphics[width=0.75\linewidth]{edsrpipeline.png}
     \caption{An overview of the ESDR pipeline.}
     \label{fig:edsrpipeline}
 \end{figure}
@@ -46,47 +47,42 @@ This process is repeated until the fourth convolution stage, which is followed b
     \label{fig:upsampleblockpipeline}
 \end{figure}
 
-\noindent A key design to improve reconstruction quality is the removal of batch normalization layers from the residual blocks. In low level vision tasks, batch normalization has been observed to degrade image quality and unnecessarily constrain the dynamic range of feature representations while also increasing memory usage. By excluding batch normalization, \acs{EDSR} can use more feature channels and more layers within the same resource budget, which in practice leads to an improvement in \acs{PSNR} and \acs{SSIM} on standard \acs{SR} benchmarks\cite{lim2017edsr}.
+\noindent A key design to improve reconstruction quality is the removal of batch normalization layers from the residual blocks. In low level vision tasks, batch normalization has been observed to degrade image quality and unnecessarily constrain the dynamic range of feature representations while also increasing memory usage. By excluding batch normalization, \acs{EDSR} can use more feature channels and more layers within the same resource budget, which in practice leads to an improvement in \acs{PSNR} and \acs{SSIM} on standard \acs{SR} benchmarks \cite{lim2017edsr}.
 \\\\
 As \acs{EDSR} is a deep and wide model, residual scaling is used such that the output of each residual block is multiplied by a small factor before being added to the skip connection, in order to stabilize the training. 
 \\\\
-The upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. The upsampling module uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2} and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
+The upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. The upsampling module uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2} and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output \cite{shi2016subpixel_arxiv}. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
 \\\\
 As a result \acs{EDSR} constitutes a general and well established architectural option for learning based \acs{SR} and has frequently been used as a reference or starting point in subsequent work \cite{lim2017edsr}. 
 
 
-\section{Loss Functions}
+\section{Loss Function}
 
 \subsection*{Multiclass Cross-Entropy Loss}
 Multiclass cross-entropy loss, also known as softmax loss, is commonly used for classification tasks where each input has one correct class \cite{softmax}. It works by applying a softmax function to the model's output logits to produce a probability distribution for each class, and then calculating the negative log-likelihood of the true class. This encourages the model to assign a high probability score to the correct class, while penalizing confident but incorrect predictions. The output probabilities can be interpreted as the model's confidence in each class. However, these probabilities are directly influenced by the regularization strength used in training. A high regularization leads to smaller weights, as larger weight values are punished more, which leads to less confident predictions. In contrast lower regularization may allow for overconfident predictions.
 
-
-\subsection*{Triplet Loss}
-The triplet loss function works on three samples at a time \cite{tripletlossadintro, tripletlossintro}: 
-
-\begin{itemize}
-    \item \texttt{anchor}
-    \item \texttt{postive}, a sample with the same label as the \texttt{anchor} 
-    \item \texttt{negative}, a sample with a different label than the \texttt{anchor}
-\end{itemize}
-
-\noindent The goal is to minimize the distance between the \texttt{anchor} and the \texttt{positive} sample, while expanding the gap between the \texttt{anchor} and the \texttt{negative} sample. This way the model learns to group similar cases together and keep different examples far apart. This is useful for person \acs{ReID}, 
-where the goal is to generate embeddings that cluster images of the same person together, while keeping embeddings of different people separated. 
- 
-
 \section{Evaluation Metrics}
 
 \subsection*{Rank}
-
-\subsection*{mAP}
-\ac{mAP} is a usefull metric commonly used to examine the performance of object detection systems, such as a \ac{ReID} model. The \ac{mAP} metric is made up of multiple other sub metrics, such as \ac{IoU}, Recall, and Precision, that are important to understand to grasp how the \ac{mAP} works, and how it is correctly calculated. 
-
+Rank-k metrics are widely used in \ac{ReID} to measure how "early" the system retrieves the correct identity of a person when matching a query image with a gallery. Rank is based on a concept called the Cumulative Matching Characteristic, which describes the probability that the first correct match appears within the top k results of all queries evaluated.
+For example, a Rank metric with \texttt{k = 1} would answer the question "For how many queries was the top match the correct identity?" while a Rank with \texttt{k = 5} would answer "For how many queries did the correct identity appear in the top 5 matches?". This is the same with different valued k's, just with more or less of the matches for the queries accounted for. Because it is a Cumulative Metric, it will count a query as a success if the correct match is within the top k positions. In other words, once a query has its first correct match at rank r, it is counted as a success for all Rank-k metrics where \(k \ge r\). This shows how rank metrics can measure how early the system retrieves the correct identity, and complements the other evaluation metric this project uses, namely \ac{mAP}.
 
 
-To correctly calculate the \ac{mAP} metric for 
+\subsection*{\ac{mAP}}
+\acf{mAP} is a commonly used metric to examine the performance of both object detection and information retrieval systems, such as \ac{ReID}. The formular for \ac{mAP} can differ depending on what it is being used for, but in a \ac{ReID} context, it works by measuring how good the system is at retrieving the correct identities across the entire ranked gallery list, which also makes it ideal to work alongside the Rank-k metric, as it estimates all true matches, and not just the k first.
+\\\\
+As the name implies, \ac{mAP} fundamentally works by calculating the mean of the overall Average Precisions of all valid queries. In \ac{ReID}, Average Precision is computed from the ranked retrieval list by measuring precision at every correct match starting from the top. So for each query, the gallery images are ranked by similarity, where the precision is computed from the top match in that gallery before the specific match. Afterwards, an average of all those hits is calculated, which is the definition of the Average Precision. Meanwhile, \ac{mAP} is the mean of those Average Precisions across all the valid (Queries with atleast one match) queries.
+\\\\
+For the evaluation of the models and systems in our project, \ac{mAP} was calculated similarly as explained above.
+
+
+%The \ac{mAP} metric is made up of multiple other sub metrics, such as \ac{IoU}, Recall, and Precision, that are important to understand to grasp how the \ac{mAP} works, and how it is correctly calculated. 
+
+%Average Precision is computed by finding the area under the precision-recall curve, where precision is the proportion of true positive and false positive matches, while recall is the proportion of true positives out of all possible positive matches
+
+% Firstly, a filter was applied to only keep the good matches in the gallery, and After the trained OSNet model extracts the features and calculates the distance/similarity of the query and gallery with \texttt{torch.cdist}, all of the gallery images are sorted by the given similarity with the query. Before being  Afterwards the Average Precision is found based on the matches in each query, and then \ac{mAP}
+
+%Because its a Cumulative Metric, it will count a query as a success if there is a match within the certain k-range of that query. For example, if a query had its first correct identity match at Rank-3, a Rank-10 metric would count that query as a success, as that specific metric asks "Is there a correct match within 10 matches?" for each query.
 
 % reid_test.py has mAP = sum(aps) / valid queries, where aps is a list of "ap", and ap = sum(precisions) / len(precisions) that is appended to aps. And precisions is a list of "hits/(pos+1)" in a for loop that has "for pos in pos_idx". And pos_idx is "pos_idx = good.nonzero(as_tuple=False).view(-1)" which is described as indices for True in good. While good is "good = matches[i][order]
-\section{Activation Functions}
-
-\subsection*{ReLU}
 

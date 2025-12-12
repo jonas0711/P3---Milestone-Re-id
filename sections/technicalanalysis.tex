@@ -1,9 +1,9 @@
 \chapter{Technical Analysis} \label{cha: technicalanalysis}
-This chapter will present and analyze the technical foundations of the problems described in Chapter \ref{cha:problemanalysis}. It focuses on surveillance equipment, computer vision techniques, person Re-Identification, image Super-Resolution, and the combination of these. Related works will be presented throughout the chapter, where relevant to each section.
+This chapter will present and analyze the technical foundations of the problems described in Chapter \ref{cha:problemanalysis}. It focuses on surveillance equipment, computer vision techniques, person Re-Identification, image Super-Resolution, and the combination of these. Related work will be presented throughout the chapter, where relevant to each section.
 
 \section{Surveillance Equipment and Footage}
 \label{subsec:Surveillance_equipment_n_footage}
-As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. To tackle the project proposal regarding improving person \ac{ReID}, it is beneficial to first understand the challenges of using surveillance footage as a data source.
+As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras are widely used in both public and private settings, which is why it is important to acknowledge the many different factors that can influence the overall quality and consistency of the final footage. To improve person \ac{ReID}, it is beneficial to first understand the challenges of using surveillance footage as a source of data.
  
 \subsection{Camera Technology}
 \label{subsubsec:How_cameras_work}
@@ -28,28 +28,28 @@ As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple differ
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{figures/images/lens_comparison_fix.jpg}
-    \caption{3 sets of images shot at the same locations, but with different camera lenses. Used to highlight the changes in the image when using dissimilar camera hardware \cite{LensComparisonDifferences}.}
+    \caption{Three sets of images shot at the same locations, but with different camera lenses. Used to highlight the changes in the image when using dissimilar camera hardware \cite{LensComparisonDifferences}.}
     \label{fig:lens_comparison}
 \end{figure}
 
-Other impacts on footage in the form of camera settings also affects the footage. Many surveillance cameras have set restrictions on their performance to reduce energy consumption and storage. This means that the footage is purposely lowered in quality, and therefore some valuable data could be lost. In addition, certain cameras include extra functionalities such as night vision, infrared (\acs{IR}), pan tilt-zoom (\acs{PTZ}), and many more, which can alter the overall footage in a way that differentiates it from cameras which do not include those traits \cite{ecamnightvisionCCTV2025, ucocare2024SurvilanceCameraFunction}. 
+\noindent Other impacts on footage in the form of camera settings also affects the footage. Many surveillance cameras have set restrictions on their performance to reduce energy consumption and storage. This means that the footage is purposely lowered in quality, and therefore some valuable data could be lost. In addition, certain cameras include extra functionalities such as night vision, infrared (\acs{IR}), pan tilt-zoom (\acs{PTZ}), and many more, which can alter the overall footage in a way that differentiates it from cameras which do not include those traits \cite{ecamnightvisionCCTV2025, ucocare2024SurvilanceCameraFunction}. 
 \\\\
 The value of surveillance cameras depends on the quality of the image. If the image is in poor quality identifying features are hard to decipher, especially when the suspect is further away from the camera. Resulting in a more difficult identification. The quality of a surveillance video depends on the hardware of the camera and how the image is compressed. 
 \\\\
 The resolution of the camera directly effects the number of pixels a subpart of an image corresponds to. While a HD image is \(1280\times720 \text{ pixels} \approx 900.000 \text{ pixels}\) in total, a 4K resolution image is around \(3840\times 2160 \text{ pixels} \approx 8 \text{ million pixels}\), capturing over 8 times more information in the image. When zooming in, a higher-resolution image appears sharper, allowing smaller details to be more easily recognized \cite{image_resolution}.
 \\\\
-When capturing videos in higher resolution, each frame occupies more storage space, resulting in many gigabits of data then monitoring continuously throughout the day. If multiple cameras are deployed, the required storage capacity increases significantly, or footage must be deleted more frequently. To solve this problem, the footage compressed using lossy compressed some unimportant information while keeping the most important \cite{compression_challenge}.
+When capturing videos in higher resolution, each frame occupies more storage space, resulting in many gigabits of data then monitoring continuously throughout the day. If multiple cameras are deployed, the required storage capacity increases significantly, or footage must be deleted more frequently. To solve this problem, the footage compressed using lossy compression, which removes less important information while preserving the most relevant content \cite{compression_challenge}.
 \\\\
 A study from 2022 tested the influence of JPEG compression on object detection, through testing performance of various object detection methods on images with different amount of compression. The study showed, that small object was the most affected by the compression \cite{image_compression_study}.
 
 % HVIS AI SKAL VÆRE ET ANDET STED?
 %This is important to be aware of when working with \ac{AI}, as computer vision works by analyzing and learning the different pixel patterns in images and videos, which, if not done correctly, can cause unwanted biases for an \ac{AI}-model when used on other surveillance systems by fixating on unimportant noise that would not be present in other instances \cite{opencv2025visionproblems, common_challenges_image_class2024}.
 
-\subsection{Environmental Effect on the Image quality. Impacts on Footage} \label{sec: environmentaleffectontheimagequality}
+\subsection{Environmental Effect on the Image quality} \label{sec: environmentaleffectontheimagequality}
 The affects on footage are not only limited to hardware and software of the cameras themselves (as stated in Section \ref{subsec:TechnicalImpactFootage}), as a big part of them arise from the environment they are placed in. These could be the external factors such as location, season, and weather, which alters the footage and objects within it. For example, there are a lot of differences in footage from a camera that is placed inside rather than outside where weather like rain or snow can create noise which reduce clarity and usefulness in the footage. 
 In contrast, a camera inside is not affected by these elements, and might have some other factors that differ from the latter \cite{arxiv_superres2021, ClassificationWeatherEffects2022}. 
 \\\\
-Other environmental aspects that are important to note are light and distance. Many surveillance cameras are placed outside at night where light is limited, and therefore makes capturing image details difficult. This is also commonly accompanied by the surveillance cameras being placed in out of reach locations that covers large amounts of space which reduce the quality of subjects further away as seen in Figure \ref{fig:camera_distance}. Even with external camera attachments such as zoom-technology and \acs{IR} filters, which increases overall visibility, it still does not have the same condition as footage that is taken with perfect lighting and precise camera focus\cite{common_challenges_image_class2024, opencv2025visionproblems, ecamnightvisionCCTV2025}.
+Other environmental aspects that are important to note are light and distance. Many surveillance cameras are placed outside at night where light is limited, and therefore makes capturing image details difficult. This is also commonly accompanied by the surveillance cameras being placed in out of reach locations that covers large amounts of space which reduce the quality of subjects further away as seen in Figure \ref{fig:camera_distance}. Even with external camera attachments such as zoom-technology and \acs{IR} filters, which increases overall visibility, it still does not have the same condition as footage that is taken with perfect lighting and precise camera focus \cite{common_challenges_image_class2024, opencv2025visionproblems, ecamnightvisionCCTV2025}.
 \\\\
 
 \begin{figure}[H]
@@ -59,9 +59,9 @@ Other environmental aspects that are important to note are light and distance. M
     \label{fig:camera_distance}
 \end{figure}
 
-\subsection{Key takeaways from Surveillance Equipment and Footage} 
+\subsection{Key Takeaways}
 \label{subsec:camera_takeaways}
-The main goal of this section is to explain the different attributes that can alter and affect the footage of a surveillance camera. By explaining the fundamental concept of a camera and its different components, it underlines the fact that all footage is in some way unique, and many elements such as weather, distance, light, hardware, software, and so on, can ultimately influence the final footage and its quality.
+In summery, many different attributes that can alter and affect the footage of a surveillance camera. Elements such as weather, distance, light, hardware and software is important factors in understanding, why quality of surveillance footage can differ a lot. 
 
 \section{Computer Vision}
 This section is largely based on IBM's \textit{What is computer vision?}, which serves as an accessible overview of the \ac{CV} domain \cite{IBM2025computerVision}. \ac{CV} enables machines with the ability to interpret and understand visual inputs such as images and videos. The focus of this section is on these data formats. 
@@ -84,7 +84,7 @@ Building upon the introduction in Section \ref{ReID-prob}, a person \ac{ReID} al
 \\\\
 Fundamental challenges for \ac{ReID} networks include the issues of open-set and one-shot learning. Open-set learning references to the models ability to recognize and handle completely new, unseen classes. This concept is particuarly relevant for \ac{ReID}, as a deployed \ac{ReID} system must generalize well so that images of people not seen in training are represented as a distinct feature vector \cite{Liao2014OpenSet}. Furthermore, there might only be a single query image of the \ac{POI} accessible, from which the network can learn identifying features. Working with networks a large amount of input is preferable for a solid classification, but as this is rarely the case when looking for a \ac{POI}, a \ac{ReID} network is trained to adapt and extract identifying information from a limited input. This is characteristic for the one-shot problem \cite{Zheng2015OneShot}. 
 \\\\
-During training, a network learns how to extract identifying features that place embeddings of the same individuals closely, while also distancing them from separate individuals. This is accomplished through metric learning, which guides the model to to minimize distances between embeddings of the same person, while also maximizing the distances between different individuals \cite{Zheng2016PersonReID}. 
+During training, a network learns feature representations which discriminate between different individuals, handled differently depending on the loss function. Metric learning objectives separate different individuals, while pulling samples of the same identities together. Classification losses optimize decision boundaries, which often results in clustering the same identities together, while encouraging separability between identities \cite{Zheng2016PersonReID}. 
 \\\\
 The output of a network is a feature embedding, which is used for \ac{ReID} through a similarity score based on the distance between each query and gallery image. The system then returns a ranking of the gallery embeddings with the closest distance to the query embedding, usually shortened by either setting a confidence threshold or a top \textit{x} list \cite{Zheng2016PersonReID}.
 
@@ -107,9 +107,9 @@ Section \ref{subsec:Surveillance_equipment_n_footage} states the complications t
 \\\\
 The images might further be of inherently poor quality due to surveillance cameras typically covering a large area, have lower resolution, and compression due to storage limitations. Each person only occupies a small part of the whole image, leaving limited information available for analysis by the system. 
 \\\\
-In summary, the main challenge of a \ac{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the pre-processing step before the network performs embedding, with techniques such as \ac{SR} showing the potential to improve quality 
+In summary, the main challenge of a \ac{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the pre-processing step before the network performs embedding, with techniques such as \ac{SR} being a potential method to improve quality.
 
-\subsection{Related Works}\label{subsec:reid_reworks}
+\subsection{Related Work}\label{subsec:reid_reworks}
 This related works section will focus on presenting different types of person \ac{ReID} networks, to get an overview of the field of work. 
 
 \subsubsection{DeepReID: Deep Filter Pairing Neural Network for Person Re-Identification}
@@ -157,7 +157,7 @@ However, this method introduces image enhancements as a separate preprocessing s
 
 %Published in 2024, cited by 5. No github available.
 
-\subsection{Takeaways} \label{subsec:takeawayspreid}
+\subsection{Key Takeaways} \label{subsec:takeawayspreid}
 
 Early studies showed that deep-learning could replace hand-crafting features for \ac{ReID} tasks, by automatically learning features directly from image data. Later research, specifically the Omniscale paper, introduced a lightweight architecture that could capture features across different scales, combining global and local features. The more recent study from 2024 emphasized how image quality plays a critical role in \ac{ReID} accuracy. All three papers use either Rank-1, \ac{mAP} or both to measure accuracy. This leaves the important takeaways as:
 
@@ -360,7 +360,7 @@ A central design principle for \ac{SR} is the perception–distortion trade-off,
 %https://research.facebook.com/blog/2020/07/introducing-neural-supersampling-for-real-time-rendering/
 %https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/7ef605fc8dba5425d6965fbd4c8fbe1f-Paper-round2.pdf
 
-\subsection{Related Works}\label{sec: related work}
+\subsection{Related Work}\label{sec: related work}
 To get an overview of some of the current work in the \ac{SR} field, the following related works section will focus on groundbreaking work, as well as some of the newer advancements.  
 
 \subsubsection{Learning a Deep Convolutional Network for Image Super-Resolution}
@@ -379,7 +379,7 @@ This paper from 2019 proposes a method for single image super resolution called 
 \\\\
 Despite SAN outperforming state-of-the-art results, the model is computationally expensive due to the SOCA module that introduces extra matrix operations to learn covariance relationships, and the non-local modules. 
 
-\subsection{Takeaways}
+\subsection{Key Takeaways}
 The SRCNN paper demonstrated that deep learning could successfully learn mapping directly between low- and high-resolution images. The EDSR showed that removing unnecessary layers, along with deepening the model and stabilizing training, improved performance significantly. Later research, specifically the SAN paper, further improved the task by introducing attention-based techniques that model feature correlations and global image context. The three methods all evaluate their results through PSNR and SSIM metrics. This leaves the important takeaways as:
 
 \begin{itemize}
@@ -390,7 +390,7 @@ The SRCNN paper demonstrated that deep learning could successfully learn mapping
 \end{itemize}
 
 
-\section{Related works for Super-Resolution Re-Identification}\label{sec:superres-reid}
+\section{Related work for Super-Resolution Re-Identification}\label{sec:superres-reid}
 
 As the implementation of \ac{SR} has the potential to improve the performance of a person \ac{ReID} model, based on the challenges described in Section \ref{subsec:challenges-ReID}, this section will examine existing approaches that combine \ac{SR} and person \ac{ReID}.
 
@@ -406,7 +406,7 @@ This paper from 2021 introduces the Adaptive Person Super-Resolution (APSR) mode
 \\\\
 While this approach does have promising results, the use of multiple \ac{SR} modules introduces high model complexity and increases computational costs. It also relies heavily on the network advisory's accuracy, as incorrect module selection could degrade image quality rather than enhancing it. 
 
-\subsection{Takeaways}
+\subsection{Key Takeaways}
 Both papers address the challenge of person \ac{ReID} under different image resolutions by introducing \ac{SR}. The paper from 2019 jointly trained the \ac{SR} module and person \ac{ReID}, creating a resolution invariant person \ac{ReID} system. Later, the paper from 2021 extended this idea, by making the \ac{SR} module step adaptive to the content of the image. Together, these studies highlight how \ac{SR} can be beneficial in improving a person \ac{ReID} system. This leaves the important takeaways as:
 
  \begin{itemize}

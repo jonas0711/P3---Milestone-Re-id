@@ -1,14 +1,16 @@
 \chapter{Implementation} \label{cha: implementation}
-This Chapter presents the implementation of the manufactured dataloader and training scripts, as well as the chosen \acs{SR} and \acs{ReID} architecture, and the combination of these.
+This Chapter presents the implementation of the dataloader and training scripts, as well as the chosen \acs{SR} and \acs{ReID} architecture, and the combination of these.
 SR and ReID together with the overall implementation choices.
 
 \section{Dataloaders}
 \label{imp_dataloading}
-Both of the data loaders were built using the \texttt{Dataset} and \texttt{DataLoader} classes from \texttt{torch.utils.data}. They are designed to generate batches of data samples for training, validation and test. Special for the \ac{ReID} data loader is that validation and test is divided into query and gallery splits. 
+Two data loaders were built using the \texttt{Dataset} and \texttt{DataLoader} classes from \texttt{torch.utils.data}. They are designed to generate batches of data samples for training, validation and test. Special for the \ac{ReID} data loader is that validation and test is divided into query and gallery splits. For the \ac{ReID} datasets, three datasets were used for training MSMT17 \cite{wei2018person}, Market-1501 \cite{Zheng2015ICCV}  and CUHK03 \cite{KaggleCUHK03}
+
+
+
+The data loader combines these datasets, enabling joint training across all of them. To prevent any person-id conflict, in cases where the same person-id appears in multiple datasets, and to ensure continues ID-values, a \texttt{JSON} file with mappings was created. This maps the old ID, with a dataset specific prefix in front, to a new continues value. It ensures that all person-ID's remain unique across datasets, while preserving a person-ID for each person and introducing continues values on which softmax loss can be used. In the process of creating the \texttt{JSON} file, every 10th new person-ID is pulled into the validation set. In the validation split, one sample per person-ID is added to the query set. The remaining samples are categorized for the gallery set: Any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery.
 \\\\
-For the \ac{ReID} datasets, three datasets were used for training: MSMT17, Market1501 and CUHK03. The data loader combines these datasets, enabling joint training across all of them. To prevent any person-id conflict, in cases where the same person-id appears in multiple datasets, and to ensure continues ID-values, a \texttt{JSON} file with mappings was created. This maps the old ID, with a dataset specific prefix in front, to a new continues value. It ensures that all person-ID's remain unique across datasets, while preserving a person-ID for each person and introducing continues values on which softmax loss can be used. In the process of creating the \texttt{JSON} file, every 10th new person-ID is pulled into the validation set. In the validation split, one sample per person-ID is added to the query set. The remaining samples are categorized for the gallery set: Any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery.
-\\\\
-The data loader for the SR datasets simply splits the images into input and target images, and creates batches. The images from DIV2K and RELLISUR dataset were kept separate.
+The data loader for the SR datasets simply splits the images into input and target images, and creates batches. The images from DIV2K \cite{Agustsson2017NTIRE} and RELLISUR \cite{aakerberg2021rellisur} dataset were kept separate.
 
 \section{Dataaugmentation} \label{sec: dataaugmentation}
 A classic way to improve performance and generalization is through augmentations. The goal is to improve model performance in terms of generalization across different image scales and resolution, for robustness in real life scenarios. The different types of augmentation and their purpose is included in Table \ref{tab:augmentationtypes}.
@@ -16,7 +18,6 @@ A classic way to improve performance and generalization is through augmentations
     \centering
     \begin{tabular}{|>{\centering\arraybackslash}p{0.18\linewidth}|>{\centering\arraybackslash}p{0.78\linewidth}|}\hline
          \cellcolor[HTML]{D8E9F7} \textbf{Augmentation}&  \cellcolor[HTML]{D8E9F7} \textbf{Purpose}\\\hline
-         Normalization&  Standardize pixel intensity values to improve training.\\\hline
          Horizontal flipping&  Increase dataset size.\\\hline
  Gaussian blur&Improve robustness to low-quality or blurred images.\\\hline
  Gaussian noise&Enhance generalization to imperfect or noisy images.\\\hline
@@ -84,7 +85,7 @@ A classic way to improve performance and generalization is through augmentations
 
 \section{Implementation of OSNet}\label{sec:implementationosnet}
 %Note: vi bruger x1 modellen, som er den største. 
-The architecture of the person \acs{ReID} model that is implemented is the same as described in Section \ref{lab:methodreid}. The \acf{OSNet} implementation is taken from the \texttt{Torchreid} repository, which comes with a pretrained \acs{OSNet} model. However, to ensure full control over the training process and to train from scratch, a custom training script was made. 
+The architecture of the implemented person \acs{ReID} model is identical to what described in Section \ref{lab:methodreid}. The \acf{OSNet} implementation is taken from the \texttt{Torchreid} repository, which comes with a pretrained \acs{OSNet} model. However, to ensure full control over the training process and to train from scratch, a custom training script was made. 
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|}\hline
@@ -265,6 +266,31 @@ Since the \ac{SR} module was trained to upscale images, it is not specialized fo
 To combine the two modules end to end, each model was downloaded from it’s respective Github repository. The models were then wrapped in a function which builds the model with the configuration befitting it’s size. OSNet configuration can be seen in Table \ref{tab:osnet-config}, EDSR configuration can be seen in Table \ref{tab:edsr-config}.
 \\\\
 To allow for losses to back-propagate through both modules, a new class was created with a combined forward pass. The forward pass takes an image as input, forwards it through the \ac{SR} module first and then through the \ac{ReID} module, with the option of also returning the \ac{SR} output to increase operation transparency. The class also allows for each module to be initiated with frozen weights, such that the possibility of the \ac{SR} module becoming a \ac{ReID} feature extractor is minimized. The frozen module can then be unfrozen with an unfreeze function.
+\\\\
+To benefit from the end to end integration of the two models, training was continued with pretrained weights from baseline \ac{OSNet} and finetuned \ac{EDSR}. \ac{OSNet} weights were frozen for the first 30 epochs, such that \ac{EDSR} could adapt to the new data being \ac{LR} images of people, instead of the more diverse nature of DIV2K and RELLISUR. While only a classification loss back-propagated, it should still help specialize the model for the task, as can be seen in Section XXX. The learning rate for \ac{EDSR} was chosen, due to it being a middle point between the training and finetuning learning rate used during the standalone training. The learning rate for \ac{OSNet} was set to \texttt{1e-3}, such that it would drop to \texttt{1e-4} after the the first milestone, which coincides with \ac{OSNet} being unfrozen. This was chosen as the model had already learned the task of \ac{ReID}, and in this joint training should focus on learning to extract features from \ac{SR} images. A second milestone was set at epoch 60 for final finetuning with the lowest learning rate. Training concluded at epoch 95, at which point the model had learned enough for a fair comparison with the other models, even if more performance could have been squeezed out. 
+\subsection*{Training Configuration for Joint ReID and SR Model}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}\hline
+         \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Value}\\\hline
+        No. classes &  2117\\\hline
+        No. epochs &  95\\\hline
+        No. epochs with frozen OSNet& 30\\\hline
+        Batch Size &  64 \\\hline
+        Optimizer &  SGD \\\hline
+        Momentum&0.9\\\hline
+        Weight Decay&0.0005\\\hline
+        Learning Rate Scheduler &\texttt{MultiStepLR}\\\hline
+        EDSR Learning Rate & 1e-5\\\hline
+        OSNet Learning Rate & 1e-3\\\hline
+        LR Milestones&  [30, 60]\\\hline
+        LR Gamma&  0.1\\\hline
+        Loss Function&  CrossEntropyLoss\\\hline 
+        Label Smoothing&0.1\\ \hline
+    \end{tabular}
+    \caption{The training hyperparameters and their value for training Joint model.}
+\label{tab:osnettrainingparameters}
+\end{table}
 
 \section{Deployment}
 \label{deployment}
@@ -283,3 +309,27 @@ The backend pipeline of the deployment script works by first processing the gall
     \label{fig:deployment_example}
 \end{figure}
 
+
+
+
+
+
+%==============================flyttet fra results
+
+\subsection{EDSR Training}
+Two training strategies were tested for the \ac{EDSR} model. The first approach trained the model from scratch on RELLISUR data. The second approach took the best checkpoint from this model and finetuned it on \ac{DIV2K} to improve generalization. Both models used the baseline configuration described in Section \ref{sec:edsr_implementation}.
+\\\\
+The model trained from scratch on RELLISUR showed a normal learning progression. Training loss started at approximately 0.12 and decreased quickly to around 0.095 within the first 25 epochs. The loss continued to decrease slowly and stabilized around 0.089 after epoch 150. Validation \ac{PSNR} started at 23.7 dB and improved to approximately 25.3 dB within the first 25 epochs. The highest validation \ac{PSNR} of 25.72 dB was achieved at epoch 82, and the best model checkpoint was saved at epoch 113 based on validation \ac{PSNR}. After this point, validation \ac{PSNR} fluctuated between 25.3 and 25.7 dB without further improvement, showing that the model had converged. Based on the training curves shown in Figure \ref{fig:edsr_comparison}, the model might have achieved slightly better results with additional training epochs, but the current training duration was good enough to show how the approach works and how the model learns from the data.
+\\\\
+The best checkpoint from the scratch model (epoch 113) was then finetuned on \ac{DIV2K} to give the model more diverse image content. This finetuning showed a different training pattern. Training loss started at approximately 0.078, which is much lower than the initial scratch training, and decreased only slightly over the course of training. This low initial loss showed that the RELLISUR-trained weights already learned useful \ac{SR} features. The highest validation \ac{PSNR} of 25.49 dB was achieved at epoch 1, after which validation \ac{PSNR} gradually declined to approximately 25.18 dB. This shows that training on \ac{DIV2K} moved the model away from the RELLISUR validation distribution. A reduced learning rate of $5 \times 10^{-6}$ was used to prevent the model from forgetting what it learned on RELLISUR.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/images/cropped_models_comparison.png}
+    \caption{Comparison of training curves for \ac{EDSR} trained from scratch on RELLISUR (blue) and the same model finetuned on \ac{DIV2K} (green). Top left shows training loss, top right shows validation loss, bottom left shows validation \ac{PSNR}, and bottom right shows the learning rate schedule.}
+    \label{fig:edsr_comparison}
+\end{figure}
+
+\noindent Figure \ref{fig:edsr_comparison} compares the training curves of both models. The scratch model achieved higher validation \ac{PSNR} but the finetuned model had lower training loss throughout. This difference can be explained by the different training distributions. The scratch model focused heavily on the cropped RELLISUR validation images, while the finetuned model learned to work better on new data from the diverse \ac{DIV2K} dataset.
+\\\\
+When tested on the RELLISUR NLHR test set (85 native low-resolution images), the finetuned model achieved an average \ac{PSNR} of 33.30 dB, while the scratch model achieved 31.77 dB. This 1.53 dB improvement shows that the finetuning strategy worked as intended. Interestingly, while the scratch model had higher validation \ac{PSNR} during training (25.72 dB vs 25.49 dB), it performed worse on the test set. This shows that validation performance on cropped images does not always show how well the model will work on full native low-resolution images. Training on diverse \ac{DIV2K} content helped the finetuned model work better on the test set. Both models reached a \ac{PSNR} above 30 dB on average, which shows that the models are useful for the \ac{SR} task and can produce super-resolved images with good enough quality for later use in applications such as \ac{ReID}. Individual test images showed \ac{PSNR} values ranging from approximately 20 dB to 42 dB. This variation depends on image content, lighting conditions, and the original capture resolution.

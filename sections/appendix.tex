@@ -101,3 +101,241 @@ cam2\_person316.png & cam2\_person294.png \\
     \label{fig:trade_model_comparison}
 \end{figure}
 Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer Michaeli \cite{Blau2018PerceptionDistortion}. 16 models were plotted against each other in 6 different graphs. All graphs had NIQE for measuring perception, and 6 different metrics were used to evaluate distortion.
+
+
+\section{Full Result Tables}
+
+\subsection{Baseline}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Unmodified Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 2.83\%& 3.21\%&  1.55\%\\ \hline
+\textbf{Rank-1} & 6.10\%& 7.45\%& 4.13\%\\ \hline
+\textbf{Rank-5} & 13.51\%& 14.77\%& 8.30\%\\ \hline
+\textbf{Rank-10}& 17.68\%& 19.12\%& 11.45\%\\ \hline
+\textbf{Rank-20}& 22.62\%&  23.92\%& 16.07\% \\ 
+\hline
+\end{tabular}
+\caption{Results for scaletest test on DukeMTMC-ReID dataset for the baseline model.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 2.83\%& 2.79\%& 2.74\%& 2.65\%\\ \hline
+\textbf{Rank-1} & 6.10\%& 5.66\%& 5.92\%& 5.66\%\\ \hline
+\textbf{Rank-5} & 13.51\%& 13.60\%& 13.29\%& 13.15\%\\ \hline
+\textbf{Rank-10}& 17.68\%& 17.19\%& 17.64\%& 15.98\%\\ \hline
+\textbf{Rank-20}&  22.62\%& 22.22\%& 22.8\%& 21.41\%\\ \hline
+\end{tabular}
+\caption{Results for compression test on DukeMTMC-ReID dataset for the baseline model.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{Rank-1} & 7\%\\ \hline
+\textbf{Rank-5} & 12.33\%\\ \hline
+\textbf{Rank-10}& 19\%\\ \hline
+\textbf{Rank-20}& 25.33\%\\ \hline
+\end{tabular}
+\caption{Results for test on iLIDS-VID dataset for the baseline model.}
+\end{table}
+
+\subsection{Augmented}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Unmodified Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 2.24\%& 2.54\%& 1.35\%\\ \hline
+\textbf{Rank-1} & 5.07\%& 6.51\%& 3.59\%\\ \hline
+\textbf{Rank-5} & 10.55\%&  12.34\%& 7.41\%\\ \hline
+\textbf{Rank-10}& 14.27\%& 15.62\%& 9.83\%\\ \hline
+\textbf{Rank-20}& 19.17\%&  20.06\%& 13.73\%\\ \hline
+\end{tabular}
+\caption{Results for scale test on DukeMTMC-ReID dataset for the robust model.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low\\ (Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 2.24\%& 2.25\%& 2.26\%& 2.20\%\\ \hline
+\textbf{Rank-1} & 5.07\%& 5.16\%& 5.21\%& 4.67\%\\ \hline
+\textbf{Rank-5} & 10.55\%& 10.82\%& 11.36\%& 10.55\%\\ \hline
+\textbf{Rank-10}& 14.27\%& 14.41\%&  14.32\%& 13.51\%\\ \hline
+\textbf{Rank-20}&   19.17\%& 19.39\%& 18.94\%& 18.40\%\\ \hline
+\end{tabular}
+\caption{Results for compression test on DukeMTMC-ReID dataset for the robust model.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{Rank-1} & 2.67\%\\ \hline
+\textbf{Rank-5} & 7.33\%\\ \hline
+\textbf{Rank-10}& 11.67\%\\ \hline
+\textbf{Rank-20}& 18.67\%\\ \hline
+\end{tabular}
+\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the augmented model.}
+\end{table}
+
+\subsection{Sequential}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 1.05\%& 1.23\%& 1.52\%\\ \hline
+\textbf{Rank-1} & 2.15\%& 2.33\%& 4.26\%\\ \hline
+\textbf{Rank-5} & 5.66\%& 6.06\%& 8.66\%\\ \hline
+\textbf{Rank-10}& 7.94\%& 9.02\%& 11.89\%\\ \hline
+\textbf{Rank-20}& 10.59\%& 12.48\%& 15.75\%\\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_result}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 1.05\%& 1.08\%& 1.05\%& 0.96\%\\ \hline
+\textbf{Rank-1} & 2.15\%& 2.51\%& 2.15\%& 2.11\%\\ \hline
+\textbf{Rank-5} & 5.66\%& 5.52\%& 5.29\%& 4.71\%\\ \hline
+\textbf{Rank-10}& 7.94\%& 7.50\%& 7.72\%& 7.81\%\\ \hline
+\textbf{Rank-20}&  10.59\%& 10.73\%& 10.95\%& 10.28\%\\ \hline
+\end{tabular}
+\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\label{tab:compressiontest_ood2_result}
+\end{table}
+
+\subsection{Joint}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 3.69\%& 4.30\%& 3.05\%\\ \hline
+\textbf{Rank-1} & 7.23\%& 8.75\%& 6.73\%\\ \hline
+\textbf{Rank-5} & 14.54\%& 16.70\%& 14.0\%\\ \hline
+\textbf{Rank-10}& 19.54\%& 21.32\%& 18.04\%\\ \hline
+\textbf{Rank-20}& 3.69\%& 26.89\%& 22.85\%\\ \hline
+\end{tabular}
+\caption{Scale test of Joint on 25 pairs from Market-1501 dataset.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 3.69\%& 3.61\%& 3.64\%& 3.37\%\\ \hline
+\textbf{Rank-1} & 7.23\%& 7.18\%& 7.41\%& 6.42\%\\ \hline
+\textbf{Rank-5} & 14.54\%& 14.72\%& 14.63\%& 13.69\%\\ \hline
+\textbf{Rank-10}& 19.54\%& 18.94\%& 19.25\%& 18.13\%\\ \hline
+\textbf{Rank-20}&  3.69\%& 24.60\%& 25.04\%& 23.52\%\\ \hline
+\end{tabular}
+\caption{Compression test of Joint on 25 pairs from Market-1501 dataset.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
+\textbf{Rank-1} & 3\%\\ \hline
+\textbf{Rank-5} & 8.33\%\\ \hline
+\textbf{Rank-10}& 12\%\\ \hline
+\textbf{Rank-20}& 18 \%\\ \hline
+\end{tabular}
+\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the joint model.}
+\end{table}

@@ -83,11 +83,11 @@ As the system handles potentially sensitive data, it is important to ensure data
 
 
 \section{Future Work}
-Hvad mangler det for at blive realiseret system?
+%Hvad mangler det for at blive realiseret system?
 
 %- The gap between training data and deployment environments should be addressed in future works. 
 
-This project adresses the problem statement of designing a proof of concept system person \ac{Reid} system improved through \ac{SR} Integration. The results demostrates ? ***** 
+This project addresses the problem statement of designing a proof of concept system person \ac{Reid} system improved through \ac{SR} Integration. The results demonstrates ? ***** 
 
 %Dataset
 %Flere forskellige kulturer, religoner i træning for at undgå bias. 
@@ -100,26 +100,24 @@ The training datasets used in this project is primarily consists of ** vi ved de
 %SR forbedringer
 %Implementere auxiliary loss i joint training så SR også optimeres på reconstruction quality
 %Fokus på at SR forbedre specifikke tøj detaljer 
-%Undersøg multi scale SR Der tager forskellige input resolutions 
-The \ac{SR} module could be improved through several approaches. Implementing an auxiliary loss during joint training would allow the SR module to optimize for both reconstruction quality and \ac{ReID} perfomence at the same time, rather then only learning from only learning from the \ac{ReID} loss. The \ac{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
+%Undersøg multi scale SR Der tager forskellige input resolutions
+\subsubsection{Super-Resolution Enhancements}
+The \ac{SR} module could be improved through several approaches. Implementing an auxiliary loss during joint training would allow the SR module to optimize for both reconstruction quality and \ac{ReID} performance at the same time, rather then only learning from only learning from the \ac{ReID} loss. The \ac{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
 
 
 
 %ReID forbedringer
+\subsubsection{Re-Identification Enhancements}
 The ReID module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person ReID. Investigating different freezing strategies during joint training, such as trying unfreezing layers or trying different learning rates for SR or Reid modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
-
-Deployment and System Integration
-
-
 
 
 %Sammenligne loss functions ?? Har vi skrevet om det før ?
-
 %Undersøge forskellige freezing strategier i jont train.
 %Systematisk hyperparemeter tuning
 
 %Deployment
-Deployment and System Integration
+\subsubsection{Deployment and System Integration}
+For practical deployment, several improvements are necessary . The The pipeline should be optimized for real-time inference to enable immediate processing of surveillance footage during active investigations **MAybe not** . Exploring edge deployment options would allow the system to run on local hardware, reducing latency and dependency on network connectivity. A comprehensive logging system should be implemented to track when and by whom the system is accessed, supporting transparency and accountability in accordance with ethical guidelines. Establishing a feedback loop from practical use would enable continuous improvement based on real-world performance and user needs. Finally, implementing end-to-end encryption for both data storage and transmission is essential to protect the sensative personal data processed by the system 
 
 %Real-time inference 
 %Edge deployment
