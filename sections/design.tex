@@ -1,23 +1,23 @@
 \chapter{Design and Methods} \label{cha: designandmethods}
-This Chapter first presents two hypothesis that guide the design and methods decisions. Second, the chosen \acs{ReID} and \acs{SR} models are presented, along with the losses and metrics used during training and validation. Finally, the different strategies for combining the two architectures are explored. The chapter is divided into three sections \ref{sec: Designreidmodule} \acs{ReID} Module,  \ref{sec:designSRmodule} \acs{SR} Module and \ref{combinednetworks} Combined XXXX, to maintain a clear and structured overview. 
+This Chapter first presents two hypothesis that guide the design and methods decisions. Second, the chosen \acs{ReID} and \acs{SR} models are presented, along with the losses and metrics used during training and validation. Finally, the different strategies for combining the two architectures are explored. The chapter is divided into three sections: Section \ref{sec: Designreidmodule} \acs{ReID} Module,  Section \ref{sec:designSRmodule} \acs{SR} Module, and Section \ref{sec:experiment_definition}
+Experiment Definition, to maintain a clear and structured overview. 
 
 \section{Hypotheses}\label{sec:hypotheses}
-The chapters \ref{cha:problemanalysis} and \ref{cha: technicalanalysis} have outlined weaknesses and shortcomings in \acs{ReID} domain, as well as the potential of improvement when combined with \acs{SR}. Based on these insights, two hypotheses have been formulated to guide the subsequent analysis.
+Chapters \ref{cha:problemanalysis} and \ref{cha: technicalanalysis} have outlined weaknesses and shortcomings in the \acs{ReID} domain, as well as the potential of improvement when combined with \acs{SR}. Based on these insights, two hypotheses have been formulated to guide the subsequent analysis.
 
-The experimental setups are built around the following hypotheses, and will be explained in the end of the chapter:
 \begin{itemize}
-    \item \textit{Hypothesis 1}: Training the \acs{ReID} module on augmented images will lead to more robust feature extraction.
-    \item \textit{Hypothesis 2}: Running input through the \acs{SR} module, before it enters the \acs{ReID} module, will lead to better performance. 
+    \item \hypertarget{hypothesis:1}{\textit{Hypothesis 1}}: Training the \acs{ReID} module on augmented images will improve performance when evaluated under in-distribution and \acf{OOD} conditions.*
+    \item \hypertarget{hypothesis:2}{\textit{Hypothesis 2}}: Running input through the \acs{SR} module, before it enters the \acs{ReID} module, will lead to better performance. 
 \end{itemize}
-
-As the project objective is to investigate how \acs{SR} can enhance the performance of \acs{ReID}, each component, presented in this chapter, was selected with the intent of establishing a fair and consistent foundation for comparison, rather than to achieve state-of-the-art results. Furthermore, both of the chosen model architectures have low parameter counts, for the purpose of solving the problem with design/architecture choices instead of relying on adding more parameters. 
+\noindent * The conditions for in-distribution and \acs{OOD} is defined in section \ref{Reidteststrategy}
+\\\\
+As the project objective is to investigate how \acs{SR} can enhance the performance of \acs{ReID}, each component, presented in this chapter, was selected with the intent of establishing a fair and consistent foundation for comparison, rather than to achieve state-of-the-art results. Furthermore, both of the chosen model architectures have low parameter counts, for the purpose of solving the problem with design/architecture choices instead of relying on adding more parameters. The experimental setups are built around the hypotheses, and will be explained in the end of the chapter.
 
 \section{ReID Module} \label{sec: Designreidmodule}
 This section introduces the chosen \acs{ReID} architecture, along with the training and test strategies, loss function and evaluation metrics. 
 
 \subsection{OSNet} \label{sec:methodreid}
-The \acf{OSNet} architecture presented in Section \ref{sec:omniscale} demonstrates strong performance across several person re-identification benchmarks \cite{OSNet}. The architecture is chosen as the \acs{ReID} module for this project based on its performance and the lightweight architecture, allowing for competitive accuracy that is not fueled by very many parameters. 
-The details of the architecture are presented in this section, based on Figure \ref{fig:osnetpipeline}. 
+The \acf{OSNet} architecture presented in Section \ref{sec:omniscale} demonstrates strong performance across several person re-identification benchmarks \cite{OSNet}. The architecture is chosen as the \acs{ReID} module for this project based on this performance combined with the lightweight architecture, allowing for competitive accuracy without relying on a large number of parameters. This balance makes it suitable for scalable deployment scenarios, where computational efficiency is an important consideration. The details of the architecture are presented in this section, based on Figure \ref{fig:osnetpipeline}. 
 
 \begin{figure} [H]
     \centering
@@ -50,19 +50,20 @@ This process is repeated until the fourth convolution stage, which is followed b
         Layers per stage (\texttt{layers})        & [2, 2, 2] \\\hline
         Channels per stage (\texttt{channels})    & [64, 256, 384, 512] \\\hline
     \end{tabular}
-        \caption{OSNet\_x1\_0 Configuration.}
+        \caption{\acs{OSNet}\_x1\_0 Configuration.}
     \label{tab:osnet-config}
 \end{table}
 
-\subsection{Loss Function}
+\subsection{Loss Function}\label{sec:reidloss}
 The choice of a loss function is fundamental to the optimization process and to shaping the representations learned by the model \cite{lossfunction}. In person \acs{ReID} tasks, the loss function must encourage the learning of discriminative features that can separate identities while remaining efficient during training. In addition, an open-set problem, as \acs{ReID} is, requires the model to generalize effectively to identities not seen during training. This section introduces the loss function used for \acs{OSNet} and explains how it supports effective feature learning for identity classification.
 
 \subsubsection*{Multiclass Cross-Entropy Loss}
-Multiclass cross-entropy loss, also known as softmax loss, is commonly used for classification tasks where each input has one correct class \cite{softmax}. It works by applying a softmax function to the model's output logits to produce a probability distribution for each class, and then calculating the negative log-likelihood of the true class. The following formula shows the softmax loss written directly in terms of logits, as presented in \cite{softmax}:
+Multiclass cross-entropy loss, also known as softmax loss, is commonly used for classification tasks where each input has one correct class \cite{softmax}. It works by applying a softmax function to the model's output logits to produce a probability distribution for each class, and then calculating the negative log-likelihood of the true class. Formula \ref{formula:softmaxloss} shows the softmax loss written directly in terms of logits, as presented in \cite{softmax}:
 
-\[
+\begin{equation}
 \mathcal{L}_i = - f_{y_i} + \log \sum_{j} e^{f_j}
-\]
+\label{formula:softmaxloss}
+\end{equation}
 
 \begin{description}
     \item[$\mathcal{L}_i$]: Softmax loss for the $i$-th sample.
@@ -72,29 +73,76 @@ Multiclass cross-entropy loss, also known as softmax loss, is commonly used for 
     \item[$\sum_j e^{f_j}$]: Normalization term over all classes.
 \end{description}
 
-\noindent This encourages the model to assign a high probability score to the correct class, while penalizing confident but incorrect predictions. The output probabilities can be interpreted as the model's confidence in each class. However, these probabilities are influenced by the scale of the model's logits, which is affected by the regularization strength used in training. Stronger regularization punishes large parameter values, which can reduce the scale of the logits and result in softer softmax outputs. In contrast, lower regularization may allow for larger softmax outputs. Label smoothing is a regularization technique commonly used in combination with softmax loss, as it prevents the model from becoming overconfident in its predictions, by softening the target labels instead of using one-hot encoded labels \cite{labelsmoothing}. This is particularly beneficial for person \acs{ReID}, as it addresses the challenge of limited training samples per identity. By preventing extreme confidence on training identities, label smoothing encourages the model to learn more robust features that generalize better to unseen test identities, a critical requirement for the open-set nature of person \acs{ReID}.
+\noindent This encourages the model to assign a high probability score to the correct class, while penalizing confident but incorrect predictions. The output probabilities can be interpreted as the model's confidence in each class. However, these probabilities are influenced by the scale of the model's logits, which is affected by the regularization strength used in training. Stronger regularization punishes large parameter values, which can reduce the scale of the logits and result in softer softmax outputs. In contrast, lower regularization may allow for larger softmax outputs. Label smoothing is a regularization tec   hnique commonly used in combination with softmax loss, as it prevents the model from becoming overconfident in its predictions, by softening the target labels instead of using one-hot encoded labels \cite{labelsmoothing}. This is particularly beneficial for person \acs{ReID}, as it addresses the challenge of limited training samples per identity. By preventing extreme confidence on training identities, label smoothing encourages the model to learn more robust features that generalize better to unseen test identities, a critical requirement for the open-set nature of person \acs{ReID}.
 
-\subsection{Evaluation Metrics}
+\subsection{Evaluation Metrics}\label{reidmethodevalmetric}
 The evaluation metrics help measure how well the models perform on a given task \cite{evaluationmetrics}. Therefore, selecting the appropriate metrics is essential to ensure that the evaluation reflects the objective of the task. In the context of person \acs{ReID}, the evaluation must capture the model's ability to correctly identify individuals, as well as the quality of the ranking of retrieved matches. This section introduces the evaluation metrics used for the person \acs{ReID} module.
 
 \subsubsection*{Rank}
 Rank-\textit{k} metrics are widely used in \acs{ReID} to measure how good the system is at getting a correct identity match within a certain range. Rank is based on a concept called the Cumulative Matching Characteristic, which describes the probability that the first correct match appears within the top \textit{k} results of all queries evaluated.
 \\\\
-For example, a Rank metric with \texttt{k = 1} would answer the question "For how many queries were the top match the correct identity?" while a Rank with \texttt{k = 5} would answer "For how many queries did the correct identity appear in the top 5 matches?". This is the same with different valued \textit{k's}, just with more or less of the matches for the queries accounted for. Because it is a Cumulative Metric, it will count a query as a success if the correct match is within the top \textit{k} positions. In other words, once a query has its first correct match at rank \textit{r}, it is counted as a success for all Rank-\textit{k} metrics where \(k \ge r\). This is done on multiple queries where an average is then taken of the successes for each Rank-\textit{k} \cite{rankmetricEvidently}. 
+For example, a Rank metric with \texttt{k = 1} would answer the question "For how many queries were the top match the correct identity?" while a Rank with \texttt{k = 5} would answer "For how many queries did the correct identity appear in the top 5 matches?". This is the same with different valued \textit{k's}, just with more or less of the matches for the queries accounted for.
 \\\\
-In short, Rank-\textit{k} describes the models ability to find a correct match in top-\textit{k}, making it ideal as evaluation metric for this project.
+Because it is a Cumulative Metric, it will count a query as a success if the correct match is within the top \textit{k} positions. In other words, once a query has its first correct match at rank \textit{r}, it is counted as a success for all Rank-\textit{k} metrics where \(r \le k\). This is done on multiple queries where an average is then taken of the successes for each Rank-\textit{k} \cite{rankmetricEvidently}. A more in-deph explination can be seen in the Rank formula \ref{formula:Rank}.
+
+\begin{equation}
+\mathrm{Rank}\text{-}k
+\;=\;
+\frac{1}{Q}\sum_{q=1}^{Q}\mathbf{1}\!\left[r_q \le k\right]
+    \label{formula:Rank}
+\end{equation}
+
+\begin{description}
+    \item[$r_q$]: The location of the first correct match for the query $q$.
+    \item[$\mathbf{1}\lbrack r_q \le k\rbrack$]: Turns each query into a binary success criterion. If $r_q \le k$, return 1; otherwise 0.
+\end{description}
+
+
 
 \subsubsection*{\acs{mAP}}
-\acf{mAP} is a commonly used metric to examine the performance of both object detection and information retrieval systems, such as \acs{ReID}. \acs{mAP} can differ depending on what it is being used for, but in a \acs{ReID} context, it works by measuring how good the system is at retrieving the correct identities across the entire ranked gallery list, which also makes it ideal to work alongside the Rank-\textit{k} metric, as it estimates all true matches, and not just a given \textit{k} range. As the name implies, \acs{mAP} is found by calculating the mean of the overall Average Precisions of all valid queries. In \acs{ReID}, Average Precision is computed from the ranked gallery list by measuring precision at every correct match starting from the highest similarity score to the lowest. An average of these precisions is then taken to get the Average Precision of that query. Meanwhile, \acs{mAP} is the mean of those Average Precisions across all the valid queries. This means it both accounts for how good the system is at finding matches, but also how good it ranks them \cite{mAPlightly}. Because \acs{mAP} evaluates the model’s ability to retrieve all relevant matches, it is selected as the primary metric for model selection.
+\acf{mAP} is a commonly used metric to examine the performance of both object detection and information retrieval systems, such as \acs{ReID}. \acs{mAP} can differ depending on what it is being used for, but in a \acs{ReID} context, it works by measuring how good the system is at retrieving the correct identities across the entire ranked gallery list, which also makes it ideal to work alongside the Rank-\textit{k} metric, as it estimates all true matches, and not just a given \textit{k} range. As the name implies, \acs{mAP} is found by calculating the mean of the overall Average Precisions of all valid queries. In \acs{ReID}, Average Precision is computed from the ranked gallery list by measuring precision at every correct match starting from the highest similarity score to the lowest. An average of these precisions is then taken to get the Average Precision of that query as seen in formular \ref{formula:AP}. Meanwhile, \acs{mAP} is the mean of those Average Precisions across all the valid queries as seen in formula \ref{formula:mAP}. This means it both accounts for how good the system is at finding matches, but also how good it ranks them \cite{mAPlightly}. Because \acs{mAP} evaluates the model’s ability to retrieve all relevant matches, it is selected as the primary metric for model selection.
 
-\subsection{Training Strategy}
-The \acs{ReID} module were trained on a combination of Market-1501 \cite{CVATM1501}, MSMT17 \cite{wei2018person} and CUHK03 \cite{KaggleCUHK03}, providing 2,117 unique identities across diverse surveillance conditions. This multi dataset approach was chosen to ensure that the model learns generalizable features rather than dataset-specific patterns. Each dataset contributes distinct characteristics: Market-1501 provides realistic detector noise, CUHK03 offers both manual and automatic detected annotations, and MSMT17 contributes with 15 cameras across indoor and outdoor scenes, captured at different times of day.
+
+\begin{equation}
+\mathrm{AP}(q)
+\;=\;
+\frac{1}{R_q}\sum_{i=1}^{N} P_q(i)\,\mathrm{rel}_q(i)
+\label{formula:AP}
+\end{equation}
+
+\begin{description}
+    \item[$P_q(i)$]: The precision that is calculated for correct/relevant match $\mathrm{rel}_q(i)$ at rank $i$ for query $q$.
+    \item[$R_q$]: Total number of relevant matches in the gallery for query $q$.
+    \item[$\mathrm{rel}_q(i)$]: "Relevance" at rank $i$ for query $q$.
+\end{description}
+
+
+
+\begin{equation}
+\mathrm{mAP}
+\;=\;
+\frac{1}{Q}\sum_{q=1}^{Q}\mathrm{AP}(q)
+\label{formula:mAP}
+\end{equation}
+\begin{description}
+    \item[$\mathrm{AP}(q)$]: The Average Precision as seen in formula \ref{formula:AP} for query $q$.
+\end{description}
+
+\subsection{Training Strategy}\label{trainingstragegyreid}
+The \acs{ReID} module will be trained on a combination of Market-1501 \cite{CVATM1501}, MSMT17 \cite{wei2018person} and CUHK03 \cite{KaggleCUHK03}, providing 2,355 unique identities across diverse surveillance conditions. This multi-dataset training approach is chosen to ensure that the model learns generalizable features rather than dataset-specific patterns. Each dataset contributes with distinct characteristics: Market-1501 provides realistic detector noise in the form of distractors, CUHK03 emphasizes controlled cross-camera matching scenarios, and MSMT17 contributes with 15 cameras across indoor and outdoor scenes, captured at different times of day.
+
+\subsubsection{Mixed dataset}
+When mixing multiple datasets, overlapping person identities and inconsistent ID indexing must be avoided. To prevent any person-id conflict, in cases where the same person-id appears in multiple datasets, and to ensure continues ID-values, a \texttt{JSON} file with mappings was created. This maps the old ID, with a dataset specific prefix in front, to a new continues value. It ensures that all person-ID's remain unique across datasets, while preserving a person-ID for each person and introducing continues values usable for softmax loss. 
+\\\\
+During the process of creating the \texttt{JSON} file, every 10th new person-ID is pulled into the validation set. In total 238 persons are added to the validation set. The decision to include every 10th person-ID in the validation set was made to ensure that the evaluation is performed on a sufficiently large and diverse set of images. In each validation identity, one sample per person-ID is added to the query set. The remaining samples are categorized for the gallery set: Any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery, with is standard \acs{ReID} evaluation protocol.
 
 \subsection{Testing Strategy}\label{Reidteststrategy}
-Evaluation follows a two stage approach, In distribution testing on MSMT17, Market-1501, and CUHK03 establishes a baseline performance on known datasets. The primary focus is \acs{OOD} testing using DukeMTMC-\acs{ReID} serves as a same domain \acs{OOD} test with outdoor university surveillance similar to the training datasets, but with a new demographic and environment. \acs{iLIDS-VID} provides a cross domain test with indoor airport footage, evaluating whether the model learned truly discriminative features or over fitted to outdoor characteristics. Beyond dataset shifts, controlled degradations are applied to DukeMTMC-ReID: scale reduction (0.75, 0.5, 0.25) and JPEG compression (quality 50, 25, 15). These simulate realistic surveillance challenges where persons appear at varying distances or footage is compressed for storage, directly testing the projects core hypothesis \acs{SR} can reduce resolution degradation effects on \acs{ReID} performance. 
+Evaluation will follow a two stage approach: In distribution testing on MSMT17, Market-1501, and CUHK03 to establish a baseline performance on known datasets. \acf{OOD} testing, which is the primary focus, using two datasets. DukeMTMC-ReID \cite{Gou2017DukeMTMC4ReID} will serve as a same domain \acs{OOD} test with outdoor university surveillance, similar to the content of the training datasets, but with a new demographic and environment. \acs{iLIDS-VID} \cite{wang2014person} will provide a cross domain test with indoor airport footage, evaluating whether the model learned truly discriminative features or over-fitted to outdoor characteristics. Beyond dataset shifts, controlled degradations are applied to DukeMTMC-ReID to simulate realistic surveillance challenges where persons appear at varying distances or footage is compressed for storage, directly testing the projects core hypothesis that \acs{SR} can reduce resolution degradation effects on \acs{ReID} performance. 
 
-\section{Dataaugmentation} \label{sec: dataaugmentation}
-To test if the first hypothesis is true both a baseline and robust version of the \acs{ReID} Module is created, so a fair comparison can be made. This is done through different augmentation pipelines. As the goal is to improve model performance in terms of generalization across different image scales and resolution, for robustness in real life scenarios. The different types of augmentation and their purpose is included in Table \ref{tab:augmentationtypes}.
+\subsection{Dataaugmentation} \label{sec: dataaugmentation}
+
+To support the objective of the testing strategy, a data augmentation strategy is applied to expose the model to controlled variations in image quality, lighting, scale, and appearance. This allows for direct comparison between a baseline version of \acs{OSNet} and an augmented version of \acs{OSNet}, assessing whether augmentations improve generalization under the testing conditions described in Section \ref{Reidteststrategy}. The different types of augmentations and their purpose is included in Table \ref{tab:augmentationtypes}.
+
 \begin{table}[H]
     \centering
     \begin{tabular}{|>{\centering\arraybackslash}p{0.18\linewidth}|>{\centering\arraybackslash}p{0.78\linewidth}|}\hline
@@ -107,10 +155,12 @@ To test if the first hypothesis is true both a baseline and robust version of th
  Padding& Secure that tensor sizes is the same in order to be stacked.\\\hline
  JPEG compression& Improve robustness to compression noise, simulating compression from surveillance footage.\\ \hline
     \end{tabular}
-    \caption{The different augmentations implemented.}
+    \caption{The different implemented augmentations.}
     \label{tab:augmentationtypes}
 \end{table}
-\noindent These data augmentations were used in two different transformation pipelines: One with light augmentations for baseline version, one with strong augmentations for the robust version, see Table \ref{tab:three_subtables}.
+
+\noindent These data augmentations were used in two different transformation pipelines: One with light augmentations for the baseline version, and one with strong augmentations for the augmented version, see Table \ref{tab:three_subtables}.
+
 \begin{table}[H]
 \centering
 \begin{subtable}[T]{0.32\linewidth}
@@ -124,7 +174,7 @@ To test if the first hypothesis is true both a baseline and robust version of th
     \vspace{6.1em}
 \end{itemize}
 \\ \hline\end{tabular}
-\caption{Augmentations used for baseline version of OSNet.}
+\caption{Augmentations used for the baseline version of \acs{OSNet}.}
 \end{subtable}
 \begin{subtable}[T]{0.32\linewidth}
 \centering
@@ -135,19 +185,23 @@ To test if the first hypothesis is true both a baseline and robust version of th
     \item Gaussian Blur
     \item Brightness change
     \item Resizing
-    \item JPEG compression*
+    \item JPEG compression
     \item Horizontal flipping
     \vspace{1em}
 \end{itemize}
 \\ \hline\end{tabular}
-\caption{Augmentation used for robust version of OSNet.}
+\caption{Augmentation used for the augmented version of \acs{OSNet}.}
 \end{subtable}
 \caption{The two different augmentations pipelines.}
 \label{tab:three_subtables}
 \end{table}
 
+\subsection{Key Takeaways}
+From the previous sections, several key design decisions have been made. These include the selection of \acs{ReID} architecture (OSNet), the choice of loss function (Multiclass Cross-Entropy Loss) and the evaluation metrics (Rank-\textit{k} and \acs{mAP}). In addition, the training and test strategy were defined as: training across three datasets, while testing both in-distribution and \acs{OOD} to asses the models' robustness under different surveillance conditions.
+Finally, two different versions of the \acs{ReID} module, baseline and augmented, were introduced to assess the hypothesis regarding whether data augmentation can improve generalization and feature robustness.
+
 \section{SR Module}\label{sec:designSRmodule}
-This section presents the chosen \acs{SR} architecture, as well as the training strategy using the two \acs{SR} datasets presented in Section \ref{sec: superresdata}. Based on the technical analysis of the perception-distortion trade of in the SR domain presented in \ref{subsec:perception-distortion-tradeoff}, a low distortion model is considered more suitable for integration with \acs{ReID}, as it reduces the risk for introduction of SR artifacts.
+This section presents the chosen \acs{SR} architecture, as well as the training strategy using the two \acs{SR} datasets presented in Section \ref{sec: superresdata}. Based on the technical analysis of the perception-distortion trade of in the \acs{SR} domain presented in \ref{subsec:perception-distortion-tradeoff}, a low distortion model is considered more suitable for integration with \acs{ReID}, as it reduces the risk for introduction of \acs{SR} artifacts.
 
 \subsection{EDSR}
 \acf{EDSR} is a \acs{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}.
@@ -179,85 +233,81 @@ The architecture consists of a convolutional layer, a deep stack of residual blo
     \label{fig:upsampleblockpipeline}
 \end{figure}
 
-\noindent As shown in Figure \ref{fig:edsrpipeline}, the upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. In Figure \ref{fig:upsampleblockpipeline}, the pipeline of the upsampling module is visualized. It uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2} and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output \cite{shi2016subpixel_arxiv}. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods.
+\noindent As shown in Figure \ref{fig:edsrpipeline}, the upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. In Figure \ref{fig:upsampleblockpipeline}, the pipeline of the upsampling module is visualized. It uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2} and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output \cite{shi2016subpixel_arxiv}. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods. **Kilde**
 
 \subsection{Loss Function}
-For the training of the \acs{SR} module, mean absolute error (MAE), also called L1 loss, was used as the training objective. MAE was chosen over mean squared error, MSE or L2 loss, because it produces sharper reconstructions and is less sensitive to outliers in the training data.\footnote{Kilde skal indsættes her for påstanden om L1 loss robusthed over for outliers.} 
+For the training of the \acs{SR} module, mean absolute error (\ac{MAE}), also called \ac{L1} loss, was used as the training objective. \ac{MAE} was chosen over mean squared error (\ac{MSE}), or \ac{L2} loss, because it produces sharper reconstructions and is less sensitive to outliers in the training data \cite{lossfunctiongeek}.
+
 
 \subsection{Evaluation Metric}
-PSNR does ditten og datten
+This section presents the evaluation metrics used for the \acs{SR} module. The primary metric is \acf{PSNR}, supported by \acf{SSIM}. Both measure distortion and fit the chosen low-distortion \acs{SR} strategy, which aims to avoid hallucinated details and artifacts that could hurt downstream \acs{ReID} performance \cite{Blau2018PerceptionDistortion}.
 
-\subsection{Training and Validation Strategy}
+\subsubsection*{PSNR}
+\acs{PSNR} measures the pixel-wise difference between the super-resolved output and the reference \acs{HR} image, derived from the mean squared error (MSE). A higher \acs{PSNR} means lower distortion and more accurate reconstruction. For \acs{ReID}, the goal is to keep real discriminative details and avoid adding fake ones. \acs{PSNR} is therefore the primary model-selection criterion (best checkpoint chosen by highest validation \acs{PSNR}) to prioritize pixel accuracy over perceptual effects that could create false details \cite{lim2017edsr}.
+
+\subsubsection*{SSIM}
+\acs{SSIM} measures structural similarity (luminance, contrast, structure) between reference and output \cite{Wang2004SSIM}. Values close to 1 mean structures are well preserved. \acs{SSIM} is reported with \acs{PSNR} to check that edges and textures—critical for \acs{ReID} embeddings—remain intact. Using both \acs{PSNR} and \acs{SSIM} reflects the low-distortion strategy and reduces the risk of hallucinations and artifacts that could harm \acs{ReID} discrimination \cite{Blau2018PerceptionDistortion}.
+
+
+\subsection{Training and Validation Strategy}\label{SRtrainingdata}
 A two-stage training strategy was employed. First, the model was pretrained on the RELLISUR dataset, followed by finetuning on \acs{DIV2K}. This approach was chosen instead of mixing the datasets directly due to their fundamentally different degradation characteristics. RELLISUR consists of real low-light and low-resolution image pairs captured under natural imaging conditions, where degradations arise from the physical image acquisition process rather than synthetic downsampling.
-
+\\\\
 By pretraining on RELLISUR, the model is exposed to realistic degradation patterns, allowing it to learn robust representations for handling real-world low-light super-resolution. Subsequent finetuning on \acs{DIV2K}, which contains high-quality images with synthetically generated low-resolution counterparts, refines these representations under controlled degradation settings. This finetuning stage improves reconstruction stability and generalization while retaining the realism learned during pretraining.
 
 \subsection{Data Augmentation}
-As the XXXX is to make \acs{SR} to remove
-\begin{table}[T]{0.32\linewidth}
+The purpose of integrating a \acs{SR} module into the \acs{ReID} pipeline is to handle the surveillance data better, while up scaling the images. For this reason is the \acs{SR} Module trained using the data augmentations presented in \ref{tab:edsraugmentation}.
+
+\begin{table}[H]
 \centering
-\begin{tabular}{|>{\centering\arraybackslash}p{0.9\linewidth}|}\hline
-\cellcolor[HTML]{D8E9F7} \textbf{EDSR Training Augmentation}\\\hline
-\begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+\begin{tabular}{|>{\centering\arraybackslash}p{0.4\linewidth}|}
+\hline
+\cellcolor[HTML]{D8E9F7}\textbf{EDSR Training Augmentation}\\ \hline
+\begin{itemize}[leftmargin=45pt, topsep=0pt, itemsep=0pt]
     \item Gaussian noise
-    \item Gaussian Blur
+    \item Gaussian blur
     \item Brightness change
-    \item Resizing
-    \item JPEG compression*
     \item Horizontal flipping
+\item JPEG compression
     \vspace{1em}
-\end{itemize}
-\\ \hline\end{tabular}
-\caption{Augmentation used for \acs{SR} module.}
-\label{edsraugmentation}
+\end{itemize}\\ \hline
+\end{tabular}
+\caption{Augmentations used for the \acs{SR} module.}
+\label{tab:edsraugmentation}
 \end{table}
-*By mistake, JPEG compression was not applied to the EDSR pipeline. The consequences of this mistake are discussed in Section XXX.
 
-\section{Combining Architectures}\label{combinednetworks}
+\section{Model Setups} \label{sec:model_definitions} \label{combinednetworks}
+In order to validate the hypotheses defined in Section \ref{sec:hypotheses}, three experiments will be conducted. For the purpose of these experiments, four model's will be implemented in Chapter \ref{cha: implementation}. The \hyperlink{model:baseline}{first model} will serve as a baseline for comparison. The \hyperlink{model:augmented}{second model} will be used to validate \hyperlink{hypothesis:1}{\textit{hypothesis 1}}. The \hyperlink{model:sequential}{third} and \hyperlink{model:endtoend}{fourth} models will be used to validate \hyperlink{hypothesis:2}{\textit{hypothesis 2}} at two different integration levels. Each model is defined as follows:
 
-\subsection{Sequential}
+\subsection*{\hypertarget{model:baseline}{Baseline} Model}
+Baseline model of \acs{OSNet} trained from scratch using the light augmentations pipeline from Table \ref{tab:three_subtables}.
 
-\subsection{Joint end-to-end integration}
+\subsection*{\hypertarget{model:augmented}{Augmented} Model}
+Augmented model of \acs{OSNet} trained from scratch using the strong augmentation pipeline from Table \ref{tab:three_subtables}.
 
-\section{Summary}
-During the chapters different XXXX
-The finding during this chapter leads to definition of four implementations, what is explored in order to find a solution to the two hypothesis.
+\subsection*{\hypertarget{model:sequential}{Sequential} Model}
+Pretrained baseline model of \acs{OSNet} in sequential combination with pretrained \acs{EDSR}. Sequential is defined as the two modules (\acs{SR} and \acs{ReID}) being combined without further training.
 
-\begin{itemize}
-    \item Baseline model of \acs{OSNet} trained using the light augmentations.
-    \item Robust model of \acs{OSNet} trained using the strong augmentations.
-    \item Baseline model of \acs{OSNet} in sequential combination with \acs{EDSR}.
-    \item Baseline model of \acs{OSNet} trained jointly end-to-end with \acs{EDSR}.
-\end{itemize}
+\subsection*{\hypertarget{model:endtoend}{End-to-end} Model}
+Pretrained baseline model of \acs{OSNet} trained end-to-end with pretrained \acs{EDSR}, using the strong augmentation pipeline from Table \ref{tab:three_subtables}. End-to-end is defined as the modules being combined, such that losses from the \acs{ReID} module back-propagate into the \acs{SR} module.
 
 
-The integration can be executed in a multitude of ways. In this project, only some of these implementation will be explored. 
- 
-Et eller andet .... dette chapter vil investigate how to do se, and then experiments will be set...
+\subsection{Summary}
 
-in order to test, what improves the in- and out-of-distribution performance of the \acs{ReID} model, which are defined in Section \ref{Reidteststrategy}. 
+The four models are summarized in Table \ref{tab:model_overview}
 
-This will be explored at two levels of integration:
-    \begin{itemize}
-        \item \textit{Integration 1}: Sequential integration, where input is first processed through the \acs{SR} module, before it enters the \acs{ReID} module.
-        \item \textit{Integration 2}: End-to-end integration such that \acs{ReID} losses can back-propagate into the \acs{SR} module.
-    \end{itemize}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Model} & \textbf{\acs{ReID} Module} & \textbf{Augmentation} & \textbf{\acs{SR} Module} & \textbf{Initialization} & \textbf{Training} \\ \hline
+\hyperlink{model:baseline}{Baseline}   & \acs{OSNet} & Light  & None       & Random     & True \\ \hline
+\hyperlink{model:augmented}{Augmented} & \acs{OSNet} & Strong & None       & Random     & True \\ \hline
+\hyperlink{model:sequential}{Sequential} & \acs{OSNet} & Strong & \acs{EDSR} & Pretrained & False \\ \hline
+\hyperlink{model:endtoend}{End-to-end} & \acs{OSNet} & Strong & \acs{EDSR} & Pretrained & True \\ \hline
+\end{tabular}
+\caption{Overview of model configurations.}
+\label{tab:model_overview}
+\end{table}
 
-
-
-
-%For the evaluation of the models and systems in our project, \ac{mAP} and Rank was calculated similarly as explained above with some minor additional steps, like filtering out images that has multiple images 
-
-%The \ac{mAP} metric is made up of multiple other sub metrics, such as \ac{IoU}, Recall, and Precision, that are important to understand to grasp how the \ac{mAP} works, and how it is correctly calculated. 
-
-%Average Precision is computed by finding the area under the precision-recall curve, where precision is the proportion of true positive and false positive matches, while recall is the proportion of true positives out of all possible positive matches
-
-% Firstly, a filter was applied to only keep the good matches in the gallery, and After the trained OSNet model extracts the features and calculates the distance/similarity of the query and gallery with \texttt{torch.cdist}, all of the gallery images are sorted by the given similarity with the query. Before being  Afterwards the Average Precision is found based on the matches in each query, and then \ac{mAP}
-
-%Because its a Cumulative Metric, it will count a query as a success if there is a match within the certain k-range of that query. For example, if a query had its first correct identity match at Rank-3, a Rank-10 metric would count that query as a success, as that specific metric asks "Is there a correct match within 10 matches?" for each query.
-
-%,  and after the trained OSNet model extracts the features and calculates the distance/similarity of the query and gallery with \texttt{torch.cdist}, all of the gallery images are sorted by the given similarity with the query. Before being 
-
-
-% reid_test.py has mAP = sum(aps) / valid queries, where aps is a list of "ap", and ap = sum(precisions) / len(precisions) that is appended to aps. And precisions is a list of "hits/(pos+1)" in a for loop that has "for pos in pos_idx". And pos_idx is "pos_idx = good.nonzero(as_tuple=False).view(-1)" which is described as indices for True in good. While good is "good = matches[i][order]
 

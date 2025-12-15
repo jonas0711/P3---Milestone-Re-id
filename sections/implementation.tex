@@ -2,22 +2,18 @@
 This Chapter presents the implementation of the dataloaders, the chosen \acs{SR} and \acs{ReID} architecture, training scripts, and the combination of the models. To evaluate the hypotheses outlined in Section \ref{sec:hypotheses}, three model configurations have been implemented, and will be compared against a baseline model. 
 
 \section{ReID Module}
-This section presents the dataloader, model configuration and training setup used for the \acs{ReID} module. 
+This section presents the implementation details, when it comes to the \acs{ReID} module, including the dataloader, model configuration and training setup. 
 
-\section{Dataloaders}
-\label{imp_dataloading}
-Two data loaders were built using the \texttt{Dataset} and \texttt{DataLoader} classes from \texttt{torch.utils.data}, one for \acs{SR} and another for \acs{ReID}. They are designed to generate batches of data samples for training, validation and test.
-
-\subsection{Dataloader for ReID Data}
-The data loader combines the three datasets presented in Chapter \ref{sec:reid-data}, using the \texttt{Dataset} and \texttt{DataLoader} classes from \texttt{torch.utils.data}, enabling joint training across all of them. To prevent any person-id conflict, in cases where the same person-id appears in multiple datasets, and to ensure continues ID-values, a \texttt{JSON} file with mappings was created. This maps the old ID, with a dataset specific prefix in front, to a new continues value. It ensures that all person-ID's remain unique across datasets, while preserving a person-ID for each person and introducing continues values on which softmax loss can be used. In the process of creating the \texttt{JSON} file, every 10th new person-ID is pulled into the validation set. In the validation split, one sample per person-ID is added to the query set. The remaining samples are categorized for the gallery set: Any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery.
+\subsection{Dataloader}
+The dataloader for the training on \acs{ReID} were built using the \texttt{DataLoader} class from \texttt{torch.utils.data}, designed to generate batches of data samples for training, validation and test.
+The dataloader combines the three datasets presented in Section \ref{sec:trainingstragegyreid}, using the \texttt{Dataset} and \texttt{DataLoader} classes from \texttt{torch.utils.data}, enabling joint training across all of them. 
 
 \subsection{Re-Implementation of OSNet}\label{sec:implementationosnet}
 %Note: vi bruger x1 modellen, som er den største. 
-The architecture of the implemented person \acs{ReID} model is identical to what described in Section \ref{lab:methodreid}. The \acf{OSNet} implementation is taken from the \texttt{Torchreid} repository, which comes with a pretrained \acs{OSNet} model. However, to ensure full control over the training process and to train from scratch, a custom training script was made. 
+The architecture of the implemented person \acs{ReID} model is identical to what described in Section \ref{sec:methodreid}. The implementation of the \acf{OSNet} architecture is taken from the \texttt{Torchreid} repository, which also comes with a pretrained \acs{OSNet} model \cite{TorchReIDM1501}. However, to ensure full control over the training process and to train from scratch, a custom training script was made. 
 
-\subsubsection{Hyperparameters}
-The complete set of training hyper parameters is presented in Table \ref{tab:osnettrainingparameters}. The model was trained using \acs{SGD} with momentum set to 0.9 and weight decay set to 0.0005 for regularization. The initial learning rate was set to 0,001. The loss function used is CrossEntropyLoss with a label smoothing of 0.1. Label smoothing is a regularization technique that prevents the model from becoming overconfident in its predictions, by softening the target labels instead of using one-hot encoded labels. This is particularly beneficial for person \acs{ReID}, as it addresses the challenge of limited training samples per identity. By preventing extreme confidence on training identities, label smoothing encourages the model to learn more robust features that generalize better to unseen test identities, a critical requirement for the open-set nature of person \acs{ReID}.
-%Info om LR, Få mere info i næste afsnit.
+\subsection{Training Hyperparameters}
+This section describes the optimization setup, loss function, and learning rate policy used for training the baseline and augmented version of \acs{ReID}. The training hyperparameters is mostly based on the ones applied in the original OSNet paper \cite{Zhou2019OmniScale}, but some changes have been made to optimize training. A complete overview of the selected training hyperparameters is provided in Table~\ref{tab:osnettrainingparameters}.
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|}\hline
@@ -27,12 +23,11 @@ The complete set of training hyper parameters is presented in Table \ref{tab:osn
          Batch Size &  64 \\\hline
          Optimizer &  SGD \\\hline
          Momentum&0.9\\\hline
-         Weight Decay&0.0005\\\hline
+         Weight Decay& \(5e-4\)\\\hline
+ Learning Rate &\(1e-3\)\\\hline
          Learning Rate Scheduler &\texttt{MultiStepLR}\\\hline
-         Learning Rate & 0.001\\\hline
          LR Milestones&  [100, 175, 225]\\\hline
          LR Gamma&  0.1\\\hline
-         Optimizer &  SGD \\\hline
          Loss Function&  CrossEntropyLoss\\\hline
          
  Label Smoothing&0.1\\ \hline
@@ -41,59 +36,96 @@ The complete set of training hyper parameters is presented in Table \ref{tab:osn
 \label{tab:osnettrainingparameters}
 \end{table}
 
-\noindent A \texttt{MultiStepLR} scheduler controls the learning rate throughout training, reducing it by a factor of 0.1 at epoch 100, 175, and 225. The results of the learning rate schedule:
+\noindent Both the baseline and the augmented version are trained using SGD optimizer with a momentum set at 0.9 and a weight decay of \(5e-4\), as this optimization were used in the original implementation and training of OSNet \cite{Zhou2019OmniScale}. A batch size is kept at 64, like in the paper, but the learning rate is changed from \(65e-3\) to \(1e-3\), because initial training showed XXXXXX. The number of epoch are kept the same as well, expecting a convergence before reaching 350 epochs. Keeping a large number of epoch ensure that convergence can be reached within one training, while still keeping the flexibility of early stopping.
+\\\\
+During training the learning rate is scheduled using a \texttt{MultiStepLR} with the milestones at 100, 175 and 250, where the learning rate is reduced with a factor of 10. This is as well different from the original training, because a plateau was hit early on in training of the two versions.
+\\\\
+As introduced in Section \ref{sec:reidloss}, the loss function used for training is the multiclass cross-entropy loss. In practice, this is implemented using the \texttt{CrossEntropyLoss} module from the \texttt{torch.nn} library, which provide built-in label smoothing via input parameter. Label smoothing is applied with a factor of 0.1, limiting the confidence of the predicted class probabilities and thereby reducing overfitting to training identities. This regularization is particularly beneficial for the open-set learning setting of person \acs{ReID}, as it encourages the model to learn more robust and transferable feature embeddings, as discussed in Section~\ref{sec:reidloss}, as described in Section \ref{sec:reidloss}.
 
-\begin{itemize}
-    \item Epochs 0-100: LR = 0.001
-    \item Epochs 100 - 174 LR = 0.0001
-    \item Epochs 175 - 224 LR = 0.00001
-    \item Epochs 225 - 350 LR = 0.000001
-
-\end{itemize}
-Training ran for a total of 350 epochs without early stopping, though checkpoints were saved every 10 epochs, as well as the best model based on an average in performance metrics.
-
-\subsubsection{Validation Strategy}
+\subsection{Validation strategy}
+During training the learning of the models are monitored using the validation set introduced in \ref{trainingstragegyreid}. The performance are measured using the metrics from Section \ref{reidmethodevalmetric}: Rank1, Rank5, Rank10, Rank20 and \acs{mAP}.
+\\\\
 The model's performance was monitored through periodic validation:
 \begin{itemize}
     \item For epochs 1 - 200: validation is performed every 10 epoch
     \item For epochs 201 - 350: validation frequency increases to every 5 epoch
 \end{itemize}
 
-\noindent This adaptive validation strategy allows for more frequent monitoring as learning rate drops, and the training approaches convergence.
+\noindent This adaptive validation strategy allows for more frequent monitoring as learning rate drops, and the training approaches convergence. Training ran for a total of 350 epochs without early stopping, though checkpoints were saved every 10th epochs, as well as the best model based on \acs{mAP} score.
 
-\subsubsection{Baseline Model Definition}
-A baseline \ac{OSNet} model was trained on unmodified images, to establish a clear benchmark for comparison when evaluating the hypotheses outlined in Section \ref{sec:hypotheses}. This model was  trained using the light augmentation pipeline outlines in Table \ref{tab:three_subtables}, with the training and validation strategies mentioned above. 
+\subsection{Training Duration and Checkpointing}
+The two different version, baseline and augmented, is trained using the same training hyperparameters, ensuring a comparable outcome. The training and validation plots for the two versions of the \acs{ReID} module can be seen in Figure \ref{fig:augbaseloggings}.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{baseaugtrain.png}
+        \caption{Training loss for baseline and augmentation model}
+        \label{fig:baseaugtrain}
+    \end{subfigure}
+    \hfill % adds space between
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{baseaugvalmap.png}
+        \caption{Mean Average Precision for baseline and augmentation model}
+        \label{fig:baseaugvalmap}
+    \end{subfigure}
+    \vfill % adds space between
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{augbaserank.png}
+        \caption{Rank-1 for baseline and augmentation model}
+        \label{fig:baseaugvalrank}
+    \end{subfigure}
+    \caption{Training and validation results for baseline and augmentation model}
+    \label{fig:augbaseloggings}
+\end{figure}
+The best model is primarily chosen based on \acs{mAP} score, because it prioritize the ability to rank all positive matches, although Rank-1 often show similar results to \acs{mAP}.
 
-\subsubsection{Robust Model Definition}
-To evaluate \textit{hypothesis 1}, an \ac{OSNet} model was trained with the same configuration and strategies as the baseline model, with the only difference being that the training data was augmented, using the strong augmentation pipeline outlined in Table \ref{tab:three_subtables}. 
+\subsubsection{Baseline}
+
+
+\subsubsection{Augmented}
+
 
 \section{SR Module}
-This section describes how the \acs{EDSR} model was configured and trained for this project.
+This section describes how the \acs{SR} module, using the previously described \acs{EDSR} architecture, was configured and trained for this project.
 
-\subsection{Dataloader for SR Data}
-The data loader for the SR datasets simply splits the images into input and target images, and creates batches. The images from \acs{DIV2K} \cite{Agustsson2017NTIRE} and RELLISUR \cite{aakerberg2021rellisur} dataset were kept separate, this will be elaborated on in Section \ref[{}.
+\subsection{Dataloader}
+The data loader for the SR datasets simply splits the images into input and target images, and creates batches. The images from \acs{DIV2K} \cite{Agustsson2017NTIRE} and RELLISUR \cite{aakerberg2021rellisur} dataset were kept separate, as described in Section \ref{SRtrainingdata}.
 
-\subsection{EDSR Model Configuration / Re-implementation of EDSR}
-Table \ref{tab:edsr-architecture} summarizes the base \acs{EDSR} configuration, consisting of 16 residual blocks and 64 feature maps. The base configuration was chosen over the larger configuration (32 blocks, 256 features) to reduce training time while maintaining adequate reconstruction quality \cite{lim2017edsr}.
+\subsection{Re-implementation of EDSR}
+The implemented version of the \acs{EDSR} architecture was taken from the source code from the original paper for \acs{EDSR} \cite{lim2017edsr}. A small change have been made to the architecture XXXXXX.
+However, the training script is implemented from scratch to ensure control.
+
+\subsection{Training Hyperparameters}
+This section describes the training hyperparameters, where an overview is presented in Table \ref{tab:edsrtrainingparameters}.
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|}\hline
-        \cellcolor[HTML]{D8E9F7}\textbf{Parameter} & \cellcolor[HTML]{D8E9F7}\textbf{Value} \\\hline
-        Number of residual blocks (\texttt{n\_blocks}) & 16 \\\hline
-        Number of feature maps (\texttt{n\_feats}) & 64 \\\hline
-        Upscaling factor (\texttt{scale}) & 2 \\\hline
-        Input channels (\texttt{in\_ch}) & 3 \\\hline
-        Output channels (\texttt{out\_ch}) & 3 \\\hline
-        Residual scaling factor (\texttt{res\_scale}) & 1.0 \\\hline
+    \begin{tabular}{|c|c|c|}\hline
+         \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Stage 1: RELLISUR}&\cellcolor[HTML]{D8E9F7} \textbf{Stage 2: DIV2K}\\\hline
+         No. epochs &  200&100\\\hline
+         Batch Size &  16&16\\\hline
+         Optimizer &  Adam &Adam\\\hline
+ $\beta_1$&0.9 &0.9 \\\hline
+ $\beta_2$&0.999 &0.999 \\\hline
+         Learning Rate& \(1e-4\) &\(5e-6\)\\\hline
+         Loss Function&  L1 Loss&L1 Loss\\ \hline
     \end{tabular}
-    \caption{Base \acs{EDSR} configuration.}
-    \label{tab:edsr-architecture}
+    \caption{The training hyperparameters for EDSR.}
+\label{tab:edsrtrainingparameters}
 \end{table}
+The training is performed in two stages: stage one is training from scratch on RELLISUR, while stage two is finetuning the best version from stage one on DIV2K, as introduced in Section \ref{SRtrainingdata}. 
+
+\subsubsection{Hyperparameters}
+Table \ref{tab:edsr-hyperparameters} summarizes the complete training configuration for both stages.
+
+
+\subsubsection{Validation Strategy}
+Validation was performed at the end of each epoch using the RELLISUR validation split. The validation pipeline computed both validation loss (L1) and validation \ac{PSNR} to monitor training progress. Model checkpoints were saved every 10 epochs, and the best model based on validation \ac{PSNR} was saved separately for final evaluation.
 
 \subsubsection{Training from Scratch on RELLISUR}
 The model was trained from scratch on the RELLISUR dataset using random weight initialization. RELLISUR provides paired \acs{LR} and \acs{HR} images captured under natural imaging conditions, as described in Section~\ref{sec:...}. During training, the images were not used at their full spatial resolution. Instead, patch-based training was employed, where aligned \acs{LR} and \acs{HR} patches of size \textit{64×128} and \textit{128×256} pixels respectively were randomly cropped from the original image pairs. This patch-based strategy is standard practice in super-resolution training, as it reduces memory consumption and increases the number of effective training samples.
 \\\\
 The RELLISUR validation split was used to monitor training progress and to select the best-performing checkpoint. An Adam optimizer with $\beta_1 = 0.9$, $\beta_2 = 0.999$, and a learning rate of $1 \times 10^{-4}$ was used. The best checkpoint was selected at epoch 113 based on validation \acs{PSNR}.
+
 \subsubsection{Finetuning on DIV2K}
 The best checkpoint from Stage~1 (epoch 113) was used as the starting point for finetuning on the \ac{DIV2K} dataset. The learning rate was reduced to $5 \times 10^{-6}$ in order to preserve the representations learned from RELLISUR while allowing gradual adaptation to the synthetically degraded \acs{DIV2K} data. 
 \\\\
@@ -119,33 +151,6 @@ Skal vi referere op til dataugmentation afsnittet?
         Gaussian Blur & 0.5 & LR only & Kernel: 7, Sigma: [0.1, 2.0] \\\hline
     \end{tabular}
 \end{table}
-
-\subsubsection{Hyperparameters}
-Table \ref{tab:edsr-hyperparameters} summarizes the complete training configuration for both stages.
-
-\begin{table}[H]
-    \centering
-    \caption{Training hyperparameters for \acs{EDSR}. Both stages used the RELLISUR validation split for model selection.}
-    \label{tab:edsr-hyperparameters}
-    \begin{tabular}{|l|c|c|}\hline
-        \cellcolor[HTML]{D8E9F7}\textbf{Hyperparameter} & \cellcolor[HTML]{D8E9F7}\textbf{Stage 1 (RELLISUR)} & \cellcolor[HTML]{D8E9F7}\textbf{Stage 2 (DIV2K)} \\\hline
-        Training Dataset & RELLISUR & DIV2K \\\hline
-        Validation Dataset & RELLISUR val split & RELLISUR val split \\\hline
-        Initial Weights & Random & Epoch 113 checkpoint \\\hline
-        Number of Epochs & 200 & 100 \\\hline
-        Batch Size & 16 & 16 \\\hline
-        Optimizer & Adam & Adam \\\hline
-        Learning Rate & 1e-4 & 5e-6 \\\hline
-        $\beta_1$, $\beta_2$ & 0.9, 0.999 & 0.9, 0.999 \\\hline
-        Loss Function & L1 Loss & L1 Loss \\\hline
-        LR Input Size & 64 × 128 & 64 × 128 \\\hline
-        HR Output Size & 128 × 256 & 128 × 256 \\\hline
-        Model Selection & Best Val PSNR & Best Val PSNR \\\hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{Validation Strategy}
-Validation was performed at the end of each epoch using the RELLISUR validation split. The validation pipeline computed both validation loss (L1) and validation \ac{PSNR} to monitor training progress. Model checkpoints were saved every 10 epochs, and the best model based on validation \ac{PSNR} was saved separately for final evaluation.
 
 
 \section{Implementation of Sequential ReID and SR}

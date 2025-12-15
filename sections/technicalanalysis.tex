@@ -1,5 +1,5 @@
 \chapter{Technical Analysis} \label{cha: technicalanalysis}
-This chapter will present and analyze the technical foundations of the problems described in Chapter \ref{cha:problemanalysis}. It focuses on surveillance equipment, computer vision techniques, person \acf{ReID}, image acf{SR}, and the combination of these. Related work will be presented throughout the chapter, where relevant to each section.
+This chapter will present and analyze the technical foundations of the problems described in Chapter \ref{cha:problemanalysis}. It focuses on surveillance equipment, computer vision techniques, person \acf{ReID}, image \acf{SR}, and the combination of these. Related work will be presented throughout the chapter, where relevant to each section.
 
 \section{Surveillance Equipment and Footage}
 \label{subsec:Surveillance_equipment_n_footage}
@@ -122,9 +122,7 @@ Despite outperforming state-of-the-art methods at the time, this solution has se
 
 \subsubsection{Omni-Scale Feature Learning for Person Re-Identification}\label{sec:omniscale}
 
-This research from 2019 presents a novel deep \acs{ReID} \acs{CNN}, termed \acf{OSNet}, designed for person \acs{ReID} \cite{OSNet}. The main idea is that discriminative features for \acs{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight. The model is evaluated using Rank-1 and \acs{mAP} metrics, against 20 different state-of-the-art methods. 
-\\\\
-While \acs{OSNet} presents a lightweight architecture with state-of-the-art competitive performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
+This research from 2019 presents a novel deep \acs{ReID} \acs{CNN}, termed \acf{OSNet}, designed for person \acs{ReID} \cite{OSNet}. The main idea is that discriminative features for \acs{ReID} are captured across different spatial scales and combinations. This is achieved through a residual block, composed of multiple convolutional feature streams, with each detecting features at different scales. A unified aggregation gate dynamically fuse these multiscale streams with input-dependent channel-wise weights. To avoid overfitting, pointwise and depthwise convolutions are used within the blocks. Stacking these blocks layer-by-layer keeps the model very lightweight. The model is evaluated using Rank-1 and \acs{mAP} metrics, against 20 different state-of-the-art methods. Four variants of \acs{OSNet} exist, but the best performing version is the full-size. The results from the full-size version are presented in Table \ref{tab:sotaosnetresults}
 
 \begin{table}[H]
 \centering
@@ -143,11 +141,10 @@ MSMT17& 88.6\%& 73.5\%\\ \hline
 CUHK03& 78.7\%& 52.9\%\\\hline
 \end{tabular}
 \caption{An overview of \acs{OSNet} performance \cite{OSNet}.}
-\label{tab:osnetresults}
+\label{tab:sotaosnetresults}
 \end{table}
 
-% Tested på svære datasætte, performer bedre end state-of the art, men ikke imponerende resultater -- stort drop i performance
-%Published in 2019, cited by 1292. Github link: https://github.com/
+\noindent While \acs{OSNet} presents a lightweight architecture with state-of-the-art competitive performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
 
 \subsubsection{Applying Deep Learning Image Enhancement Methods to Improve Person Re-Identification}
  
@@ -396,18 +393,18 @@ The SRCNN paper demonstrated that deep learning could successfully learn mapping
 \end{itemize}
 
 
-\section{Related work for Super-Resolution Re-Identification}\label{sec:superres-reid}
+\section{Combining Super-Resolution with Re-Identification}
+Images, feature-level, keeping SR from becoming a second ReID, losses, auxillary loss, artefacts/hallucination/perception-distortion, 
 
+\subsection{Related work for Super-Resolution Re-Identification}\label{sec:superres-reid}
 As the implementation of \acs{SR} has the potential to improve the performance of a person \acs{ReID} model, based on the challenges described in Section \ref{subsec:challenges-ReID}, this section will examine existing approaches that combine \acs{SR} and person \acs{ReID}.
 
-\subsection{Resolution-Invariant Person Re-Identification} 
-
+\subsubsection{Resolution-Invariant Person Re-Identification} 
 A method for person \acs{ReID} robust to resolution variance by jointly training a \acs{FFSR} module and a \acs{RIFE} by joint end-to-end \acs{CNN} learning \cite{FFSR}, was proposed in this paper from 2019. \acs{FFSR} enhances the person in the image without focusing on the background. This is done through evaluation with their own metric, foreground focus \acs{SR} loss, using a defined mask around the person to priority that part of the image more. \acs{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. Through jointly training of the two modules \acs{FFSR} and \acs{RIFE}, a resolution invariant \acs{ReID} system, because \acs{FFSR} learns from the \acs{ReID}'s objective, making it specifically optimized for this task. 
 \\\\
 Although this method is very promising in combining \acs{ReID} with \acs{SR}, it does have limitations in terms of data, with the model only being trained on \acs{ReID} specific datasets. Only one, the CAVIAR dataset, out of the 5 datasets used, consists of real \acs{LR} and \acs{HR} pairs, with 1220 images of 72 identities in total. The rest of the datasets are synthetically down-sampled. As explored in Section \ref{sec:SR-data}, there are differences between real \acs{LR} and synthetic down-sampled \acs{LR} images, that could have a significant impact in this case, where the majority of the images are down-sampled.
 
-\subsection{Adaptive Super-Resolution for Person Re-Identification with Low-Resolution Images}
-
+\subsubsection{Adaptive Super-Resolution for Person Re-Identification with Low-Resolution Images}
 This paper from 2021 introduces the Adaptive Person Super-Resolution (APSR) model, which jointly trains and fuses multiple \acs{SR} modules, adapting to the information in each input image, in an end-to-end framework \cite{APSR}. Within APSR, an advisory network first assesses the image content, and dynamically selects appropriate SR modules to upscale the person region. This design makes the \acs{SR} process content aware, and produces an enhanced image that can be directly fed to the person \acs{ReID} module for improved identification performance.
 \\\\
 While this approach does have promising results, the use of multiple \acs{SR} modules introduces high model complexity and increases computational costs. It also relies heavily on the network advisory's accuracy, as incorrect module selection could degrade image quality rather than enhancing it. 

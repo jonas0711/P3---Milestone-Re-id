@@ -1,9 +1,9 @@
 \chapter{Discussion} \label{cha: discussion}
 
 \section{Data}
-In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This higlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, CUHK03, and MSMT17 datasets are all recorded at different universities in different regions of China, while the DukeMTMC-ReID dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The ILIDS-VIDS dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
+In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This highlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, CUHK03, and MSMT17 datasets are all recorded at different universities in different regions of China, while the DukeMTMC-ReID dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The \acs{iLIDS-VIDS} dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
 \\\\
-The data was split so that the models were trained on the Market-1501, MSMT17, and CUHK03 datasets, and final testing was performed on the ILIDS-VID and DukeMTMC-ReID datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch likely impacts performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
+The data was split so that the models were trained on the Market-1501, MSMT17, and CUHK03 datasets, and final testing was performed on the \acs{iLIDS-VID} and DukeMTMC-ReID datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch likely impacts performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
 \\\\
 Furthermore, the datasets are not balanced in size. For example the MSMT17 dataset contains almost three times more identities and nearly ten times more images than CUHK03, which may cause the model to overfit to the dominant dataset and under-represent features from the smaller datasets. In future work, a more structured training strategy could be explored, such as training on each dataset separately, balancing datasets in each batch, or incorporating datasets with diverse cultural, environmental and geographical conditions during training, to improve cross-domain generalization and fairness. 
 \\\\
@@ -27,7 +27,7 @@ Data-augmentation is applied to improve model generalizability, by introducing d
 Despite this, if all the augmentations happened to be applied heavily to a single image, quality may degrade to a point where it is too difficult for the model to extract meaningful features. This highlights the importance of balancing data augmentation, so realism is preserved without compromising the visual information. During implementation, the Python \texttt{random} library was used to apply random transformations. However, it would have been more appropriate to use PyTorch's own random functions, as they share the same seeding used throughout the framework, and are compatible with GPU training. This ensures better reproducibility and consistency across experiments, especially when using multiple workers and different hardware setups. 
 
 \subsubsection{OOD Dataset}
-The OOD dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the iLIDS-VID dataset. It fulfills the purpose of showing the model's performance on unseen data, outside of its distribution. An argument for using IlIDS-VID during training, instead of testing, could be made, as adding a completely different environment could decrease the model's specialization to Chinese campus environments. However, this was not chosen in this project, as the iLIDS-VID data is small, and therefore more suitable for evaluation purposes.
+The \acs{OOD} dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the \acs{iLIDS-VID} dataset. It fulfills the purpose of showing the model's performance on unseen data, outside of its distribution. An argument for using \acs{ilIDS-VID} during training, instead of testing, could be made, as adding a completely different environment could decrease the model's specialization to Chinese campus environments. However, this was not chosen in this project, as the \acs{iLIDS-VID} data is small, and therefore more suitable for evaluation purposes.
 
 \section{Experiments}
 - Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
@@ -42,7 +42,7 @@ Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? (nemmere kod
 \subsubsection{Baseline}
 Opnåede vi det vi ville med baseline, er den lavet så den er fair til at bruge til sammenligning?
 
-\subsubsection{Augmentated}
+\subsubsection{Augmented}
 
 \subsection{EDSR}
 Var EDSR et godt valg? 
@@ -87,7 +87,7 @@ As the system handles potentially sensitive data, it is important to ensure data
 
 %- The gap between training data and deployment environments should be addressed in future works. 
 
-This project addresses the problem statement of designing a proof of concept system person \ac{Reid} system improved through \ac{SR} Integration. The results demonstrates ? ***** 
+This project addresses the problem statement of designing a proof of concept system person \ac{ReID} system improved through \ac{SR} Integration. The results demonstrates ? ***** 
 
 %Dataset
 %Flere forskellige kulturer, religoner i træning for at undgå bias. 
