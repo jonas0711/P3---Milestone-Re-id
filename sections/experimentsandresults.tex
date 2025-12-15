@@ -1,7 +1,6 @@
 \chapter{Experiments and Results} \label{cha: experiments and results}
  This chapter presents the experiments conducted, to determine the value of adding an \acs{SR} module, as well as the results from the four experiments. An out-of-distribution test is presented, which is used in the experiments. 
 
-
 \section{Out-of-Distribution Test} \label{sec: oodtestny}
 Since the implemented person \acs{ReID} model was trained on the Market-1501 dataset, a new \acs{OOD} test had to be designed to fulfill this project's definition of an \acs{OOD} test, as described in Section \ref{outofdistributiontest}. This \acs{OOD} test was conducted using the test set from DukeMTMC-ReID under three different conditions, as well as the entire \acs{iLIDS-VID} dataset which is unknown to \acs{OSNet}. They are presented in Table \ref{tab:newood_conditions}.
 \\\\
@@ -45,6 +44,7 @@ iLIDS-VID \\
 \end{table}
 
 \noindent The results of the \acs{OOD} test are presented in this chapter, because it shows if \acs{SR} is necessary, while the results from final testing will be included in Chapter \ref{cha: results}. All models presented in this Chapter will be evaluated and compared using the \acs{OOD} test.
+
 
 \section{Experiments}
 
@@ -101,15 +101,69 @@ Based on the results presented in Section \ref{sec: robustosnet}, the problem of
 \subsubsection{Sequential Evaluation}
 The sequential evaluation pipeline passed images through the trained \ac{SR} model before feeding the upscaled output to the \ac{ReID} model. This setup allowed direct comparison between the baseline \ac{ReID} performance and the \ac{SR}-enhanced pipeline under identical test conditions. The evaluation was conducted on the OOD test conditions described in Table \ref{tab:newood_conditions}.
 
-\subsection{Experiment Three: Joint EDSR and Baseline}
-The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the OSNet baseline model with EDSR in a joint end-to-end framework. 
+\subsection{Experiment Three: End-to-end EDSR and Baseline}
+The results from \ref{sec: sr+baseline} indicates that sequential training does not provide a satisfactory result. The final experiment is conducted by training the baseline model with \acs{EDSR} in a joint End-to-end framework. 
 
 
 
 \section{Results}
+This section presents the results of the conducted tests.
+
+\subsection{In-Distribution Performance}
+Table \ref{tab:reid_indist} presents the in-distribution performance of all model configurations on the MSMT17, Market-1501, and CUHK03 datasets.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}\hline
+        \multicolumn{7}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{In-Distribution Test}}\\\hline
+        \rowcolor[HTML]{D8E9F7}
+         & \multicolumn{2}{c|}{\textbf{MSMT17}} 
+         & \multicolumn{2}{c|}{\textbf{Market-1501}} 
+         & \multicolumn{2}{c|}{\textbf{CUHK03}} \\\hline
+        \rowcolor[HTML]{D8E9F7}
+         & mAP & Rank-1 & mAP & Rank-1 & mAP & Rank-1 \\\hline
+         \textbf{Baseline} 
+         & 0.51\% & 1.72\% 
+         & \textcolor{red}{29.16\%} & \textcolor{red}{50.53\%} 
+         & \textcolor{red}{2.68\%} & \textcolor{red}{2.64\%} \\\hline
+         \textbf{Augmented} 
+         & 0.39\% & 1.24\% 
+         & 16.23\% & 30.64\% 
+         & 0.93\% & 0.43\% \\\hline
+         \textbf{Sequential} 
+         & 0.26\% & 0.72\% 
+         & 10.39\% & 25.83\% 
+         & 0.99\% & 0.64\% \\\hline
+         \textbf{End-to-end} 
+         & \textcolor{red}{0.78\%} & \textcolor{red}{2.48\%} 
+         & 28.04\% & 49.19\% 
+         & 2.17\% & 2.14\% \\\hline
+    \end{tabular}
+    \caption{In-distribution test results for all model configurations. The best values in each column are highlighted in red.}
+    \label{tab:reid_indist}
+\end{table}
 
 \subsection*{Out-of-Distribution Test on DukeMTMC-ReID}
 The baseline model has a \acf{mAP} of 2.83\% and Rank-1 of 6.1\% on the test with the unmodified images from DukeMTMC-ReID. Compared to the validation results, this performance is substantially lower. However, a drop in performance is not unexpected given the domain shift introduced by the new dataset. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{0.3\linewidth}
+                |>{\centering\arraybackslash}p{0.2\linewidth}
+                |>{\centering\arraybackslash}p{0.2\linewidth}|}
+\hline
+\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on DukeMTMC-ReID}} \\ \hline
+\rowcolor[HTML]{D8E9F7}
+& \textbf{mAP} & \textbf{Rank-1} \\ \hline
+\textbf{Baseline}   & 2.83\% & 6.10\% \\ \hline
+\textbf{Augmented}  & 2.36\% & 5.21\%\\ \hline
+\textbf{Sequential} & 1.05\% & 2.15\% \\ \hline
+\textbf{End-to-end}      & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} \\ \hline
+\end{tabular}
+\caption{Comparison of all \acs{OSNet} configurations on the DukeMTMC-ReID dataset.}
+\label{tab:duke_all_models}
+\end{table}
+
 
 \subsection*{Out-of-Distribution Scale Test}
 Inspecting the result of the \acs{OOD} scale test, all metrics increase with the scale reduction of 0.75 compared to the unmodified images. 
@@ -141,16 +195,16 @@ This is assumed to be caused by the presence of differently sized images in the 
 & 1.55\% & 4.13\% \\
 \hline
 \textbf{Augmented} 
-& 2.24\% & 5.07\%
-& 2.54\% & 6.51\%
-& 1.35\% & 3.59\% \\
+& 2.36\% & 5.20\%
+& 2.66\% & 6.24\%
+& 1.51\% & 3.64\% \\
 \hline
 \textbf{Sequential} 
 & 1.05\% & 2.15\%
 & 1.23\% & 2.33\%
 & 1.52\% & 4.26\% \\
 \hline
-\textbf{Joint} 
+\textbf{End-to-end} 
 & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%}
 & \textcolor{red}{4.30\%} & \textcolor{red}{8.75\%}
 & \textcolor{red}{3.05\%} & \textcolor{red}{6.73\%} \\
@@ -198,22 +252,19 @@ The compression test show a clear drop in performance with reduction of quality,
 & 2.65\% & 5.66\% \\
 \hline
 \textbf{Augmented} 
-& 2.24\% & 5.07\%
-& 2.25\% & 5.16\%
-& 2.26\% & 5.21\%
-& 2.20\% & 4.67\% \\
+& 2.36\%& 5.20\%& 2.29\%& 5.30\%& 2.31\%& 5.43\%& 2.27\%& 4.67\% \\
 \hline
 \textbf{Sequential} 
-& -- & -- 
-& -- & -- 
-& -- & -- 
-& -- & -- \\
+& 1.05\% & 2.15\% 
+& 1.08\% & 2.51\% 
+& 1.05\% & 2.15\% 
+& 0.96\% & 2.11\% \\
 \hline
-\textbf{Joint} 
-& -- & -- 
-& -- & -- 
-& -- & -- 
-& -- & -- \\
+\textbf{End-to-end} 
+& \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} 
+& \textcolor{red}{3.61\%} & \textcolor{red}{7.18\%} 
+& \textcolor{red}{3.64\%} & \textcolor{red}{7.41\%} 
+& \textcolor{red}{3.37\%} & \textcolor{red}{6.42\%} \\
 \hline
 \end{tabular}
 \caption{Comparison of OSNet variants on DukeMTMC-ReID under varying compression levels. Metrics shown: mAP and Rank-1.}
@@ -241,9 +292,9 @@ The results for \acs{iLIDS-VID} is although far from the validations results, sh
 \rowcolor[HTML]{D8E9F7}
 & \textbf{Rank-1} \\ \hline
 \textbf{Baseline} & \textcolor{red}{7.00\%} \\ \hline
-\textbf{Augmented} & 2.67\% \\ \hline
+\textbf{Augmented} & 2.33\% \\ \hline
 \textbf{Sequential} & 1.33\% \\ \hline
-\textbf{Joint} & 3\% \\ \hline
+\textbf{End-to-end} & 3\% \\ \hline
 \end{tabular}
 \caption{Comparison of all OSNet configurations on the iLIDS-VID dataset.}
 \label{tab:ilidsvid_all_models_vertical}
@@ -257,44 +308,3 @@ Compared to the Rank-1 results on the other tests, the robust model achieves the
 The attempt at creating a robust model did not succeed, as it was significantly worse than the baseline model on all tests.
 \\\\
 flyt: The robust \acs{OSNet} achieves a \acs{mAP} of 2.24\% and Rank-1 of 5.07\% on the unmodifed dataset, see Table \ref{tab:compressiontest_result_robust}. Compared to the baseline model, it underperforms by respectively 0.59\% and 1.03\%. This suggests that the heavy augmentation may have hindered the model's ability to learn discriminative features, instead of improved generalization as originally intended. 
-
-
-
-
-
-
-
-\subsection{In-Distribution Performance}
-
-Table \ref{tab:reid_indist} presents the in-distribution performance of all model configurations on the MSMT17, Market-1501, and CUHK03 datasets.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|}\hline
-        \multicolumn{7}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{In-Distribution Test}}\\\hline
-        \rowcolor[HTML]{D8E9F7}
-         & \multicolumn{2}{c|}{\textbf{MSMT17}} 
-         & \multicolumn{2}{c|}{\textbf{Market-1501}} 
-         & \multicolumn{2}{c|}{\textbf{CUHK03}} \\\hline
-        \rowcolor[HTML]{D8E9F7}
-         & mAP & Rank-1 & mAP & Rank-1 & mAP & Rank-1 \\\hline
-         \textbf{Baseline} 
-         & 0.51\% & 1.72\% 
-         & \textcolor{red}{29.16\%} & \textcolor{red}{50.53\%} 
-         & \textcolor{red}{2.68\%} & \textcolor{red}{2.64\%} \\\hline
-         \textbf{Augmented} 
-         & 0.39\% & 1.24\% 
-         & 16.23\% & 30.64\% 
-         & 0.93\% & 0.43\% \\\hline
-         \textbf{Sequential} 
-         & 0.26\% & 0.72\% 
-         & 10.39\% & 25.83\% 
-         & 0.99\% & 0.64\% \\\hline
-         \textbf{Joint} 
-         & \textcolor{red}{0.78\%} & \textcolor{red}{2.48\%} 
-         & 28.04\% & 49.19\% 
-         & 2.17\% & 2.14\% \\\hline
-    \end{tabular}
-    \caption{In-distribution test results for all model configurations. The best values in each column are highlighted in red.}
-    \label{tab:reid_indist}
-\end{table}

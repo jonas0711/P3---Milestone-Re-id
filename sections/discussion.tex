@@ -32,7 +32,7 @@ The OOD dataset consists of different augmented versions of the DukeMTMC-Reid da
 \section{Experiments}
 - Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
 - Hvorfor tror vi resultaterne bliver som de gør? eg. hvorfor er det ikke nok bare at træne en robust osnet. 
-- Hvorfor er det bedre at træne joint?
+- Hvorfor er det bedre at træne End-to-end?
 
 \section{Results}
 
@@ -50,9 +50,9 @@ Var EDSR et godt valg?
 \subsection{Sequential EDSR and Baseline}
 Implementing both models sequentially effectively meant that only \acs{OSNet} had the chance to improve. By only inputting the \acs{HR} \acs{ReID} image, \acs{EDSR} could not learn more than it already knew about general upscaling. \acs{OSNet} learned how to extract useful embeddings from \acs{SR} images. %Der skal mere til men pas lige nu.
 
-\subsection{Joint EDSR and Baseline}
+\subsection{End-to-end EDSR and Baseline}
 %Hvorfor implementeret  på den måde - hvad med auxilary loss?
-The joint implementation of the \acs{EDSR} and \acs{OSNet} models served it's purpose as intended. The combined forward pass allowed \acs{EDSR} to learn from \acs{OSNet}'s loss, and thereby specialize the upscaling to assists in better embeddings. However, having no \acs{SR} specific loss, limited this ability. Implementing an auxillary loss, by inputting downscaled \acs{ReID} data, and comparing it to the original \acs{HR} data, could have improved performance. Therefore this addition should be considered for future work. 
+The End-to-end implementation of the \acs{EDSR} and \acs{OSNet} models served it's purpose as intended. The combined forward pass allowed \acs{EDSR} to learn from \acs{OSNet}'s loss, and thereby specialize the upscaling to assists in better embeddings. However, having no \acs{SR} specific loss, limited this ability. Implementing an auxillary loss, by inputting downscaled \acs{ReID} data, and comparing it to the original \acs{HR} data, could have improved performance. Therefore this addition should be considered for future work. 
 
 \section{Deployment}
 
@@ -98,17 +98,17 @@ The training datasets used in this project is primarily consists of ** vi ved de
 
 
 %SR forbedringer
-%Implementere auxiliary loss i joint training så SR også optimeres på reconstruction quality
+%Implementere auxiliary loss i End-to-end training så SR også optimeres på reconstruction quality
 %Fokus på at SR forbedre specifikke tøj detaljer 
 %Undersøg multi scale SR Der tager forskellige input resolutions
 \subsubsection{Super-Resolution Enhancements}
-The \ac{SR} module could be improved through several approaches. Implementing an auxiliary loss during joint training would allow the SR module to optimize for both reconstruction quality and \ac{ReID} performance at the same time, rather then only learning from only learning from the \ac{ReID} loss. The \ac{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
+The \ac{SR} module could be improved through several approaches. Implementing an auxiliary loss during End-to-end training would allow the SR module to optimize for both reconstruction quality and \ac{ReID} performance at the same time, rather then only learning from only learning from the \ac{ReID} loss. The \ac{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
 
 
 
 %ReID forbedringer
 \subsubsection{Re-Identification Enhancements}
-The ReID module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person ReID. Investigating different freezing strategies during joint training, such as trying unfreezing layers or trying different learning rates for SR or Reid modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
+The ReID module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person ReID. Investigating different freezing strategies during End-to-end training, such as trying unfreezing layers or trying different learning rates for SR or Reid modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
 
 
 %Sammenligne loss functions ?? Har vi skrevet om det før ?

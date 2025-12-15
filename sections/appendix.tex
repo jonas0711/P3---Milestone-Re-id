@@ -126,7 +126,7 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-20}& 22.62\%&  23.92\%& 16.07\% \\ 
 \hline
 \end{tabular}
-\caption{Results for scaletest test on DukeMTMC-ReID dataset for the baseline model.}
+\caption{Results for scaletest test on DukeMTMC-ReID dataset for Baseline.}
 \end{table}
 
 \begin{table}[H]
@@ -149,7 +149,7 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 17.68\%& 17.19\%& 17.64\%& 15.98\%\\ \hline
 \textbf{Rank-20}&  22.62\%& 22.22\%& 22.8\%& 21.41\%\\ \hline
 \end{tabular}
-\caption{Results for compression test on DukeMTMC-ReID dataset for the baseline model.}
+\caption{Results for compression test on DukeMTMC-ReID dataset for Baseline.}
 \end{table}
 
 \begin{table}[H]
@@ -165,7 +165,7 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 19\%\\ \hline
 \textbf{Rank-20}& 25.33\%\\ \hline
 \end{tabular}
-\caption{Results for test on iLIDS-VID dataset for the baseline model.}
+\caption{Results for test on iLIDS-VID dataset for Baseline.}
 \end{table}
 
 \subsection{Augmented}
@@ -182,13 +182,13 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
 \rowcolor[HTML]{D8E9F7}
 {} & Unmodified Scale 1& Scale 0.75& Scale 0.5\\ \hline
-\textbf{mAP}    & 2.24\%& 2.54\%& 1.35\%\\ \hline
-\textbf{Rank-1} & 5.07\%& 6.51\%& 3.59\%\\ \hline
-\textbf{Rank-5} & 10.55\%&  12.34\%& 7.41\%\\ \hline
-\textbf{Rank-10}& 14.27\%& 15.62\%& 9.83\%\\ \hline
-\textbf{Rank-20}& 19.17\%&  20.06\%& 13.73\%\\ \hline
+\textbf{mAP}    & 2.36\%& 2.66\%& 1.51\%\\ \hline
+\textbf{Rank-1} & 5.21\%& 6.24\%& 3.64\%\\ \hline
+\textbf{Rank-5} & 12.07\%&  12.21\%& 8.81\%\\ \hline
+\textbf{Rank-10}& 16.07\%& 16.07\%& 12.21\%\\ \hline
+\textbf{Rank-20}& 21.27\%&  21.41\%& 15.93\%\\ \hline
 \end{tabular}
-\caption{Results for scale test on DukeMTMC-ReID dataset for the robust model.}
+\caption{Results for scale test on DukeMTMC-ReID dataset for Augmented.}
 \end{table}
 
 \begin{table}[H]
@@ -205,13 +205,13 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \rowcolor[HTML]{D8E9F7}
 {} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low\\ (Q = 25)}&
 \makecell{Very low \\ (Q = 15)}\\ \hline
-\textbf{mAP}    & 2.24\%& 2.25\%& 2.26\%& 2.20\%\\ \hline
-\textbf{Rank-1} & 5.07\%& 5.16\%& 5.21\%& 4.67\%\\ \hline
-\textbf{Rank-5} & 10.55\%& 10.82\%& 11.36\%& 10.55\%\\ \hline
-\textbf{Rank-10}& 14.27\%& 14.41\%&  14.32\%& 13.51\%\\ \hline
-\textbf{Rank-20}&   19.17\%& 19.39\%& 18.94\%& 18.40\%\\ \hline
+\textbf{mAP}    & 2.36\%& 2.29\%& 2.31\%& 2.27\%\\ \hline
+\textbf{Rank-1} & 5.21\%& 5.30\%& 5.43\%& 5.43\%\\ \hline
+\textbf{Rank-5} & 12.07\%& 11.62\%& 11.80\%& 10.86\%\\ \hline
+\textbf{Rank-10}& 16.07\%& 16.07\%&  16.43\%& 15.71\%\\ \hline
+\textbf{Rank-20}&   21.27\%& 20.30\%& 21.32\%& 20.42\%\\ \hline
 \end{tabular}
-\caption{Results for compression test on DukeMTMC-ReID dataset for the robust model.}
+\caption{Results for compression test on DukeMTMC-ReID dataset for Augmented.}
 \end{table}
 
 \begin{table}[H]
@@ -222,12 +222,12 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
     |}
 \hline
 \multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
-\textbf{Rank-1} & 2.67\%\\ \hline
-\textbf{Rank-5} & 7.33\%\\ \hline
-\textbf{Rank-10}& 11.67\%\\ \hline
-\textbf{Rank-20}& 18.67\%\\ \hline
+\textbf{Rank-1} & 2.33\%\\ \hline
+\textbf{Rank-5} & 9.33\%\\ \hline
+\textbf{Rank-10}& 15.00\%\\ \hline
+\textbf{Rank-20}& 22.0\%\\ \hline
 \end{tabular}
-\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the augmented model.}
+\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the Augmented.}
 \end{table}
 
 \subsection{Sequential}
@@ -250,7 +250,7 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 7.94\%& 9.02\%& 11.89\%\\ \hline
 \textbf{Rank-20}& 10.59\%& 12.48\%& 15.75\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\caption{Compression test of Sequential on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_result}
 \end{table}
 
@@ -274,11 +274,11 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 7.94\%& 7.50\%& 7.72\%& 7.81\%\\ \hline
 \textbf{Rank-20}&  10.59\%& 10.73\%& 10.95\%& 10.28\%\\ \hline
 \end{tabular}
-\caption{Compression test of OSNet on 25 pairs from Market-1501 dataset.}
+\caption{Compression test of Sequential on 25 pairs from Market-1501 dataset.}
 \label{tab:compressiontest_ood2_result}
 \end{table}
 
-\subsection{Joint}
+\subsection{End-to-end}
 
 \begin{table}[H]
 \centering
@@ -298,7 +298,7 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 19.54\%& 21.32\%& 18.04\%\\ \hline
 \textbf{Rank-20}& 3.69\%& 26.89\%& 22.85\%\\ \hline
 \end{tabular}
-\caption{Scale test of Joint on 25 pairs from Market-1501 dataset.}
+\caption{Scale test of End-to-end on 25 pairs from Market-1501 dataset.}
 \end{table}
 
 \begin{table}[H]
@@ -321,7 +321,7 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 19.54\%& 18.94\%& 19.25\%& 18.13\%\\ \hline
 \textbf{Rank-20}&  3.69\%& 24.60\%& 25.04\%& 23.52\%\\ \hline
 \end{tabular}
-\caption{Compression test of Joint on 25 pairs from Market-1501 dataset.}
+\caption{Compression test of End-to-end on 25 pairs from Market-1501 dataset.}
 \end{table}
 
 \begin{table}[H]
@@ -337,5 +337,5 @@ Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer 
 \textbf{Rank-10}& 12\%\\ \hline
 \textbf{Rank-20}& 18 \%\\ \hline
 \end{tabular}
-\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the joint model.}
+\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the End-to-end model.}
 \end{table}
