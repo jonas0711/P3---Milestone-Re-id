@@ -1,13 +1,78 @@
 \chapter{Experiments and Results} \label{cha: experiments and results}
  This chapter presents the experiments conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}} and \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} defined in Section \ref{sec:hypotheses}. The objective is to determine whether incorporating an \acs{SR} module improves the robustness of a person \acs{ReID} module under \acs{OOD} conditions. To support this evaluation, this chapter first presents an independent assessment of the chosen \acs{SR} model, followed by four experimental configurations: The \hyperlink{Baseline}{Baseline} model, the \hyperlink{Augmented}{Augmented} model, the \hyperlink{Sequential}{Sequential} model, and the \hyperlink{End-to-end}{End-to-end} model. The results from these experiments are presented and briefly discussed. 
 
-\subsection{SR Experiments} \label{sec: srexperiments}
+\section{SR Experiments} \label{sec: srexperiments}
+Before integrating \acs{SR} into the \acs{ReID} pipeline, the selected \acs{SR} architecture is evaluated independently to verify that it provides meaningful improvements over simple interpolation methods. This section presents the evaluation results and a direct comparison between \acs{EDSR} and bicubic interpolation.
 
-Before integrating \acs{SR} into the \acs{ReID} pipeline, the selected \acs{SR} architecture is evaluated independently to verify that it provides meaningful improvements over simple interpolation methods. A direct comparison between \acs{EDSR} and bicubic interpolation was conducted to provide a natural baseline for comparison with deep learning-based \acs{SR} methods.
+\subsubsection{Two-Stage Training Results}
+Two \acs{EDSR} models were trained using a two-stage approach: the first model was trained from scratch on \acs{RELLISUR}, and the second model was obtained by finetuning the first model on \acs{DIV2K}. Table \ref{tab:training_results} presents the validation results for both training stages.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|}
+\hline
+\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Training Validation Results}} \\
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Training Stage} & \textbf{Validation PSNR (dB)} & \textbf{Validation Loss} \\
+\hline
+Stage 1: RELLISUR Scratch & \textcolor{red}{24.72} & \textcolor{red}{0.090} \\
+\hline
+Stage 2: DIV2K Finetuned & 24.28 & 0.095 \\
+\hline
+\end{tabular}
+\caption{Validation performance for both training stages. Best validation results highlighted in red.}
+\label{tab:training_results}
+\end{table}
+
+\subsubsection{Test Set Evaluation}
+Both models were evaluated on the \acs{RELLISUR} test set consisting of 85 naturally degraded low-resolution images. Table \ref{tab:edsr_test_results} presents the test set performance for both models. The scratch model achieved a mean \acs{PSNR} of 28.25 dB and \acs{SSIM} of 0.9751, while the finetuned model achieved 28.09 dB \acs{PSNR} and 0.9733 \acs{SSIM}. The scratch model outperformed the finetuned model by 0.16 dB in \acs{PSNR} and 0.0018 in \acs{SSIM}.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|}
+\hline
+\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{EDSR Test Set Performance}} \\
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Model} & \textbf{PSNR (dB)} & \textbf{SSIM} \\
+\hline
+RELLISUR Scratch & \textcolor{red}{28.25} & \textcolor{red}{0.9751} \\
+\hline
+DIV2K Finetuned & 28.09 & 0.9733 \\
+\hline
+\end{tabular}
+\caption{Test set performance comparison between scratch and finetuned \acs{EDSR} models on \acs{RELLISUR} test set (85 images). Best values highlighted in red.}
+\label{tab:edsr_test_results}
+\end{table}
+
+\subsubsection{EDSR vs. Bicubic Interpolation}
+To verify that \acs{EDSR} provides meaningful improvements over simple interpolation methods, as described in \hyperlink{req:1}{\textit{Requirement 1}}, a direct comparison was conducted between the trained \acs{EDSR} models and bicubic interpolation. Bicubic interpolation is a traditional image upscaling method that uses a cubic polynomial to estimate pixel values.
 \\\\
-Bicubic interpolation is a traditional image upscaling method that uses a cubic polynomial to estimate pixel values, providing a natural baseline for comparison with deep learning-based \acs{SR} methods.
-\\\\
-The evaluation compares the trained \acs{EDSR} model against bicubic interpolation using the same test conditions. Both methods are applied to low-resolution images from the test set, and the upscaled outputs are evaluated using \acs{PSNR} and \acs{SSIM} metrics. The results demonstrate that \acs{EDSR} consistently outperforms bicubic interpolation across all evaluated metrics. On the test dataset, \acs{EDSR} achieves a mean \acs{PSNR} of [PLACEHOLDER] dB compared to [PLACEHOLDER] dB for bicubic interpolation, representing an improvement of [PLACEHOLDER] dB. Similarly, \acs{EDSR} achieves a mean \acs{SSIM} of [PLACEHOLDER] compared to [PLACEHOLDER] for bicubic interpolation. These results show that \acs{EDSR} performs better than bicubic interpolation.
+Both \acs{EDSR} models and bicubic interpolation were evaluated on the same \acs{RELLISUR} test set. Table \ref{tab:edsr_vs_bicubic} presents the comparison results. The scratch \acs{EDSR} model achieved a mean \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, representing an improvement of 1.10 dB. The finetuned \acs{EDSR} model achieved 28.09 dB, representing an improvement of 0.94 dB over bicubic interpolation. For \acs{SSIM}, the scratch model achieved 0.9751 compared to 0.9689 for bicubic (improvement of 0.0061), and the finetuned model achieved 0.9733 (improvement of 0.0044). These results demonstrate that \acs{EDSR} consistently outperforms bicubic interpolation across all evaluated metrics.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{EDSR vs. Bicubic Interpolation}} \\
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Method} & \textbf{PSNR (dB)} & \textbf{SSIM} & \textbf{$\Delta$ PSNR (dB)} & \textbf{$\Delta$ SSIM} \\
+\hline
+Bicubic Interpolation & 27.15 & 0.9689 & - & - \\
+\hline
+EDSR RELLISUR Scratch & \textcolor{red}{28.25} & \textcolor{red}{0.9751} & \textcolor{red}{+1.10} & \textcolor{red}{+0.0061} \\
+\hline
+EDSR DIV2K Finetuned & 28.09 & 0.9733 & +0.94 & +0.0044 \\
+\hline
+\end{tabular}
+\caption{Performance comparison between \acs{EDSR} models and bicubic interpolation on the \acs{RELLISUR} test set. $\Delta$ values represent improvements over bicubic interpolation. Best values highlighted in red.}
+\label{tab:edsr_vs_bicubic}
+\end{table}
 
 
 
@@ -52,7 +117,7 @@ Image pairs from an unseen dataset, with primarily indoor images, to test cross-
 
 \section{Experiments}
 
-The \acs{OOD} test conducted in Section \ref{sec: oodtestny} highlights that the off-the-shelf \acs{OSNet} model fails when confronted with images that are heavily augmented and simulate the domain shift encountered in real-world deployment. In order to determine whether implementing an \acs{SR} module in the \acs{ReID} pipeline, several experiments were conducted to establish a clear and fair method for comparison. The experiments are designed to test the hypotheses defined in Section \ref{sec:hypotheses}. 
+In order to determine whether implementing an \acs{SR} module in the \acs{ReID} pipeline, several experiments were conducted to establish a clear and fair method for comparison. The experiments are designed to test the hypotheses defined in Section \ref{sec:hypotheses}. 
 \\\\
 Before incorporating the \acs{SR} module, the effect of applying strong data augmentation during training is evaluated first, to determine whether robustness to \acs{OOD} conditions can be achieved through training strategies alone. This step provides a reference point to determine whether the additional complexity introduced by the \acs{SR} module is justified. 
 
@@ -76,7 +141,11 @@ In this setup, with the \acs{EDSR} and \hyperlink{Baseline}{Baseline} modules co
 
 \subsection{Experiment Three: End-to-end \acs{EDSR} and Baseline}
 
-This experiment was conducted as an extension of 
+This experiment was conducted to further evaluate \hyperlink{Hypothesis 2}{Hypothesis 2} by assessing if joint end-to-end training of the \acs{SR} and \acs{ReID} module improves robustness under \acs{OOD} conditions.
+\\\\
+The \hyperlink{End-to-end}{End-to-end} model is compared against the \hyperlink{Sequential}{Sequential} model. Both configurations used the same \acs{EDSR} and \hyperlink{Baseline}{Baseline} model, with the only difference being the training strategy of the configurations. Where the \hyperlink{Sequential}{Sequential} model was combined, the \hyperlink{End-to-end}{End-to-end} model trained the \acs{EDSR} and \hyperlink{Baseline}{Baseline} models jointly, allowing the \acs{SR} module to adapt specifically to the \acs{ReID} task.
+\\\\
+By keeping the other factors constant, this experiment isolated the effect of joint end-to-end training compared to sequential integration. 
 
 
 \section{Results}
@@ -104,9 +173,9 @@ Table \ref{tab:reid_indist} presents the in-distribution performance of all mode
          & 16.23\% & 30.64\% 
          & 0.93\% & 0.43\% \\\hline
          \textbf{Sequential} 
-         & 0.26\% & 0.72\% 
-         & 10.39\% & 25.83\% 
-         & 0.99\% & 0.64\% \\\hline
+         & 0.62\% & 0.92\% 
+         & 25.86\% & 50.48\% 
+         & 0.85\% & 0.78\% \\\hline
          \textbf{End-to-end} 
          & \textcolor{red}{0.78\%} & \textcolor{red}{2.48\%} 
          & 28.04\% & 49.19\% 
@@ -128,8 +197,9 @@ The baseline model has a \acf{mAP} of 2.83\% and Rank-1 of 6.1\% on the test wit
 \multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on DukeMTMC-ReID}} \\ \hline
 \rowcolor[HTML]{D8E9F7}
 & \textbf{mAP} & \textbf{Rank-1} \\ \hline
-\textbf{Baseline}   & 2.83\% & 6.10\% \\ \hline
-\textbf{Augmented}  & 2.36\% & 5.21\%\\ \hline
+\textbf{Baseline}   & 10.05\%& 22.75\%
+\\ \hline
+\textbf{Augmented}  & 4.76\%& 10.32\%\\ \hline
 \textbf{Sequential} & 1.05\% & 2.15\% \\ \hline
 \textbf{End-to-end}      & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} \\ \hline
 \end{tabular}
@@ -163,14 +233,10 @@ This is assumed to be caused by the presence of differently sized images in the 
 & \textbf{mAP} & \textbf{Rank-1} \\
 \hline
 \textbf{Baseline} 
-& 2.83\% & 6.10\%
-& 3.21\% & 7.45\%
-& 1.55\% & 4.13\% \\
+& 10.05\%& 22.75\%& 14.77\%& 29.98\%& 11.16\%& 21.54\%\\
 \hline
 \textbf{Augmented} 
-& 2.36\% & 5.20\%
-& 2.66\% & 6.24\%
-& 1.51\% & 3.64\% \\
+& 4.76\%& 10.32\%& 6.58\%& 14.32\%& 5.07\%& 11.13\%\\
 \hline
 \textbf{Sequential} 
 & 1.05\% & 2.15\%
@@ -217,13 +283,11 @@ The compression test show a clear drop in performance with reduction of quality,
 & \textbf{mAP} & \textbf{Rank-1} \\
 \hline
 \textbf{Baseline} 
-& 2.83\% & 6.10\%
-& 2.79\% & 5.66\%
-& 2.74\% & 5.92\%
-& 2.65\% & 5.66\% \\
+& 10.05\%& 22.75\%
+& 9.34\%& 21.41\%& 8.82\%& 20.06\%& 7.08\%& 15.88\%\\
 \hline
 \textbf{Augmented} 
-& 2.36\%& 5.20\%& 2.29\%& 5.30\%& 2.31\%& 5.43\%& 2.27\%& 4.67\% \\
+& 4.76\%& 10.32\%& 4.67\%& 10.28\%& 4.50\%& 10.10\%& 4.14\%& 9.61\%\\
 \hline
 \textbf{Sequential} 
 & 1.05\% & 2.15\% 
@@ -262,8 +326,8 @@ The results for \acs{iLIDS-VID} is although far from the validations results, sh
 \multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
 \rowcolor[HTML]{D8E9F7}
 & \textbf{Rank-1} \\ \hline
-\textbf{Baseline} & \textcolor{red}{7.00\%} \\ \hline
-\textbf{Augmented} & 2.33\% \\ \hline
+\textbf{Baseline} & \textcolor{red}{10\%}\\ \hline
+\textbf{Augmented} & 7.33\%\\ \hline
 \textbf{Sequential} & 1.33\% \\ \hline
 \textbf{End-to-end} & 3\% \\ \hline
 \end{tabular}

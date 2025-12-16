@@ -7,7 +7,7 @@ As stated in Section \ref{sec:videosurveillanceprobana}, surveillance cameras ar
  
 \subsection{Camera Technology}
 \label{subsubsec:How_cameras_work}
-Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement. The first step of creating these images is by focusing the light through a lens and onto an image sensor that is made up of millions of photosites which measure the intensity of light in the given frame. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
+Fundamentally, a surveillance video camera functions like a digital single-shot camera. The main difference is that a video camera stores multiple pictures in a time series, which when quickly played in order, gives the illusion of movement. The first step of creating these images is by focusing the light through a lens and onto an image sensor that is made up of millions of pixels which measure the intensity of light in the given frame. These measurements are then converted into electrical signals that represent the brightness and color of each pixel in the image \cite{unc_camera_pipeline, ucocare2024SurvilanceCameraFunction}.
 \\\\
 There are many underlying elements that happens as well, which can differ in each camera. For example, digital processing like white balance correction, compression and exposure adjustments are used to manipulate the images into a desired look in the final image or video file \cite{unc_camera_pipeline}.
 An in-depth example of this process can be seen in Figure \ref{fig:camera_pipeline} were a complete pipeline of such a case is shown to highlight the many different components that impact the output of the camera.
@@ -23,7 +23,7 @@ An in-depth example of this process can be seen in Figure \ref{fig:camera_pipeli
 
 \subsection{Limitations in imaging pipeline}
 \label{subsec:TechnicalImpactFootage}
-As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple different elements which contribute to the process of creating video footage. These elements can alter widely when compared to other hardware, which can create notable characteristics of that specific camera in the footage. An example of this could be how different camera lenses can lead to lens distortions in the footage, which creates a distinct warping effect. As seen in Figure \ref{fig:lens_comparison}, where the \acs{FOV} changes in each camera lens.
+As stated in Section \ref{subsubsec:How_cameras_work}, there are multiple different elements which contribute to the process of creating video footage. These elements can vary widely when compared to other hardware, which can create notable characteristics of that specific camera in the footage. An example of this could be how different camera lenses can lead to lens distortions in the footage, which creates a distinct warping effect. As seen in Figure \ref{fig:lens_comparison}, where the \acs{FOV} changes in each camera lens.
 
 \begin{figure}[H]
     \centering
@@ -73,7 +73,7 @@ Based on the values in each channel of each pixel, and how they relate to neighb
 
 \subsection{Images in a Time Series}
 \label{subsec:images_in_a_time_series}
-While a two dimensional image convey spacial information, images in a time series capture the temporal dimension too. Adding time as a dimension lets algorithms understand motion and change, as the focus is no longer on static images, but on the changes which happen between frames. Analyzing these changes over time allows for tracking of objects, understanding consistencies, and for compensating bad frames which suffer from poor lighting, motion blur, or occlusion, through surrounding frames. 
+While a two dimensional image conveys spatial information, images in a time series capture the temporal dimension too. Adding time as a dimension lets algorithms understand motion and change, as the focus is no longer on static images, but on the changes which happen between frames. Analyzing these changes over time allows for tracking of objects, understanding consistencies, and for compensating bad frames which suffer from poor lighting, motion blur, or occlusion, through surrounding frames. 
 \\\\
 In this format, frames are still stored as matrices of pixels which usually contain three channels, but they are stacked chronologically as well. Frames offer deeper information, but they also require substantially more processing, as even using only five frames would mean five times more processing than for a single image. Therefore, it is important to consider whether sequential frames processing is necessary for the task at hand, to avoid over computation. 
 
@@ -107,14 +107,14 @@ Section \ref{subsec:Surveillance_equipment_n_footage} states the complications t
 \\\\
 The images might further be of inherently poor quality due to surveillance cameras typically covering a large area, have lower resolution, and compression due to storage limitations. Each person only occupies a small part of the whole image, leaving limited information available for analysis by the system. 
 \\\\
-In summary, the main challenge of a \acs{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the pre-processing step before the network performs embedding, with techniques such as \acs{SR} being a potential method to improve quality.
+In summary, the main challenge of a \acs{ReID} network is extracting identifying features from a limited input. The data is of poor quality, and the domain does not allow for higher standards to be set. Therefore, a core area of improvement, is the preprocessing step before the network performs embedding, with techniques such as \acs{SR} being a potential method to improve quality.
 
 \subsection{Related Work}\label{subsec:reid_reworks}
 This related works section will focus on presenting different types of person \acs{ReID} networks, to get an overview of the field of work. 
 
 \subsubsection{DeepReID: Deep Filter Pairing Neural Network for Person Re-Identification}
 
-This paper from 2014 proposes a \acs{FPNN} for person \acs{ReID} that automatically learns features optimal for this task directly from image data, instead of relying on hand-crafted ones \cite{FPNN}. The model uses paired filters, one set for each camera view, to learn how a person’s appearance changes across different cameras. This helps the network adapt to variations in lighting, color, angles, viewpoints, and person positions. The model learns to focus on person-specific features and becomes tolerant to imperfect detections and background clutter. The model is evaluated through the Rank-1 metric, against eight different state-of-the-art methods.  
+This paper from 2014 proposes a \acf{FPNN} for person \acs{ReID} that automatically learns features optimal for this task directly from image data, instead of relying on hand-crafted ones \cite{FPNN}. The model uses paired filters, one set for each camera view, to learn how a person’s appearance changes across different cameras. This helps the network adapt to variations in lighting, color, angles, viewpoints, and person positions. The model learns to focus on person-specific features and becomes tolerant to imperfect detections and background clutter. The model is evaluated through the Rank-1 metric, against eight different state-of-the-art methods.  
 \\\\
 Despite outperforming state-of-the-art methods at the time, this solution has several limitations. The dataset used is relatively small, with 13,164 images of 1,360 different people, which can introduce bias and limit generalization. While the dataset does represent real-life scenarios of obtained data from surveillance cameras, and lighting is mentioned as a key challenge, there is no analysis of image resolution effects or how they could improve the model’s performance. This gap could be explored through integrating \acs{SR} techniques. However, as this paper is more than a decade old, it is beneficial to look at more recent papers. 
 
@@ -144,7 +144,7 @@ CUHK03& 78.7\%& 52.9\%\\\hline
 \label{tab:sotaosnetresults}
 \end{table}
 
-\noindent While \acs{OSNet} presents a lightweight architecture with state-of-the-art competitive performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
+\noindent While \acs{OSNet} presents a lightweight architecture with State-of-the-Art competitive performance, the approach does not consider image quality issues, such as poor lighting or shifting between different types of cameras. 
 
 \subsubsection{Applying Deep Learning Image Enhancement Methods to Improve Person Re-Identification}
  
@@ -364,12 +364,12 @@ To get an overview of some of the current work in the \acs{SR} field, the follow
 
 \subsubsection{Learning a Deep Convolutional Network for Image Super-Resolution}
 
-From 2014, this paper proposes a method for single image \acs{SR} called \acs{SRCNN} \cite{SRCNN}. The method directly learns an end-to-end mapping between the low- and high-resolution images and jointly optimizes all layers to learn how to reconstruct fine details and textures from data. The mapping is implemented as a deep \acs{CNN} that takes the \acs{LR} image as the input and outputs the \acs{HR} image. The model is evaluated through six different metrics, which is \acs{PSNR}, \acs{SSIM}, IFC, NQM, WPSNR, and MSSSIM, against six different state-of-the-art methods.  
+From 2014, this paper proposes a method for single image \acs{SR} called \acf{SRCNN} \cite{SRCNN}. The method directly learns an end-to-end mapping between the low- and high-resolution images and jointly optimizes all layers to learn how to reconstruct fine details and textures from data. The mapping is implemented as a deep \acs{CNN} that takes the \acs{LR} image as the input and outputs the \acs{HR} image. The model is evaluated through six different metrics, which is \acs{PSNR}, \acs{SSIM}, IFC, NQM, WPSNR, and MSSSIM, against six different state-of-the-art methods.  
 \\\\
 Even though this method achieved superior performance to the state-of-the-art methods, it might not be a good idea to apply the \acs{SRCNN} to a \acs{ReID} problem. This is because \acs{SRCNN} does not know that the goal is \acs{ReID} and might distort useful features in the process of enhancing the image. An ideal \acs{SR} model for \acs{ReID} would enhance features useful for recognition, for example the edges around clothes\cite{SRCNN}. 
 
 \subsubsection{Enhanced Deep Residual Networks for Single Image Super-Resolution} \label{sec: edsr relatedworks}
-A breakthrough paper from 2017 designed the \acf{EDSR} architecture. Built upon conventional residual networks by removing modules deemed to be unnecessary, and further improved performance by expanding model size and stabilizing training. The paper produced two models, \acs{EDSR} and MDSR respectively. The former, \textbf{E}nhanced \textbf{D}eep \textbf{S}uper-\textbf{R}esolution, is a single-scale model, and the later, \textbf{M}ulti-scale \textbf{D}eep \textbf{S}uper-\textbf{R}esolution, is a smaller model with fewer parameters, which achieved comparable performance to the single-scale architecture. \acs{EDSR} also appears in \cite{Blau2018PerceptionDistortion}, and can be found in the graphs in Appendix \ref{app:perception-distortion-graphs}, from which \acs{EDSR} consistently lands ahead of the other networks, when prioritizing low distortion.
+A breakthrough paper from 2017 designed the \acf{EDSR} architecture. Built upon conventional residual networks by removing modules deemed to be unnecessary, and further improved performance by expanding model size and stabilizing training. The paper produced two models, \acs{EDSR} and \acf{MDSR} respectively. The former, \acs{EDSR}, is a single-scale model, and the later, \acs{MDSR} is a smaller model with fewer parameters, which achieved comparable performance to the single-scale architecture. \acs{EDSR} also appears in \cite{Blau2018PerceptionDistortion}, and can be found in the graphs in Appendix \ref{app:perception-distortion-graphs}, from which \acs{EDSR} consistently lands ahead of the other networks, when prioritizing low distortion.
 \\\\
 While the networks achieved state-of-the-art results at the time of its release, it has since been outperformed by modern architecture. The low distortion is useful for certain applications, but the low perception makes it undesirable for tasks where high visual acuity is intended. 
 \\\\
@@ -383,7 +383,7 @@ This paper from 2019 proposes a method for single image super resolution called 
 Despite SAN outperforming state-of-the-art results, the model is computationally expensive due to the SOCA module that introduces extra matrix operations to learn covariance relationships, and the non-local modules. 
 
 \subsection{Key Takeaways}
-The SRCNN paper demonstrated that deep learning could successfully learn mapping directly between low- and high-resolution images. The \acs{EDSR} showed that removing unnecessary layers, along with deepening the model and stabilizing training, improved performance significantly. Later research, specifically the SAN paper, further improved the task by introducing attention-based techniques that model feature correlations and global image context. The three methods all evaluate their results through PSNR and SSIM metrics. This leaves the important takeaways as:
+The \acs{SRCNN} paper demonstrated that deep learning could successfully learn mapping directly between low- and high-resolution images. The \acs{EDSR} showed that removing unnecessary layers, along with deepening the model and stabilizing training, improved performance significantly. Later research, specifically the SAN paper, further improved the task by introducing attention-based techniques that model feature correlations and global image context. The three methods all evaluate their results through PSNR and SSIM metrics. This leaves the important takeaways as:
 
 \begin{itemize}
     \item Off-the-shelf \acs{SR} models should not be directly applied to a person \acs{ReID} problem.
@@ -394,13 +394,12 @@ The SRCNN paper demonstrated that deep learning could successfully learn mapping
 
 
 \section{Combining Super-Resolution with Re-Identification}
-Images, feature-level, keeping SR from becoming a second ReID, losses, auxillary loss, artefacts/hallucination/perception-distortion, 
 
 \subsection{Related work for Super-Resolution Re-Identification}\label{sec:superres-reid}
 As the implementation of \acs{SR} has the potential to improve the performance of a person \acs{ReID} model, based on the challenges described in Section \ref{subsec:challenges-ReID}, this section will examine existing approaches that combine \acs{SR} and person \acs{ReID}.
 
 \subsubsection{Resolution-Invariant Person Re-Identification} 
-A method for person \acs{ReID} robust to resolution variance by jointly training a \acs{FFSR} module and a \acs{RIFE} by joint end-to-end \acs{CNN} learning \cite{FFSR}, was proposed in this paper from 2019. \acs{FFSR} enhances the person in the image without focusing on the background. This is done through evaluation with their own metric, foreground focus \acs{SR} loss, using a defined mask around the person to priority that part of the image more. \acs{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. Through jointly training of the two modules \acs{FFSR} and \acs{RIFE}, a resolution invariant \acs{ReID} system, because \acs{FFSR} learns from the \acs{ReID}'s objective, making it specifically optimized for this task. 
+A method for person \acs{ReID} robust to resolution variance by jointly training a \acf{FFSR} module and a \acs{RIFE} by joint end-to-end \acs{CNN} learning \cite{FFSR}, was proposed in this paper from 2019. \acs{FFSR} enhances the person in the image without focusing on the background. This is done through evaluation with their own metric, foreground focus \acs{SR} loss, using a defined mask around the person to priority that part of the image more. \acs{RIFE} extracts features from low- and high-resolution images through two connected streams, allowing the system to compare people’s appearance regardless of image quality. Through jointly training of the two modules \acs{FFSR} and \acs{RIFE}, a resolution invariant \acs{ReID} system, because \acs{FFSR} learns from the \acs{ReID}'s objective, making it specifically optimized for this task. 
 \\\\
 Although this method is very promising in combining \acs{ReID} with \acs{SR}, it does have limitations in terms of data, with the model only being trained on \acs{ReID} specific datasets. Only one, the CAVIAR dataset, out of the 5 datasets used, consists of real \acs{LR} and \acs{HR} pairs, with 1220 images of 72 identities in total. The rest of the datasets are synthetically down-sampled. As explored in Section \ref{sec:SR-data}, there are differences between real \acs{LR} and synthetic down-sampled \acs{LR} images, that could have a significant impact in this case, where the majority of the images are down-sampled.
 
