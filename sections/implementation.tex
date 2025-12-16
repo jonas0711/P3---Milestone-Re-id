@@ -86,10 +86,10 @@ This section describes how the \acs{SR} module, using the previously described \
 The dataloader for the \acs{SR} module loads paired \acs{LR} and \acs{HR} images from the \acs{DIV2K} \cite{Agustsson2017NTIRE} and \acs{RELLISUR} \cite{aakerberg2021rellisur} datasets. The two datasets were kept separate during training to accommodate their different degradation characteristics, as described in Section \ref{SRtrainingdata}.
 
 \subsection{Re-implementation of EDSR} \label{sec:implementationedsr}
-The implemented version of the \acs{EDSR} architecture was taken from the source code from the 
-original paper for \acs{EDSR} \cite{lim2017edsr}. A small change has been made to the architecture, where the normalization is handled in the dataloader instead of using MeanShift layers in the network. 
-This change simplifies the integration with the \acs{ReID} module by ensuring consistent preprocessing across both modules. All images are normalized to the range $[-1, 1]$ using mean $= [0.5, 0.5, 0.5]$ and standard deviation $= [0.5, 0.5, 0.5]$. This normalization is applied uniformly across both \acs{LR} and \acs{HR} images to ensure that the model learns to reconstruct normalized outputs that match the normalized targets. The training script is implemented from scratch to ensure full control
-over the training process.
+The implemented version of the \acs{EDSR} architecture was taken from the source code from the original paper for \acs{EDSR} \cite{lim2017edsr}. One modification was made: image normalization is performed in the dataloader instead of inside the network. This simplifies integration with the \acs{ReID} module, as both modules can use the same preprocessing.
+\\\\
+All images are normalized to the range $[-1, 1]$ by subtracting 0.5 and dividing by 0.5 for each color channel. This normalization is applied to both \acs{LR} and \acs{HR} images, ensuring that the model learns to produce outputs in the same range as the target images. The training script is implemented from scratch to ensure full control over the training process.
+
 
 \subsection{Training Hyperparameters}
 This section describes the training hyperparameters, where an overview is presented in Table \ref{tab:edsrtrainingparameters}.
@@ -164,6 +164,9 @@ The data augmentation strategy outlined in Section \ref{SRtrainingdata} was appl
 
 
 \section{Implementation of Sequential ReID and SR}
+
+
+
 To fully asses the impact of implementing a \ac{SR} system with \acs{ReID}, a script was created to evaluate a sequential combination of the two models, where the data is first passed through the trained \acs{SR} model, whose output is then fed into the trained \acs{ReID} model. The efficiency of this setup is expressed with error metrics \acs{mAP} and Rank-1, and can then be compared with other evaluation instances, such as the same \acs{ReID} model without the \acs{SR} module. 
 \\\\
 This sequential evaluation script is made to test both \acs{ReID} alone and also in combination with \ac{SR}. It was specifically made to fit only the \acs{OSNet} and \acs{EDSR} structure, as those are the main models used in this project. The dataloader discussed in \ref{imp_dataloading} was also used in conjunction with this script, but mostly with a distinct emphasis on the evaluation part, such as query and gallery for the relevant \acs{ReID} datasets. 
@@ -176,7 +179,7 @@ This sequential evaluation script is made to test both \acs{ReID} alone and also
 
 
 \section{Implementation of End-to-end ReID and SR}
-Since the \acs{SR} module was trained to upscale images, it is not specialized for the task of person \acs{ReID}. By combining the two modules end-to-end, the \acs{ReID} loss can flow back into the \acs{SR} module, forcing it to learn specific upscaling and cleaning operations which can improve the final \acs{ReID} task. 
+Since the \acs{SR} module was trained to upscale images, it is not specialized for the task of person \acs{ReID}. By combining the two modules end-to-end, the \acs{ReID} loss can flow back into the \acs{SR} module, forcing it to learn specific cleaning or sharpening operations which can improve the final \acs{ReID} task. This effect can be seen in Figure XXX
 \\\\
 The \acs{OSNet} model re-implemented in Section \ref{sec:implementationosnet} and the \acs{EDSR} model re-implemented in Section \ref{sec:implementationedsr} were ??? . The models were then wrapped in a function which builds the model with the configurations defined in Table \ref{tab:osnet-config} and Table \ref{tab:edsr-config} respectively.
 \\\\

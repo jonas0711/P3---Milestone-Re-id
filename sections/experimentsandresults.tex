@@ -49,7 +49,7 @@ DIV2K Finetuned & 28.09 & 0.9733 \\
 \end{table}
 
 \subsubsection{EDSR vs. Bicubic Interpolation}
-To verify that \acs{EDSR} provides meaningful improvements over simple interpolation methods, as described in \hyperlink{req:1}{\textit{Requirement 1}}, a direct comparison was conducted between the trained \acs{EDSR} models and bicubic interpolation. Bicubic interpolation is a traditional image upscaling method that uses a cubic polynomial to estimate pixel values.
+To verify that \acs{EDSR} provides meaningful improvements over simple interpolation methods, as described in \hyperlink{req:1}{\textit{Requirement 1}}, a direct comparison was conducted between the trained \acs{EDSR} models and bicubic interpolation.
 \\\\
 Both \acs{EDSR} models and bicubic interpolation were evaluated on the same \acs{RELLISUR} test set. Table \ref{tab:edsr_vs_bicubic} presents the comparison results. The scratch \acs{EDSR} model achieved a mean \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, representing an improvement of 1.10 dB. The finetuned \acs{EDSR} model achieved 28.09 dB, representing an improvement of 0.94 dB over bicubic interpolation. For \acs{SSIM}, the scratch model achieved 0.9751 compared to 0.9689 for bicubic (improvement of 0.0061), and the finetuned model achieved 0.9733 (improvement of 0.0044). These results demonstrate that \acs{EDSR} consistently outperforms bicubic interpolation across all evaluated metrics.
 
