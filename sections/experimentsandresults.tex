@@ -218,7 +218,7 @@ Table \ref{tab:duke_all_models} presents the results from the \acs{OOD} test on 
 
 \subsection*{Out-of-Distribution Scale Test}
 
-Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on \acs{DukeMTMC}.
+Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on \acs{DukeMTMC}, to report model performance across varying input image sizes. The results from the scale 1.0 column are identical to the results from Table \ref{tab:duke_all_models}, as it is the same test, and they are used for comparison. 
 
 \begin{table}[H]
 \centering
@@ -258,15 +258,12 @@ Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on
 \label{tab:scale_test}
 \end{table}
 
-\noindent Inspecting the result of the \acs{OOD} scale test, all metrics increase with the scale reduction of 0.75 compared to the unmodified images. 
-\\\\
-
+\noindent When inspecting the results, it becomes evident that all metrics increase with the scale reduction of 0.75 compared to the unmodified images of scale 1.0. The \hyperlink{model:endtoend}{End-to-end} model again achieves the highest performance, with a \acs{mAP} of x\% and Rank-1 of x\%. The \hyperlink{model:baseline}{Baseline} model has a \acs{mAP} of 14.77\% and a Rank-1 of 29.98\%, while the \hyperlink{model:augmented}{Augmented} model continuously achieves roughly half of those results. The \hyperlink{model:sequential}{Sequential} model has the lowest performance out of all the models, with the highest performance being a \acs{mAP} of 3.38\% and Rank-1 of 8.17\% on scale 0.5. The three other models' performance drop on scale 0.5 compared to scale 0.75, but are still higher than the performance on full sized images. 
 
 
 \subsection*{Out-of-Distribution Compression Test}
 
-The compression test show a clear drop in performance with reduction of quality, except in Rank-5 accuracy for quality 50 and in Rank-20 for quality 25, this is although small differences. This is not seen as meaningful improvement but as fluctuations. Overall, the decrease in accuracy remains modest, yet it indicates that the model is sensitive to compression, particularly at very low quality level.
-
+Table \ref{tab:compression_test_all} presents the results from the \acs{OOD} compression test on \acs{DukeMTMC}, to report model performance across varying quality in input images. The results from the \textit{Q = 100} column are identical to the results from Table \ref{tab:duke_all_models}, as it is the same test, and they are used for comparison. 
 
 \begin{table}[H]
 \centering
@@ -307,12 +304,10 @@ The compression test show a clear drop in performance with reduction of quality,
 \hline
 \end{tabular}
 \caption{Comparison of OSNet variants on DukeMTMC-ReID under varying compression levels. Metrics shown: \acs{mAP} and Rank-1.}
-\label{tab:compression_levels_clean}
+\label{tab:compression_test_all}
 \end{table}
 
-
-
-\noindent The robust model had very similar performance across all compression strengths. The performance is overall very poor, and having such low results makes it difficult to draw meaningful conclusions when comparing across compression strengths. Comparing the performance to that of the baseline model, a clear drop is visible. This indicates that training the model with strong augmentations led to a decrease in what the model learned, instead of an increase in robustness.
+\noindent The performance for all model configurations steadily drops when decreasing the quality of the input images. The \hyperlink{model:endtoend}{End-to-end} model consistently achieves the highest performance across all compression levels, while the \hyperlink{model:sequential}{Sequential} model attains the lowest results. 
 
 
 \subsection*{Out-of-Distribution Test on iLIDS-VID}
@@ -336,12 +331,13 @@ Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \
 \label{tab:ilidsvid_all_models}
 \end{table}
 
-\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are similar or better than those observed on \acs{DukeMTMC} for all model configurations. The \hyperlink{x}{x} model achieves the highest Rank-1 of x\%. 
+\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are better than those observed on \acs{DukeMTMC} for all model configurations except the \hyperlink{model:baseline}{Baseline} model with a Rank-1 of 10\%, resulting in a difference of 0.5\% below the Rank-1 on \acs{DukeMTMC}. The \hyperlink{x}{x} model achieves the highest Rank-1 of x\%. 
 
 
 \subsection{Summary of Results}
 
-
+- tabel over hvilken model der havde bedste resultater i hver test.
+- overblik over hvilke hypoteser/req der blev opfyldt?
 
 
 
