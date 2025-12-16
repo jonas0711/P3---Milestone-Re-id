@@ -1,11 +1,12 @@
 \chapter{Discussion} \label{cha: discussion}
+This chapter discusses the results presented in chapter \ref{cha: experiments and results} and the 
 
 \section{Data}
-In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This highlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, CUHK03, and MSMT17 datasets are all recorded at different universities in different regions of China, while the DukeMTMC-ReID dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The \acs{iLIDS-VIDS} dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
+In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This highlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, CUHK03, and \acs{MSMT17} datasets are all recorded at different universities in different regions of China, while the \acs{DukeMTMC} dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The \acs{iLIDS-VID} dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
 \\\\
-The data was split so that the models were trained on the Market-1501, MSMT17, and CUHK03 datasets, and final testing was performed on the \acs{iLIDS-VID} and DukeMTMC-ReID datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch likely impacts performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
+The data was split so that the models were trained on the Market-1501, \acs{MSMT17}, and CUHK03 datasets, and final testing was performed on the \acs{iLIDS-VID} and \acs{DukeMTMC} datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch likely impacts performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
 \\\\
-Furthermore, the datasets are not balanced in size. For example the MSMT17 dataset contains almost three times more identities and nearly ten times more images than CUHK03, which may cause the model to overfit to the dominant dataset and under-represent features from the smaller datasets. In future work, a more structured training strategy could be explored, such as training on each dataset separately, balancing datasets in each batch, or incorporating datasets with diverse cultural, environmental and geographical conditions during training, to improve cross-domain generalization and fairness. 
+Furthermore, the datasets are not balanced in size. For example the \acs{MSMT17} dataset contains almost three times more identities and nearly ten times more images than CUHK03, which may cause the model to overfit to the dominant dataset and under-represent features from the smaller datasets. In future work, a more structured training strategy could be explored, such as training on each dataset separately, balancing datasets in each batch, or incorporating datasets with diverse cultural, environmental and geographical conditions during training, to improve cross-domain generalization and fairness. 
 \\\\
 Finally it is important to note that the datasets represent relative controlled environments, with no cases of extreme weather, very low-light conditions, or highly crowded events, which are expected to appear in real-world surveillance footage. 
 
@@ -27,7 +28,8 @@ Data-augmentation is applied to improve model generalizability, by introducing d
 Despite this, if all the augmentations happened to be applied heavily to a single image, quality may degrade to a point where it is too difficult for the model to extract meaningful features. This highlights the importance of balancing data augmentation, so realism is preserved without compromising the visual information. During implementation, the Python \texttt{random} library was used to apply random transformations. However, it would have been more appropriate to use PyTorch's own random functions, as they share the same seeding used throughout the framework, and are compatible with GPU training. This ensures better reproducibility and consistency across experiments, especially when using multiple workers and different hardware setups. 
 
 \subsubsection{OOD Dataset}
-The \acs{OOD} dataset consists of different augmented versions of the DukeMTMC-Reid dataset, and the \acs{iLIDS-VID} dataset. It fulfills the purpose of showing the model's performance on unseen data, outside of its distribution. An argument for using \acs{ilIDS-VID} during training, instead of testing, could be made, as adding a completely different environment could decrease the model's specialization to Chinese campus environments. However, this was not chosen in this project, as the \acs{iLIDS-VID} data is small, and therefore more suitable for evaluation purposes.
+The \acs{OOD} dataset consists of different augmented versions of the \acs{DukeMTMC} dataset, and the \acs{iLIDS-VID} dataset. It fulfills the purpose of showing the model's performance on unseen data, outside of its distribution. An argument for using \acs{iLIDS-VID} during training, instead of testing, could be made, as adding a completely different environment could decrease the model's specialization to Chinese campus environments. However, this was not chosen in this project, as the \acs{iLIDS-VID} data is small, and therefore more suitable for evaluation purposes.  
+
 
 \section{Experiments}
 - Hvordan kan OSNet træne deres model med en learningrate på 0.065 når vi ikke engang kunne på 0.032? 
@@ -35,6 +37,11 @@ The \acs{OOD} dataset consists of different augmented versions of the DukeMTMC-R
 - Hvorfor er det bedre at træne End-to-end?
 
 \section{Results}
+
+\subsection{OOD Scale Test}
+
+The results show an increase in performance on scale 0.75 which is unexpected. However, this is assumed to be caused by the presence of differently sized images in the new dataset compared to those used during training. Since the model is trained with a maximum image size of \textit{128×64}, it is not fully equipped to handle the larger or differently scaled images. Performance drop again across all metrics when testing on scale 0.5, however the results are still higher than those from the full-sized images. 
+
 
 \subsection{OSNet}
 Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? (nemmere kode, nødvendigt grundet deadline)
@@ -87,37 +94,37 @@ As the system handles potentially sensitive data, it is important to ensure data
 
 %- The gap between training data and deployment environments should be addressed in future works. 
 
-This project addresses the problem statement of designing a proof of concept system person \ac{ReID} system improved through \ac{SR} Integration. The results demonstrates ? ***** 
+This project addresses the problem statement of designing a proof of concept system person \acs{ReID} system improved through \acs{SR} Integration. The results demonstrates ? ***** 
 
 %Dataset
-%Flere forskellige kulturer, religoner i træning for at undgå bias. 
-%Evt selv lave et dataset
-%Dataset med udfordrende vejr. eller lav belysning
+% X Flere forskellige kulturer, religoner i træning for at undgå bias. 
+% X Evt selv lave et dataset
+% X Dataset med udfordrende vejr. eller lav belysning
 \subsubsection{Dataset improvements}
 The training datasets used in this project is primarily consists of ** vi ved det ikke helt **  Chinese and American university campus environments, which introduces cultural, geographical,, and environmental bias. Future work should incorporate datasets with diverse populations, clothing styles and demographics representations to ensure fair and robust performance across different deployment contexts. Additionally, datasets capturing challenging real-world scenarios such as extreme weather, heavy rain, fog, and very low-light scenarios should be included to better prepare the model for actual surveillance conditions. Finally, creating a custom dataset specifically designed to match the target deployment environment would allow for more accurate evaluation of system performance under realistic conditions.
 
 
 %SR forbedringer
-%Implementere auxiliary loss i End-to-end training så SR også optimeres på reconstruction quality
-%Fokus på at SR forbedre specifikke tøj detaljer 
-%Undersøg multi scale SR Der tager forskellige input resolutions
+% X Implementere auxiliary loss i End-to-end training så SR også optimeres på reconstruction quality
+% X Fokus på at SR forbedre specifikke tøj detaljer 
+% X Undersøg multi scale SR Der tager forskellige input resolutions
 \subsubsection{Super-Resolution Enhancements}
-The \ac{SR} module could be improved through several approaches. Implementing an auxiliary loss during End-to-end training would allow the SR module to optimize for both reconstruction quality and \ac{ReID} performance at the same time, rather then only learning from only learning from the \ac{ReID} loss. The \ac{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
+The \acs{SR} module could be improved through several approaches. Implementing an auxiliary loss during End-to-end training would allow the SR module to optimize for both reconstruction quality and \acs{ReID} performance at the same time, rather then only learning from only learning from the \acs{ReID} loss. The \acs{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather then generic image enhancement.  Furthermore, developing a multi-scale SR approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances which are essential for real-world surveillance scenarios. 
 
 
 
 %ReID forbedringer
 \subsubsection{Re-Identification Enhancements}
-The ReID module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person ReID. Investigating different freezing strategies during End-to-end training, such as trying unfreezing layers or trying different learning rates for SR or Reid modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
+The \acs{ReID} module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person \acs{ReID}. Investigating different freezing strategies during End-to-end training, such as trying unfreezing layers or trying different learning rates for \acs{SR} or \acs{ReID} modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
 
 
-%Sammenligne loss functions ?? Har vi skrevet om det før ?
-%Undersøge forskellige freezing strategier i jont train.
-%Systematisk hyperparemeter tuning
+% X Sammenligne loss functions ?? Har vi skrevet om det før ?
+% X Undersøge forskellige freezing strategier i jont train.
+% X ystematisk hyperparemeter tuning
 
-%Deployment
+
 \subsubsection{Deployment and System Integration}
-For practical deployment, several improvements are necessary . The pipeline should be optimized for real-time inference to enable immediate processing of surveillance footage during active investigations **MAybe not** . Exploring edge deployment options would allow the system to run on local hardware, reducing latency and dependency on network connectivity. A comprehensive logging system should be implemented to track when and by whom the system is accessed, supporting transparency and accountability in accordance with ethical guidelines. Establishing a feedback loop from practical use would enable continuous improvement based on real-world performance and user needs. Finally, implementing end-to-end encryption for both data storage and transmission is essential to protect the sensative personal data processed by the system 
+For practical deployment, several improvements are necessary . The pipeline should be optimized for real-time inference to enable immediate processing of surveillance footage during active investigations **Maybe not** . Exploring edge deployment options would allow the system to run on local hardware, reducing latency and dependency on network connectivity. A comprehensive logging system should be implemented to track when and by whom the system is accessed, supporting transparency and accountability in accordance with ethical guidelines. Establishing a feedback loop from practical use would enable continuous improvement based on real-world performance and user needs. Finally, implementing end-to-end encryption for both data storage and transmission is essential to protect the sensitive personal data processed by the system 
 
 %Real-time inference 
 %Edge deployment

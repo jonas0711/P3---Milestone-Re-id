@@ -130,26 +130,25 @@ Because it is a Cumulative Metric, it will count a query as a success if the cor
 \subsection{Training Strategy}\label{trainingstragegyreid}
 The \acs{ReID} module will be trained on a combination of Market-1501 \cite{CVATM1501}, MSMT17 \cite{wei2018person} and CUHK03 \cite{KaggleCUHK03}, providing 2,355 unique identities across diverse surveillance conditions. This multi-dataset training approach is chosen to ensure that the model learns generalizable features rather than dataset-specific patterns. Each dataset contributes with distinct characteristics: Market-1501 provides realistic detector noise in the form of distractors, CUHK03 emphasizes controlled cross-camera matching scenarios, and MSMT17 contributes with 15 cameras across indoor and outdoor scenes, captured at different times of day.
 
-\subsection{Combined dataset}
-Many considerations must be taken into consideration when making a \acs{ReID} dataset, especially when combining multiple datasets. Most important is, that overlapping person identities and inconsistent ID indexing must be avoided. To prevent any person-id conflicts, in cases where the same person-id appears in multiple datasets, and to ensure continues ID-values, a \texttt{JSON} file with mappings was created. 
+\subsection{Combined Dataset}\label{combineddataset}
+Constructing a person \acs{ReID} dataset requires careful handling of identity labels, particularly when combining multiple datasets. The primary challenges are avoiding overlapping person identities and ensuring consistent person-ID indexing across datasets.
 \\\\
-This maps the old ID, with a dataset specific prefix in front, to a new continues value, e.g. "10023":56. It ensures that all person-ID's remain unique across datasets, while preserving an unique person-ID for each person and introducing continues values usable for cross-entropy loss. 
+To prevent person-ID conflicts and to guarantee continuous ID values, a \texttt{JSON} mapping file is created during dataset construction. Each original person-ID is first augmented with a dataset-specific prefix and then mapped to a new, continuous global identity index, e.g. \texttt{"10023": 56}. This procedure ensures that all identities remain unique across datasets while preserving a single, consistent person-ID per individual. The resulting continuous ID values are directly compatible with cross-entropy-based classification losses.
 \\\\
-During the process of creating the \texttt{JSON} file, every 10th new person-ID is pulled into the validation set. In total 238 identities are added to the validation set, leaving 2117 identities in the training set. The decision to include every 10th person-ID in the validation set was made to ensure that the evaluation is performed on a sufficiently large and diverse set of images. The validation set are made of person-IDs to validate the models ability to identify new people. This ensures that the same people are not to find in both training and validation set.
+During the creation of the mapping file, every tenth newly assigned person-ID is reserved for the validation set. This results in 238 validation identities, while the remaining 2,117 identities are used for training. Selecting identities, rather than individual images, for validation ensures that the model is evaluated on previously unseen persons, which aligns with the open-set nature of person \acs{ReID}. The decision to include every tenth identity further guarantees that the validation set contains a sufficiently large and diverse collection of images for reliable evaluation.
 \\\\
-During training the model needs the image and the person-ID, while camera-ID is used for validation and test as well. 
-
-The three datasets is structured in different ways, making the way 
-The three different datasets are first loaded separate, and then concatenated using \texttt{ConcatDataset} from \texttt{torch.utils.data}. The only different in making the three datasets are in the way person-id and camera-id is extracted.
-
-In each validation identity, one sample per person-ID is added to the query set. The remaining samples are categorized for the gallery set: Any sample that does not match both the person-ID and camera-ID of the query sample is added to the gallery, with is standard \acs{ReID} evaluation protocol.
-
+For training, each data sample consists of an image and its corresponding person-ID. Camera-ID information is not required during training, but it is used during validation and testing to support standard \acs{ReID} evaluation protocols.
+\\\\
+The three datasets: Market-1501, \acs{MSMT17}, and \acs{CUHK03}, differ in directory structure and filename conventions. Therefore, each dataset is first loaded separately using a dataset-specific parsing routine. These routines iterate over all image files within the dataset directories and extract the person-ID and camera-ID by matching predefined filename patterns. Each image sample is ultimately represented by three attributes: the image path, the person-ID, and the camera-ID.
+\\\\
+A common evaluation protocol for person \acs{ReID} follows a query–gallery retrieval setup. This is already implemented in the existing test sets, but needs to be implemented for the validation identities. For validation, one image per validation identity is randomly selected and placed in the query set. The remaining images are assigned to the gallery set, excluding samples that share both the same person-ID and camera-ID as the query image. This setup follows standard person \acs{ReID} evaluation practice and ensures a fair and realistic retrieval scenario.
+\\\\
+Once processed individually, the three training datasets are merged into a single unified dataset using \texttt{ConcatDataset} from \texttt{torch.utils.data}. This enables seamless training across all datasets while preserving consistent person-ID and camera-ID labeling. The same merging strategy is applied to the query and gallery sets during validation, whereas the test sets are kept separate to allow dataset-specific evaluation.
 
 \subsection{Testing Strategy}\label{Reidteststrategy}
 Evaluation will follow a two stage approach: In distribution testing on MSMT17, Market-1501, and CUHK03 to establish a baseline performance on known datasets. \acf{OOD} testing, which is the primary focus, using two datasets. DukeMTMC-ReID \cite{Gou2017DukeMTMC4ReID} will serve as a same domain \acs{OOD} test with outdoor university surveillance, similar to the content of the training datasets, but with a new demographic and environment. \acs{iLIDS-VID} \cite{wang2014person} will provide a cross domain test with indoor airport footage, evaluating whether the model learned truly discriminative features or over-fitted to outdoor characteristics. Beyond dataset shifts, controlled degradations are applied to DukeMTMC-ReID to simulate realistic surveillance challenges where persons appear at varying distances or footage is compressed for storage, directly testing the projects core hypothesis that \acs{SR} can reduce resolution degradation effects on \acs{ReID} performance. 
 
 \subsection{Dataaugmentation} \label{sec: dataaugmentation}
-
 To support the objective of the testing strategy, a data augmentation strategy is applied to expose the model to controlled variations in image quality, lighting, scale, and appearance. This allows for direct comparison between a baseline version of \acs{OSNet} and an augmented version of \acs{OSNet}, assessing whether augmentations improve generalization under the testing conditions described in Section \ref{Reidteststrategy}. The different types of augmentations and their purpose is included in Table \ref{tab:augmentationtypes}.
 
 \begin{table}[H]
@@ -206,14 +205,14 @@ To support the objective of the testing strategy, a data augmentation strategy i
 \end{table}
 
 \subsection{Key Takeaways}
-From the previous sections, several key design decisions have been made. These include the selection of \acs{ReID} architecture (OSNet), the choice of loss function (Multiclass Cross-Entropy Loss) and the evaluation metrics (Rank-\textit{k} and \acs{mAP}). In addition, the training and test strategy were defined as: training across three datasets, while testing both in-distribution and \acs{OOD} to asses the models' robustness under different surveillance conditions.
+From the previous sections, several key design decisions have been made. These include the selection of \acs{ReID} architecture (OSNet), the choice of loss function (Multiclass Cross-Entropy Loss) and the evaluation metrics (Rank-\textit{k} and \acs{mAP}). In addition, the training and test strategy were defined as: training across three datasets, while testing both \acf{InD} and \acs{OOD} to asses the models' robustness under different surveillance conditions.
 Finally, two different versions of the \acs{ReID} module, baseline and augmented, were introduced to assess the hypothesis regarding whether data augmentation can improve generalization and feature robustness.
 
 \section{SR Module}\label{sec:designSRmodule}
 This section presents the chosen \acs{SR} architecture, as well as the training strategy using the two \acs{SR} datasets presented in Section \ref{sec: superresdata}. Based on the technical analysis of the perception-distortion trade of in the \acs{SR} domain presented in \ref{subsec:perception-distortion-tradeoff}, a low distortion model is considered more suitable for integration with \acs{ReID}, as it reduces the risk for introduction of \acs{SR} artifacts.
 
 \subsection{EDSR}
-\acf{EDSR} is a \acs{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}.
+\acf{EDSR} is a \acf{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}.
 \\\\
 The architecture consists of a convolutional layer, a deep stack of residual blocks and an upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, the internal flow of each resblock is illustrated in Figure \ref{fig:resblockpipeline}, and the process inside the final upsample block can be seen in Figure \ref{fig:upsampleblockpipeline}. 
 \begin{figure} [H]
@@ -223,7 +222,7 @@ The architecture consists of a convolutional layer, a deep stack of residual blo
     \label{fig:edsrpipeline}
 \end{figure}
 
-\noindent Similar to the \acs{ResNet} architecture, \ac{EDSR} has multiple skip connections enabling the training of deeper networks without suffering from vanishing gradient. These skip connections also improve feature refinement by allowing the network to focus on learning the residual improvements to the input, rather than storing the entire input in memory. In total \ac{EDSR} has two types skip-connections, one in each of the resblocks, see Figure \ref{fig:resblockpipeline} and one, from the first convolutional layer adding just before the upsampling block, see Figure \ref{fig:edsrpipeline}.
+\noindent Similar to the \acs{ResNet} architecture, \acs{EDSR} has multiple skip connections enabling the training of deeper networks without suffering from vanishing gradient. These skip connections also improve feature refinement by allowing the network to focus on learning the residual improvements to the input, rather than storing the entire input in memory. In total \ac{EDSR} has two types skip-connections, one in each of the resblocks, see Figure \ref{fig:resblockpipeline} and one, from the first convolutional layer adding just before the upsampling block, see Figure \ref{fig:edsrpipeline}.
 
 \begin{figure} [H]
     \centering
@@ -245,7 +244,7 @@ The architecture consists of a convolutional layer, a deep stack of residual blo
 \noindent As shown in Figure \ref{fig:edsrpipeline}, the upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. In Figure \ref{fig:upsampleblockpipeline}, the pipeline of the upsampling module is visualized. It uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2} and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output \cite{shi2016subpixel_arxiv}. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods. %**Kilde Eller er det nok den er længere oppe?**
 
 \subsection{Loss Function}\label{sec:srloss}
-For the training of the \acs{SR} module, \acf{MAE}, also called \acf{L1}, was used as the training objective. \acs{MAE} was chosen over mean squared error (\acf{MSE}), or \acf{L2}, because it produces sharper reconstructions and is less sensitive to outliers in the training data \cite{lossfunctiongeek}.
+For the training of the \acs{SR} module, \acf{MAE}, also called \acf{L1}, was used as the training objective. \acs{MAE} was chosen over mean squared error (\acf{MSE}), or L2 Loss, because it produces sharper reconstructions and is less sensitive to outliers in the training data \cite{lossfunctiongeek}.
 
 \subsection{Evaluation Metric}
 This section presents the evaluation metrics used for the \acs{SR} module. The primary metric is \acf{PSNR}, supported by \acf{SSIM}. Both measure distortion and fit the chosen low-distortion \acs{SR} strategy, which aims to avoid hallucinated details and artifacts that could hurt downstream \acs{ReID} performance \cite{Blau2018PerceptionDistortion}.
@@ -254,7 +253,7 @@ This section presents the evaluation metrics used for the \acs{SR} module. The p
 \acs{PSNR} measures the pixel-wise difference between the super-resolved output and the reference \acs{HR} image, derived from the mean squared error (MSE). A higher \acs{PSNR} means lower distortion and more accurate reconstruction. For \acs{ReID}, the goal is to keep real discriminative details and avoid adding fake ones. \acs{PSNR} is therefore the primary model-selection criterion (best checkpoint chosen by highest validation \acs{PSNR}) to prioritize pixel accuracy over perceptual effects that could create false details \cite{lim2017edsr}.
 
 \subsubsection*{SSIM}
-\acs{SSIM} measures structural similarity (luminance, contrast, structure) between reference and output \cite{Wang2004SSIM}. Values close to 1 mean structures are well preserved. \acs{SSIM} is reported with \acs{PSNR} to check that edges and textures—critical for \acs{ReID} embeddings—remain intact. Using both \acs{PSNR} and \acs{SSIM} reflects the low-distortion strategy and reduces the risk of hallucinations and artifacts that could harm \acs{ReID} discrimination \cite{Blau2018PerceptionDistortion}.
+\acs{SSIM} measures structural similarity (luminance, contrast, structure) between reference and output \cite{Wang2004SSIM}. Values close to 1 mean structures are well preserved. \acs{SSIM} is reported with \acs{PSNR} to check that edges and textures critical for \acs{ReID} embeddings remain intact. Using both \acs{PSNR} and \acs{SSIM} reflects the low-distortion strategy and reduces the risk of hallucinations and artifacts that could harm \acs{ReID} discrimination \cite{Blau2018PerceptionDistortion}.
 
 
 \subsection{Training and Validation Strategy}\label{SRtrainingdata}
@@ -292,18 +291,17 @@ The purpose of integrating a \acs{SR} module into the \acs{ReID} pipeline is to 
 \section{Model Setups} \label{sec:model_definitions} \label{combinednetworks}
 In order to validate the hypotheses defined in Section \ref{sec:hypotheses}, three experiments will be conducted. For the purpose of these experiments, four model's will be implemented in Chapter \ref{cha: implementation}. The \hyperlink{model:baseline}{first model} will serve as a baseline for comparison. The \hyperlink{model:augmented}{second model} will be used to validate \hyperlink{hypothesis:1}{\textit{hypothesis 1}}. The \hyperlink{model:sequential}{third} and \hyperlink{model:endtoend}{fourth} models will be used to validate \hyperlink{hypothesis:2}{\textit{hypothesis 2}} at two different integration levels. Each model is defined as follows:
 
-\subsection*{\hypertarget{model:baseline}{Baseline} Model}
+\subsubsection*{\hypertarget{model:baseline}{Baseline} Model}
 Baseline model of \acs{OSNet} trained from scratch using the light augmentations pipeline from Table \ref{tab:three_subtables}.
 
-\subsection*{\hypertarget{model:augmented}{Augmented} Model}
+\subsubsection*{\hypertarget{model:augmented}{Augmented} Model}
 Augmented model of \acs{OSNet} trained from scratch using the strong augmentation pipeline from Table \ref{tab:three_subtables}.
 
-\subsection*{\hypertarget{model:sequential}{Sequential} Model}
+\subsubsection*{\hypertarget{model:sequential}{Sequential} Model}
 Pretrained baseline model of \acs{OSNet} in sequential combination with pretrained \acs{EDSR}. Sequential is defined as the two modules (\acs{SR} and \acs{ReID}) being combined without further training.
 
-\subsection*{\hypertarget{model:endtoend}{End-to-end} Model}
+\subsubsection*{\hypertarget{model:endtoend}{End-to-end} Model}
 Pretrained baseline model of \acs{OSNet} trained end-to-end with pretrained \acs{EDSR}, using the strong augmentation pipeline from Table \ref{tab:three_subtables}. End-to-end is defined as the modules being combined, such that losses from the \acs{ReID} module back-propagate into the \acs{SR} module.
-
 
 \subsection{Summary}
 This section outlined the methods which will be implemented in this project to validate the two hypotheses presented in Section \ref{sec:hypotheses}: 
@@ -312,7 +310,7 @@ This section outlined the methods which will be implemented in this project to v
 \\\\
 \acs{OSNet} is chosen as the \acs{ReID} architecture and \acs{EDSR} is chosen as the \acs{SR} architecture. These two architectures will be used to create four different model variations, that will be compared against each other. The comparison will be based on two test types, in-distribution and out-of-distribution, as described in section \ref{Reidteststrategy}. Table \ref{tab:dataset_summary} presents the datasets selected for each test type, note that the \acs{InD} datasets are the ones used in the combined dataset.  
 
-\begin{table}[Ht]
+\begin{table}[H]
 \centering
 \begin{tabular}{|
     >{\centering\arraybackslash}p{0.16\linewidth} |
@@ -335,7 +333,7 @@ iLIDS-VID & United Kingdom & 600 & 300 & 2 & \acs{OOD} \\ \hline
 \label{tab:dataset_summary}
 \end{table}
 
-The four models which will be implemented are summarized in Table \ref{tab:model_overview}.
+\noindent The four models which will be implemented are summarized in Table \ref{tab:model_overview}.
 
 \begin{table}[H]
 \centering

@@ -1,5 +1,5 @@
 \chapter{Experiments and Results} \label{cha: experiments and results}
- This chapter presents the experiments conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}} and \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} defined in Section \ref{sec:hypotheses}. The objective is to determine whether incorporating an \acs{SR} module improves the robustness of a person \acs{ReID} module under \acs{OOD} conditions. To support this evaluation, this chapter first presents an independent assessment of the chosen \acs{SR} model, followed by four experimental configurations: The \hyperlink{Baseline}{Baseline} model, the \hyperlink{Augmented}{Augmented} model, the \hyperlink{Sequential}{Sequential} model, and the \hyperlink{End-to-end}{End-to-end} model. The results from these experiments are presented and briefly discussed. 
+ This chapter presents the experiments conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}} and \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} defined in Section \ref{sec:hypotheses}. The objective is to determine whether incorporating an \acs{SR} module improves the robustness of a person \acs{ReID} module under \acs{OOD} conditions. To support this evaluation, this chapter first presents an independent assessment of the chosen \acs{SR} model, followed by the four models defined in Section \ref{sec:model_definitions}: The \hyperlink{Baseline}{Baseline} model, the \hyperlink{Augmented}{Augmented} model, the \hyperlink{Sequential}{Sequential} model, and the \hyperlink{End-to-end}{End-to-end} model. The results from these experiments are presented and briefly discussed. 
 
 \section{SR Experiments} \label{sec: srexperiments}
 Before integrating \acs{SR} into the \acs{ReID} pipeline, the selected \acs{SR} architecture is evaluated independently to verify that it provides meaningful improvements over simple interpolation methods. This section presents the evaluation results and a direct comparison between \acs{EDSR} and bicubic interpolation.
@@ -123,7 +123,7 @@ Before incorporating the \acs{SR} module, the effect of applying strong data aug
 
 \subsection{Experiment One: Augmented Model} \label{sec: baselineosnet}
 
-This experiment was conducted to evaluate \hyperlink{Hypothesis 1}{Hypothesis 1}, which states that training a person \acs{ReID} module on augmented data will improve robustness under \acs{OOD} conditions.  
+This experiment was conducted to evaluate \hyperlink{Hypothesis 1}{\textit{Hypothesis 1}}, which states that training a person \acs{ReID} module on augmented data will improve robustness under \acs{OOD} conditions.  
 \\\\
 Two models were compared: the \hyperlink{Baseline}{Baseline} model and the \hyperlink{Augmented}{Augmented} model. Both models share the same architecture, training datasets, and training procedure, ensuring that the applied augmentation strategy is the only variable that can affect performance. Evaluations were conducted using the \acs{OOD} test as described in Section \ref{sec: oodtestny}. 
 \\\\
@@ -132,7 +132,7 @@ This experiment establishes whether robustness to \acs{OOD} conditions can be ac
 
 \subsection{Experiment Two: \acs{EDSR} and Baseline Combined} \label{sec: sr+baseline}
 
-This experiment was conducted to evaluate \hyperlink{Hypothesis 2}{Hypothesis 2}, by investigating if adding \acs{EDSR} as a preprocessing step improves \acs{ReID} performance under \acs{OOD} conditions. 
+This experiment was conducted to evaluate \hyperlink{Hypothesis 2}{\textit{Hypothesis 2}}, by investigating if adding \acs{EDSR} as a preprocessing step improves \acs{ReID} performance under \acs{OOD} conditions. 
 \\\\
 Two model configurations were compared: the \hyperlink{Baseline}{Baseline} model and a sequentially combined \acs{EDSR} and \hyperlink{Baseline}{Baseline} model, where images are first preprocessed by the \acs{SR} module and subsequently passed to the \acs{ReID} module. The \acs{ReID} model architecture, training data, and training strategies remained identical to the ones used in the \hyperlink{Baseline}{Baseline} model configuration.
 \\\\
@@ -143,16 +143,16 @@ In this setup, with the \acs{EDSR} and \hyperlink{Baseline}{Baseline} modules co
 
 This experiment was conducted to further evaluate \hyperlink{Hypothesis 2}{Hypothesis 2} by assessing if joint end-to-end training of the \acs{SR} and \acs{ReID} module improves robustness under \acs{OOD} conditions.
 \\\\
-The \hyperlink{End-to-end}{End-to-end} model is compared against the \hyperlink{Sequential}{Sequential} model. Both configurations used the same \acs{EDSR} and \hyperlink{Baseline}{Baseline} model, with the only difference being the training strategy of the configurations. Where the \hyperlink{Sequential}{Sequential} model was combined, the \hyperlink{End-to-end}{End-to-end} model trained the \acs{EDSR} and \hyperlink{Baseline}{Baseline} models jointly, allowing the \acs{SR} module to adapt specifically to the \acs{ReID} task.
+The \hyperlink{End-to-end}{End-to-end} model is compared against the \hyperlink{Sequential}{Sequential} model. Both configurations used the same \acs{EDSR} and \hyperlink{Baseline}{Baseline} model, with the only difference being the training strategy of the configurations. Where the \hyperlink{Sequential}{Sequential} model was combined, the \hyperlink{model:endtoend}{End-to-end} model trained the \acs{EDSR} and \hyperlink{model:baseline}{Baseline} models jointly, allowing the \acs{SR} module to adapt specifically to the \acs{ReID} task.
 \\\\
 By keeping the other factors constant, this experiment isolated the effect of joint end-to-end training compared to sequential integration. 
 
 
 \section{Results}
-This section presents the results of the conducted tests.
+This section presents the results of the conducted experiments. 
 
 \subsection{In-Distribution Performance}
-Table \ref{tab:reid_indist} presents the in-distribution performance of all model configurations on the \acs{MSMT17}, Market-1501, and CUHK03 datasets.
+Table \ref{tab:reid_indist} presents the \acs{InD} performance of all model configurations on the \acs{MSMT17}, Market-1501, and \acs{CUHK03} datasets, to establish a baseline performance on known datasets.
 
 \begin{table}[H]
     \centering
@@ -163,19 +163,17 @@ Table \ref{tab:reid_indist} presents the in-distribution performance of all mode
          & \multicolumn{2}{c|}{\textbf{Market-1501}} 
          & \multicolumn{2}{c|}{\textbf{CUHK03}} \\\hline
         \rowcolor[HTML]{D8E9F7}
-         & mAP & Rank-1 & mAP & Rank-1 & mAP & Rank-1 \\\hline
+         & \acs{mAP} & Rank-1 & \acs{mAP} & Rank-1 & \acs{mAP} & Rank-1 \\\hline
          \textbf{Baseline} 
-         & 0.51\% & 1.72\% 
-         & \textcolor{red}{29.16\%} & \textcolor{red}{50.53\%} 
-         & \textcolor{red}{2.68\%} & \textcolor{red}{2.64\%} \\\hline
+         & 3.75\% & 13.29\% 
+         & \textcolor{red}{73.25\%} & \textcolor{red}{88.51\%} 
+         & \textcolor{red}{9.93\%} & \textcolor{red}{15.07\%} \\\hline
          \textbf{Augmented} 
-         & 0.39\% & 1.24\% 
-         & 16.23\% & 30.64\% 
-         & 0.93\% & 0.43\% \\\hline
+         & 0.66\% & 2.58\% 
+         & 42.98\% & 66.66\%& 1.72\% & 1.57\% \\\hline
          \textbf{Sequential} 
-         & 0.62\% & 0.92\% 
-         & 25.86\% & 50.48\% 
-         & 0.85\% & 0.78\% \\\hline
+         & 0.62\% & 1.92\%& 25.86\% & 50.48\% 
+         & 0.85\% & 0.79\%\\\hline
          \textbf{End-to-end} 
          & \textcolor{red}{0.78\%} & \textcolor{red}{2.48\%} 
          & 28.04\% & 49.19\% 
@@ -185,8 +183,17 @@ Table \ref{tab:reid_indist} presents the in-distribution performance of all mode
     \label{tab:reid_indist}
 \end{table}
 
+\noindent On Market-1501 the \hyperlink{model:baseline}{Baseline} model achieves the highest performance, with a \acs{mAP} of 73.25\% and Rank-1 of 88.51\%. The \hyperlink{model:augmented}{Augmented} model showed reduced performance compared to the \hyperlink{model:baseline}{Baseline} model. -skriv færdig når end-to-end resultater kommer. 
+\\\\
+On \acs{CUHK03}, the \hyperlink{model:baseline}{Baseline} model again achieves the highest \acs{mAP} of 9.93\% and Rank-1 of 15.07\%. The three other model configurations show lower performance, with the \hyperlink{model:augmented}{Augmented} and \hyperlink{model:sequential}{Sequential} models exhibiting particularly low accuracy. 
+\\\\
+However, on \acs{MSMT17} the performance is notable lower for all model configurations. The \hyperlink{model:endtoend}{End-to-end} model achieves the highest performance among the other three models, with a \acs{mAP} of [placeholder]\% and Rank-1 of [placeholder]\%. 
+\\\\
+Overall, the \hyperlink{model:baseline}{Baseline} model demonstrates strong performance on the \acs{InD} test. 
+
 \subsection*{Out-of-Distribution Test on DukeMTMC-ReID}
-The baseline model has a \acf{mAP} of 2.83\% and Rank-1 of 6.1\% on the test with the unmodified images from \acs{DukeMTMC}. Compared to the validation results, this performance is substantially lower. However, a drop in performance is not unexpected given the domain shift introduced by the new dataset. 
+
+Table \ref{tab:duke_all_models} presents the results from the \acs{OOD} test on \acs{DukeMTMC}.
 
 \begin{table}[H]
 \centering
@@ -196,22 +203,22 @@ The baseline model has a \acf{mAP} of 2.83\% and Rank-1 of 6.1\% on the test wit
 \hline
 \multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on DukeMTMC-ReID}} \\ \hline
 \rowcolor[HTML]{D8E9F7}
-& \textbf{mAP} & \textbf{Rank-1} \\ \hline
+& \textbf{\acs{mAP}}& \textbf{Rank-1} \\ \hline
 \textbf{Baseline}   & 10.05\%& 22.75\%
 \\ \hline
 \textbf{Augmented}  & 4.76\%& 10.32\%\\ \hline
-\textbf{Sequential} & 1.05\% & 2.15\% \\ \hline
+\textbf{Sequential} & 1.46\%& 3.68\%\\ \hline
 \textbf{End-to-end}      & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} \\ \hline
 \end{tabular}
 \caption{Comparison of all \acs{OSNet} configurations on the DukeMTMC-ReID dataset.}
 \label{tab:duke_all_models}
 \end{table}
 
+\noindent The \hyperlink{model:endtoend}{End-to-end} model achieves the highest performance among all the model configurations, with a \acs{mAP} of x\% and Rank-1 of x\%. The \hyperlink{model:baseline}{Baseline} model has a \acs{mAP} of 10.05\% and a Rank-1 of 22.75\%, while the \hyperlink{model:augmented}{Augmented} model achieves roughly half of that. The \hyperlink{model:sequential}{Sequential} model has the lowest performance of them all, with a \acs{mAP} of 1.46\% and Rank-1 of 3.68\%.
 
 \subsection*{Out-of-Distribution Scale Test}
-Inspecting the result of the \acs{OOD} scale test, all metrics increase with the scale reduction of 0.75 compared to the unmodified images. 
-\\\\
-This is assumed to be caused by the presence of differently sized images in the new dataset compared to those used during training. Since the model is trained with a maximum image size of \textit{128×64}, it is not fully equipped to handle the larger or differently scaled images. As expected performance drop again across all metrics, when testing on scale 0.5.
+
+Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on \acs{DukeMTMC}.
 
 \begin{table}[H]
 \centering
@@ -228,9 +235,9 @@ This is assumed to be caused by the presence of differently sized images in the 
 & \multicolumn{2}{c|}{\textbf{Scale 0.5}} \\
 \hline
 \rowcolor[HTML]{D8E9F7}
-& \textbf{mAP} & \textbf{Rank-1}
-& \textbf{mAP} & \textbf{Rank-1}
-& \textbf{mAP} & \textbf{Rank-1} \\
+& \textbf{\acs{mAP}}& \textbf{Rank-1}
+& \textbf{\acs{mAP}}& \textbf{Rank-1}
+& \textbf{\acs{mAP}}& \textbf{Rank-1} \\
 \hline
 \textbf{Baseline} 
 & 10.05\%& 22.75\%& 14.77\%& 29.98\%& 11.16\%& 21.54\%\\
@@ -239,9 +246,7 @@ This is assumed to be caused by the presence of differently sized images in the 
 & 4.76\%& 10.32\%& 6.58\%& 14.32\%& 5.07\%& 11.13\%\\
 \hline
 \textbf{Sequential} 
-& 1.05\% & 2.15\%
-& 1.23\% & 2.33\%
-& 1.52\% & 4.26\% \\
+& 1.46\%& 3.68\%& 2.04\%& 4.85\%& 3.38\%& 8.17\%\\
 \hline
 \textbf{End-to-end} 
 & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%}
@@ -249,11 +254,13 @@ This is assumed to be caused by the presence of differently sized images in the 
 & \textcolor{red}{3.05\%} & \textcolor{red}{6.73\%} \\
 \hline
 \end{tabular}
-\caption{Comparison of \acs{OSNet} variants on \acs{DukeMTMC} across different input scales. Metrics shown: mAP and Rank-1 (R-1).}
+\caption{Comparison of \acs{OSNet} variants on \acs{DukeMTMC} across different input scales. Metrics shown: \acs{mAP} and Rank-1 (R-1).}
 \label{tab:scale_test}
 \end{table}
 
-\noindent As seen with the baseline model, performance increases when the images are slightly down-scaled to 0.75, to an \acs{mAP} of 2.54\% and a Rank-1 of 6.51\%, see Table \ref{tab:compressiontest_result_robust}. However, the robust model again underperforms compared to the baseline model, by respectively 0.67\% and 0.94\%. The consistent underperformance suggests that the strong augmentations did not improve the model's tolerance for scale variations. On the contrary, the baseline model demonstrated better generalization under these conditions, despite not being trained on augmented data. 
+\noindent Inspecting the result of the \acs{OOD} scale test, all metrics increase with the scale reduction of 0.75 compared to the unmodified images. 
+\\\\
+
 
 
 \subsection*{Out-of-Distribution Compression Test}
@@ -277,23 +284,20 @@ The compression test show a clear drop in performance with reduction of quality,
 & \multicolumn{2}{c|}{\textbf{Q = 15}} \\
 \hline
 \rowcolor[HTML]{D8E9F7}
-& \textbf{mAP} & \textbf{Rank-1} 
-& \textbf{mAP} & \textbf{Rank-1} 
-& \textbf{mAP} & \textbf{Rank-1} 
-& \textbf{mAP} & \textbf{Rank-1} \\
+& \textbf{\acs{mAP}}& \textbf{Rank-1} 
+& \textbf{\acs{mAP}}& \textbf{Rank-1} 
+& \textbf{\acs{mAP}}& \textbf{Rank-1} 
+& \textbf{\acs{mAP}}& \textbf{Rank-1} \\
 \hline
 \textbf{Baseline} 
 & 10.05\%& 22.75\%
-& 9.34\%& 21.41\%& 8.82\%& 20.06\%& 7.08\%& 15.88\%\\
+& 9.39\%& 21.41\%& 8.82\%& 20.06\%& 7.08\%& 15.89\%\\
 \hline
 \textbf{Augmented} 
 & 4.76\%& 10.32\%& 4.67\%& 10.28\%& 4.50\%& 10.10\%& 4.14\%& 9.61\%\\
 \hline
 \textbf{Sequential} 
-& 1.05\% & 2.15\% 
-& 1.08\% & 2.51\% 
-& 1.05\% & 2.15\% 
-& 0.96\% & 2.11\% \\
+& 1.46\%& 3.68\%& 1.31\%& 3.50\%& 1.30\%& 3.32\%& 1.26\%& 3.28\%\\
 \hline
 \textbf{End-to-end} 
 & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} 
@@ -302,7 +306,7 @@ The compression test show a clear drop in performance with reduction of quality,
 & \textcolor{red}{3.37\%} & \textcolor{red}{6.42\%} \\
 \hline
 \end{tabular}
-\caption{Comparison of OSNet variants on DukeMTMC-ReID under varying compression levels. Metrics shown: mAP and Rank-1.}
+\caption{Comparison of OSNet variants on DukeMTMC-ReID under varying compression levels. Metrics shown: \acs{mAP} and Rank-1.}
 \label{tab:compression_levels_clean}
 \end{table}
 
@@ -313,10 +317,7 @@ The compression test show a clear drop in performance with reduction of quality,
 
 \subsection*{Out-of-Distribution Test on iLIDS-VID}
 
-The results for the test on the \acs{iLIDS-VID} dataset is better than those on DukeMTMC-ReID, except for Rank-5. These results can although not be compared fairly one to one, because of the difference in test setups, where DukeMTMC-ReID has a big test set and is multi-shot evaluation while \acs{iLIDS-VID} is much smaller and one-shot learning, making the tests very different. 
-\\\\
-The results for \acs{iLIDS-VID} is although far from the validations results, showing that the model has difficulty generalizing to this new and different dataset. As mentioned in Section \ref{outofdistributiontest} \acs{iLIDS-VID} is different than the datasets used for training, this contribute to this decrease in performance.
-
+Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \acs{OOD} test on \acs{iLIDS-VID}. As \acs{iLIDS-VID} is one-shot learning in contrast to \acs{DukeMTMC} being multi-shot learning, the focus is on the Rank-1 results. 
 
 \begin{table}[H]
 \centering
@@ -328,21 +329,18 @@ The results for \acs{iLIDS-VID} is although far from the validations results, sh
 & \textbf{Rank-1} \\ \hline
 \textbf{Baseline} & \textcolor{red}{10\%}\\ \hline
 \textbf{Augmented} & 7.33\%\\ \hline
-\textbf{Sequential} & 1.33\% \\ \hline
+\textbf{Sequential} & 2.00\% \\ \hline
 \textbf{End-to-end} & 3\% \\ \hline
 \end{tabular}
 \caption{Comparison of all OSNet configurations on the iLIDS-VID dataset.}
-\label{tab:ilidsvid_all_models_vertical}
+\label{tab:ilidsvid_all_models}
 \end{table}
 
+\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are similar or better than those observed on \acs{DukeMTMC} for all model configurations. The \hyperlink{x}{x} model achieves the highest Rank-1 of x\%. 
 
-\noindent Overall, the results of the \acs{OOD} test are not impressive for the baseline model, but they can serve as a useful reference point for comparison with the alternative model configurations presented in this chapter.
-\\\\
-Compared to the Rank-1 results on the other tests, the robust model achieves the lowest Rank-1 in this test, of only 2.67\%, see Table \ref{tab:ilidsvid_result_robust}. This is opposite of the baseline model, that achieves the highest Rank-1 of 7\%, out of all its results. The robust model underperforms by 4.33\%.
-\\\\
-The attempt at creating a robust model did not succeed, as it was significantly worse than the baseline model on all tests.
-\\\\
-flyt: The robust \acs{OSNet} achieves a \acs{mAP} of 2.24\% and Rank-1 of 5.07\% on the unmodifed dataset, see Table . Compared to the baseline model, it underperforms by respectively 0.59\% and 1.03\%. This suggests that the heavy augmentation may have hindered the model's ability to learn discriminative features, instead of improved generalization as originally intended. 
+
+\subsection{Summary of Results}
+
 
 
 
