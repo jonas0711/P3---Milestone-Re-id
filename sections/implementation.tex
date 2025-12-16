@@ -86,7 +86,10 @@ This section describes how the \acs{SR} module, using the previously described \
 The dataloader for the \acs{SR} module loads paired \acs{LR} and \acs{HR} images from the \acs{DIV2K} \cite{Agustsson2017NTIRE} and \acs{RELLISUR} \cite{aakerberg2021rellisur} datasets. The two datasets were kept separate during training to accommodate their different degradation characteristics, as described in Section \ref{SRtrainingdata}.
 
 \subsection{Re-implementation of EDSR} \label{sec:implementationedsr}
-The implemented version of the \acs{EDSR} architecture was taken from the source code from the original paper for \acs{EDSR} \cite{lim2017edsr}. A small change have been made to the architecture, where the normalization is handled in the dataloader instead of using MeanShift layers in the network. All images are normalized to the range $[-1, 1]$ using mean $= [0.5, 0.5, 0.5]$ and standard deviation $= [0.5, 0.5, 0.5]$, which is applied uniformly across both \acs{LR} and \acs{HR} images. The training script is implemented from scratch to ensure control.
+The implemented version of the \acs{EDSR} architecture was taken from the source code from the 
+original paper for \acs{EDSR} \cite{lim2017edsr}. A small change has been made to the architecture, where the normalization is handled in the dataloader instead of using MeanShift layers in the network. 
+This change simplifies the integration with the \acs{ReID} module by ensuring consistent preprocessing across both modules. All images are normalized to the range $[-1, 1]$ using mean $= [0.5, 0.5, 0.5]$ and standard deviation $= [0.5, 0.5, 0.5]$. This normalization is applied uniformly across both \acs{LR} and \acs{HR} images to ensure that the model learns to reconstruct normalized outputs that match the normalized targets. The training script is implemented from scratch to ensure full control
+over the training process.
 
 \subsection{Training Hyperparameters}
 This section describes the training hyperparameters, where an overview is presented in Table \ref{tab:edsrtrainingparameters}.
@@ -120,7 +123,7 @@ Stage 1 employed the patch-based training strategy described in Section \ref{SRt
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{models_cropped_rellisur_scratch_training_curves.png}
-    \caption{Training and validation loss curves for EDSR trained from scratch on \acs{RELLISUR}. The left plot shows the full training progress over 200 epochs, with the best epoch marked at epoch 74. The right plot provides a zoomed view of the last 50 epochs to show the convergence behavior.}
+    \caption{Training and validation loss curves for EDSR trained from scratch on \acs{RELLISUR}. The plot shows the full training progress over 200 epochs, with the best epoch marked at epoch 74.}
     \label{fig:rellisur_training_curves}
 \end{figure}
 
@@ -130,7 +133,7 @@ Stage 2 used the same patch-based training strategy as Stage 1, applied to the \
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{models_cropped_div2k_finetuned_training_curves.png}
-    \caption{Training and validation loss curves for EDSR finetuned on \ac{DIV2K}. The left plot shows the full training progress over 100 epochs, with the best epoch marked at epoch 1. The right plot provides a zoomed view of the last 50 epochs to show the convergence behavior.}
+    \caption{Training and validation loss curves for EDSR finetuned on \ac{DIV2K}. The plot shows the full training progress over 100 epochs, with the best epoch marked at epoch 1.}
     \label{fig:div2k_training_curves}
 \end{figure}
 
@@ -154,7 +157,7 @@ The data augmentation strategy outlined in Section \ref{SRtrainingdata} was appl
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{RELLISUR_augmentation_comparison_1.png}
-    \caption{Visual comparison of a \acs{RELLISUR} image before and after data augmentation. The left panel shows the original low-resolution input image, while the right panel shows the same image after applying Gaussian noise augmentation, demonstrating the effect of the augmentation strategy on the training data.}
+    \caption{Visual comparison of a \acs{RELLISUR} image pair before and after data augmentation. The top row shows the \acs{LR} image before (left) and after (right) applying augmentation, while the bottom row shows the corresponding \acs{HR} image which remains unaugmented. This demonstrates that augmentations are applied only to \acs{LR} images during training.}
     \label{fig:rellisur_augmentation}
 \end{figure}
 

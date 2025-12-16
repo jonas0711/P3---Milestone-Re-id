@@ -67,7 +67,7 @@ This section is largely based on IBM's \textit{What is computer vision?}, which 
 \subsection{Images as Information}
 An image is a matrix of pixels, with each pixel usually having three channels, such as in RGB (Red, Green, Blue) or HSV (Hue, Saturation, Value) formats. These pixels represent the light intensity and color information measured by the photosites in cameras, and when assembled can recreate a captured scene, as stated in Section \ref{subsubsec:How_cameras_work}. 
 \\\\
-Based on the values in each channel of each pixel, and how they relate to neighboring pixels, algorithms can  derive meaningful information from images. For this to be effective, images typically require preprocessing which standardizes input to limit a model’s need for uncertainty. Classic image preprocessing consists of normalizing light or color, resizing, cropping, and denoising.  
+Based on the values in each channel of each pixel, and how they relate to neighboring pixels, algorithms can derive meaningful information from images. For this to be effective, images typically require preprocessing which standardizes input to limit a model’s need for uncertainty. Classic image preprocessing consists of normalizing light or color, resizing, cropping, and denoising.  
 
 \subsection{Images in a Time Series}
 \label{subsec:images_in_a_time_series}
@@ -132,7 +132,7 @@ p{0.18\linewidth}
 |}
 \hline
 \rowcolor[HTML]{D8E9F7}
-\textbf{OSNet Performance}& \textbf{mAP}& \textbf{R-1}\\ \hline
+\textbf{OSNet Performance}& \textbf{mAP}& \textbf{Rank-1}\\ \hline
 Market-1501& 94.8\%& 84.9\%\\ \hline
 DukeMTMC-ReID& 72.3\%& 67.8\%\\ \hline
 MSMT17& 88.6\%& 73.5\%\\ \hline
@@ -150,7 +150,7 @@ The most recent paper from 2024 proposes a pipeline where low-light image enhanc
 \\\\
 However, this method introduces image enhancements as a separate preprocessing step, rather than integrating the enhancement into the \acs{ReID} pipeline. This separation means that enhanced images are treated as fixed inputs, preventing the model from adapting the enhancement process jointly with the embedding learning. 
 
-%Published in 2024, cited by 5. No github available.
+
 
 \subsection{Key Takeaways} \label{subsec:takeawayspreid}
 
@@ -168,7 +168,7 @@ An \acf{OOD} test is defined as the models ability to perform on data that is si
 \\\\
 As discussed in Section \ref{subsec:reid_reworks}, \acs{OSNet} appears to be the most promising network, as it is omni-scale and thus scale-invariant. However, the authors of the paper conducted an experiment of testing the model on images reduced with a scale factor 0.25, corresponding to a \textit{64x32} image \cite{OSNet}. Its performance showed a drop in Rank-1 accuracy from 94.8\% to 86.9\%, while the \acs{mAP} decreases from 84.9\% to 67.3\% on the Market-1501 dataset. It is important to highlight that both training and evaluation were performed on upsampled inputs \textit{256×128}, even though the standard Market-1501 resolution is \textit{128×64}. These results indicate that \acs{OSNet} is sensitive to changes in the scale of the image, despite the omni-scale architecture.
 \\\\
-For this reasons, \acs{OSNet} will be evaluated further to confirm or deny the assumption that existing \acs{ReID} algorithms have difficulties identifying people when the image resolution is poor due to scale or compression in surveillance. 
+For this reasons, \acs{OSNet} will be evaluated further to confirm or reject the assumption that existing \acs{ReID} algorithms have difficulties identifying people when the image resolution is poor due to scale or compression in surveillance. 
 \\\\ 
 The \acs{OOD} test is conducted as a one-shot test on cross domain datasets, meaning that gallery only contains one image per person and that the dataset have not been used in training of the model. The test is using a small subset of images from the dataset Market-1501 under four different conditions, as well as a subset from the dataset \acf{iLIDS-VID}, which is unknown to \acs{OSNet}. These subsets are presented in Table \ref{tab:ood_conditions}.
 
@@ -308,7 +308,7 @@ Even though the test is conducted on small datasets of only 25 query and 25 gall
 \label{sec:SuperResolution}
 As stated in Section \ref{subsec:challenges-ReID}, surveillance images often suffer from poor quality, which results in fine-grained details to be lost. This can be mitigated through \acf{SR} integration. \acs{SR} is an image processing technique that reconstructs a \acf{HR} image from one or more \acf{LR} images. The main challenge is that multiple \acs{HR} images can result in the same \acs{LR} image, making \acs{SR} an inverse problem with no unique solution \cite{srhallucination}.
 \\\\
-Classical image up-sampling consists of interpolation, where the spatial dimensions are increased, achieving a smoother and more visually appealing picture. The drawback of these method's is the inherent smoothness produced, which causes fine-grained details to be lost in the process. As stated in Section \ref{imagebasedreid}, the task of accurately re-identifying the same individual requires identifiable features which can distinguish different individuals. Deep learning has revolutionized this task, as it offers methods which can scale the spatial dimension up, without over-smoothing and consequently lose information. 
+Classical image up-sampling consists of interpolation, where the spatial dimensions are increased, achieving a smoother and more visually appealing picture. The drawbackof these method's is the inherent smoothness produced, which causes fine-grained details to be lost in the process. As stated in Section \ref{imagebasedreid}, the task of accurately re-identifying the same individual requires identifiable features which can distinguish different individuals. Deep learning has revolutionized this task, as it offers methods which can scale the spatial dimension up, without over-smoothing and consequently lose information. 
 \\\\
 A simplified overview of general \acs{CNN} approaches for \acs{SR} can be described as follows. The network takes an input of the \acs{LR}. This input is then sent through convolution layers that extract features at different scales, with filters applied to create feature maps, with non-linear activation functions applied to introduce flexibility.  These feature maps are then sent through up-sampling layers that aim to increase the spatial dimension and correctly reconstruct missing details. These up-sampled feature maps are sent through more convolutional layers with the purpose of learning the complex relationships between the low- and high-resolution images. The final layer produces an image.
 
@@ -393,7 +393,15 @@ The \acs{SRCNN} paper demonstrated that deep learning could successfully learn m
 
 \section{Combining Super-Resolution with Re-Identification}
 
-\subsection{Joint ****}
+As stated in Section \textbackslash{}ref\{subsec:challenges-ReID\}\}, poor quality limits the features for person ReID. SR can address this by reconstructing details before feature extraction. However, how SR and ReID are combined affects the overall performance.
+
+\subsection{Integration Approaches}
+
+There are two main approaches for combining \acs{SR} with \acs{ReID}: sequential integration and joint training. In sequential integration, \acs{SR} is treated as a preprocessing step. A pretrained \acs{SR} model upscales the images, and the outputs are then passed to a separately trained \acs{ReID} model. This is simple to implement since both modules are trained independently. The drawback is that the \acs{SR} model is not aware of the \acs{ReID} task, and may introduce artifacts that do not preserve identity discriminative features. In joint training, both modules are connected in a single pipeline. This allows the \acs{ReID} loss to backpropagate through the \acs{SR} module, which means the \acs{SR} network learns to upscale in a way that benefits the \acs{ReID} task specifically.
+
+\subsection{Training considerations}
+When training both modules jointly, there is a risk that the SR module stops performing meaningful upscaling and instead become a feature extractor. To prevent this one approach is to initialize with pretrained weights and freeze certain parameters during training. This keeps the learned pretraining capabilities while still allowing fine tuning for the combined task.
+
 
 \subsection{Related work for Super-Resolution Re-Identification}\label{sec:superres-reid}
 As the implementation of \acs{SR} has the potential to improve the performance of a person \acs{ReID} model, based on the challenges described in Section \ref{subsec:challenges-ReID}, this section will examine existing approaches that combine \acs{SR} and person \acs{ReID}.

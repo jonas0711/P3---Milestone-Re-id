@@ -29,7 +29,7 @@ CUHK03 (labeled / detected) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Ma
 \end{table}
 
 \subsection*{Market-1501}
-\noindent Market-1501 is one of the most widely used datasets for person \acs{ReID}. It is recorded at Tsinghua University in Beijing using six surveillance cameras: five in \acf{HD} and one in \acs{SD} resolution. The dataset contains 32,668 cropped images of 1,501 unique individuals, each appearing in at least two camera views. Bounding boxes are generated automatically with a \acs{DPM}, and the resulting person crops are resized (normalized) to a fixed resolution of \textit{128x64} pixels. In the released dataset, all images are therefore provided at this normalized resolution of \textit{128x64} pixels. Because the detections are automatic, some bounding boxes are misaligned or partially cropped, which makes the dataset realistic for providing material under real world surveillance conditions \cite{Zheng2015ICCV}.
+\noindent Market-1501 is one of the most widely used datasets for person \acs{ReID}. It is recorded at Tsinghua University in Beijing using six surveillance cameras: five in \acf{HD} and one in \acf{SD} resolution. The dataset contains 32,668 cropped images of 1,501 unique individuals, each appearing in at least two camera views. Bounding boxes are generated automatically with a \acs{DPM}, and the resulting person crops are resized (normalized) to a fixed resolution of \textit{128x64} pixels. In the released dataset, all images are therefore provided at this normalized resolution of \textit{128x64} pixels. Because the detections are automatic, some bounding boxes are misaligned or partially cropped, which makes the dataset realistic for providing material under real world surveillance conditions \cite{Zheng2015ICCV}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/Market-1501_examples_v4.png}
@@ -38,7 +38,7 @@ CUHK03 (labeled / detected) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Ma
 \end{figure}
 
 \subsection*{MSMT17}
-\acf{MSMT17} was recorded by a network of 15 surveillance cameras, on an university campus,  deployed across indoor and outdoor environments, capturing video footage over an extended period. The dataset was designed to address real-world challenges in person \acs{ReID} including complex lighting variations, diverse viewpoint changes, and the scale requirements of large camera networks. It contains 126,441 annotated bounding boxes of 4,101 unique identities. Pedestrian bounding boxes are detected automatically using a Faster R-CNN detector, and the resulting person crops are typically resized (normalized) to a fixed input resolution of \textit{256x128} pixels for training, so that all input images have the same size. The raw videos were captured during 12 different time slots throughout the day, spanning about 180 hours of footage in total. This temporal coverage results in lighting variations, ranging from bright daylight to low light evening conditions, which closely mirrors the operational conditions of real-world surveillance systems. The combination of indoor and outdoor scenes, long-duration recording, and diverse environmental conditions enables \acs{ReID} models trained on \acs{MSMT17} to better generalize to real-world surveillance scenarios with varying lighting, viewpoints, and scale \cite{wei2018person}.
+\acf{MSMT17} was recorded by a network of 15 surveillance cameras, on an university campus, deployed across indoor and outdoor environments, capturing video footage over an extended period. The dataset was designed to address real-world challenges in person \acs{ReID} including complex lighting variations, diverse viewpoint changes, and the scale requirements of large camera networks. It contains 126,441 annotated bounding boxes of 4,101 unique identities. Pedestrian bounding boxes are detected automatically using a Faster R-CNN detector, and the resulting person crops are typically resized (normalized) to a fixed input resolution of \textit{256x128} pixels for training, so that all input images have the same size. The raw videos were captured during 12 different time slots throughout the day, spanning about 180 hours of footage in total. This temporal coverage results in lighting variations, ranging from bright daylight to low light evening conditions, which closely mirrors the operational conditions of real-world surveillance systems. The combination of indoor and outdoor scenes, long-duration recording, and diverse environmental conditions enables \acs{ReID} models trained on \acs{MSMT17} to better generalize to real-world surveillance scenarios with varying lighting, viewpoints, and scale \cite{wei2018person}.
 
 \begin{figure}[H]
     \centering
@@ -49,8 +49,7 @@ CUHK03 (labeled / detected) & 767/700 & 14,097 & 7,368 & 1,400 & 5,328 & 10 & Ma
 
 \subsection*{CUHK03}
 \noindent
-CUHK03 was collected at The Chinese University of Hong Kong and was one of the first \acs{ReID} datasets large enough to support deep learning. It consists of approximately 14,000 images of about 1,467 individuals captured by ten cameras, which are grouped into five disjoint camera pairs.  Each person appears in two cameras, giving two different viewpoints for every identity.  The dataset is released in two versions: a labeled set with manually annotated bounding boxes, and a detected set generated by the same \acf{DPM} detector used in Market-1501 \cite{Li2014DeepReID}.  
-    While CUHK03 is smaller than Market-1501 and \acs{DukeMTMC}, its clear structure and the two annotation versions make it well suited for providing the model with noise and viewpoint variation in the training data.
+CUHK03 was collected at The Chinese University of Hong Kong and was one of the first \acs{ReID} datasets large enough to support deep learning. It consists of approximately 14,000 images of about 1,467 individuals captured by ten cameras, which are grouped into five disjoint camera pairs.  Each person appears in two cameras, giving two different viewpoints for every identity.  The dataset is released in two versions: a labeled set with manually annotated bounding boxes, and a detected set generated by the same \acf{DPM} detector used in Market-1501 \cite{Li2014DeepReID}. While CUHK03 is smaller than Market-1501 and \acs{DukeMTMC}, its clear structure and the two annotation versions make it well suited for providing the model with noise and viewpoint variation in the training data.
     
 \begin{figure}[H]
     \centering
@@ -98,11 +97,10 @@ The datasets chosen for SR traning are presented. They were chosen because ...
 \noindent
 \acf{RELLISUR} was collected by Aalborg University focused on image resolution, not digital downsampling. Each of the 850 scenes are recorded in 3 different scales. \textit{X1} scale, \textit{X2} scale and \textit{X4} scale are made by changing the focal length. This difference in resolution originates from the optical settings and not made by bicubic manipulation. The dataset contains of a low light and a normal light part. This project uses the normal light consisting of 2,550 images split into test, train and validation. \acs{RELLISUR} covers indoor and outdoor environments, and consists of different kinds of structures, materials, and distances to the objects to enhance usability for \ac{SR} in realistic environments \cite{aakerberg2021rellisur}.
 
-
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{figures/images/Dataset_visu/RELLISURE_with_original.png}
     \caption{\acs{RELLISUR} examples showing the original image and the same scene at different optical scales (×1, ×2, ×4).}
     \label{fig:RELLISUR_data}
 \end{figure}
+

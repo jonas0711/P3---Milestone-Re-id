@@ -212,9 +212,22 @@ Finally, two different versions of the \acs{ReID} module, baseline and augmented
 This section presents the chosen \acs{SR} architecture, as well as the training strategy using the two \acs{SR} datasets presented in Section \ref{sec: superresdata}. Based on the technical analysis of the perception-distortion trade of in the \acs{SR} domain presented in \ref{subsec:perception-distortion-tradeoff}, a low distortion model is considered more suitable for integration with \acs{ReID}, as it reduces the risk for introduction of \acs{SR} artifacts.
 
 \subsection{EDSR}
-\acf{EDSR} is a \acf{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}.
-\\\\
-The architecture consists of a convolutional layer, a deep stack of residual blocks and an upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, the internal flow of each resblock is illustrated in Figure \ref{fig:resblockpipeline}, and the process inside the final upsample block can be seen in Figure \ref{fig:upsampleblockpipeline}. 
+\acf{EDSR} is a \acf{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}. For this project, the base configuration of \acs{EDSR} is selected due to its balance between reconstruction quality and computational efficiency. Table \ref{tab:edsr-config} summarizes the base \acs{EDSR} configuration, consisting of 16 residual blocks with 64 feature channels.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}\hline
+        \cellcolor[HTML]{D8E9F7} \textbf{Parameter} & \cellcolor[HTML]{D8E9F7} \textbf{Value} \\\hline
+        No. Residual Blocks & 16 \\\hline
+        No. Feature Channels & 64 \\\hline
+        Scale Factor & 2 \\\hline
+        Residual Scaling & 1 (no scaling) \\\hline
+    \end{tabular}
+    \caption{Base \acs{EDSR} configuration.}
+    \label{tab:edsr-config}
+\end{table}
+
+\noindent The architecture consists of a convolutional layer, a deep stack of residual blocks and an upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, while the internal structure of the residual blocks and upsampling module are illustrated in Figures \ref{fig:resblockpipeline} and \ref{fig:upsampleblockpipeline} respectively. 
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{edsrpipeline.png}
@@ -241,13 +254,13 @@ The architecture consists of a convolutional layer, a deep stack of residual blo
     \label{fig:upsampleblockpipeline}
 \end{figure}
 
-\noindent As shown in Figure \ref{fig:edsrpipeline}, the upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. In Figure \ref{fig:upsampleblockpipeline}, the pipeline of the upsampling module is visualized. It uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2} and the \texttt{PixelShuffle} operation then rearranges these features into the spatially upscaled output \cite{shi2016subpixel_arxiv}. This approach performs upsampling in a learnable manner rather than using fixed interpolation methods. %**Kilde Eller er det nok den er længere oppe?**
+\noindent As shown in Figure \ref{fig:edsrpipeline}, the upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. The internal structure of the upsampling module is illustrated in Figure \ref{fig:upsampleblockpipeline}, which shows the learnable nature of the upsampling process. Specifically, the upsampling module uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2}. As shown in the figure, this convolutional layer contains trainable weights, making the upsampling process learnable rather than relying on fixed interpolation methods such as bilinear or bicubic upsampling. The \texttt{PixelShuffle} operation then rearranges these learned features into the spatially upscaled output \cite{shi2016subpixel_arxiv}.
 
 \subsection{Loss Function}\label{sec:srloss}
-For the training of the \acs{SR} module, \acf{MAE}, also called \acf{L1}, was used as the training objective. \acs{MAE} was chosen over mean squared error (\acf{MSE}), or L2 Loss, because it produces sharper reconstructions and is less sensitive to outliers in the training data \cite{lossfunctiongeek}.
+For the training of the \acs{SR} module, \acf{MAE}, also called \acf{L1}, was used as the training objective, following the original \acs{EDSR} implementation \cite{lim2017edsr}. \acs{L1} loss is less sensitive to outliers than \acs{L2} loss, as large errors are not squared and therefore receive less emphasis during optimization \cite{Goodfellow2016}.
 
 \subsection{Evaluation Metric}
-This section presents the evaluation metrics used for the \acs{SR} module. The primary metric is \acf{PSNR}, supported by \acf{SSIM}. Both measure distortion and fit the chosen low-distortion \acs{SR} strategy, which aims to avoid hallucinated details and artifacts that could hurt downstream \acs{ReID} performance \cite{Blau2018PerceptionDistortion}.
+The primary metric for evaluating the \acs{SR} module is \acf{PSNR}, supported by \acf{SSIM}. Both measure distortion and fit the chosen low-distortion \acs{SR} strategy, which aims to avoid hallucinated details and artifacts that could hurt downstream \acs{ReID} performance \cite{Blau2018PerceptionDistortion}.
 
 \subsubsection*{PSNR}
 \acs{PSNR} measures the pixel-wise difference between the super-resolved output and the reference \acs{HR} image, derived from the mean squared error (MSE). A higher \acs{PSNR} means lower distortion and more accurate reconstruction. For \acs{ReID}, the goal is to keep real discriminative details and avoid adding fake ones. \acs{PSNR} is therefore the primary model-selection criterion (best checkpoint chosen by highest validation \acs{PSNR}) to prioritize pixel accuracy over perceptual effects that could create false details \cite{lim2017edsr}.
@@ -257,7 +270,7 @@ This section presents the evaluation metrics used for the \acs{SR} module. The p
 
 
 \subsection{Training and Validation Strategy}\label{SRtrainingdata}
-A two-stage training strategy was employed. First, the model was pretrained on the \acs{RELLISUR} dataset, followed by finetuning on \acs{DIV2K}. This approach was chosen instead of mixing the datasets directly due to their fundamentally different degradation characteristics. \acs{RELLISUR} consists of real low-light and low-resolution image pairs captured under natural imaging conditions, where degradations arise from the physical image acquisition process rather than synthetic downsampling.
+A two-stage training strategy was employed. First, the model was pretrained on the \acs{RELLISUR} dataset, followed by finetuning on \acs{DIV2K}. This approach was chosen instead of mixing the datasets directly due to their fundamentally different degradation characteristics. \acs{RELLISUR} consists of real low-light and low-resolution image pairs captured under natural imaging conditions, where degradations arise from the physical image capture process rather than synthetic downsampling.
 \\\\
 By pretraining on \acs{RELLISUR}, the model is exposed to realistic degradation patterns, allowing it to learn robust representations for handling real-world low-light super-resolution. Subsequent finetuning on \acs{DIV2K}, which contains high-quality images with synthetically generated low-resolution counterparts, refines these representations under controlled degradation settings. This finetuning stage improves reconstruction stability and generalization while retaining the realism learned during pretraining.
 

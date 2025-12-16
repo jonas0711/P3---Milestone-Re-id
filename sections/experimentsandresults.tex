@@ -1,5 +1,5 @@
 \chapter{Experiments and Results} \label{cha: experiments and results}
- This chapter presents the experiments conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}} and \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} defined in Section \ref{sec:hypotheses}. The objective is to determine whether incorporating an \acs{SR} module improves the robustness of a person \acs{ReID} module under \acs{OOD} conditions. To support this evaluation, this chapter first presents an independent assessment of the chosen \acs{SR} model, followed by the four models defined in Section \ref{sec:model_definitions}: The \hyperlink{Baseline}{Baseline} model, the \hyperlink{Augmented}{Augmented} model, the \hyperlink{Sequential}{Sequential} model, and the \hyperlink{End-to-end}{End-to-end} model. The results from these experiments are presented and briefly discussed. 
+ This chapter presents the experiments conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}} and \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} defined in Section \ref{sec:hypotheses}. The objective is to determine whether incorporating an \acs{SR} module improves the robustness of a person \acs{ReID} module under \acs{InD} and \acs{OOD} conditions. To support this evaluation, this chapter first presents an independent assessment of the chosen \acs{SR} model, followed by the four models defined in Section \ref{sec:model_definitions}: The \hyperlink{model:baseline}{Baseline} model, the \hyperlink{model:augmented}{Augmented} model, the \hyperlink{model:sequential}{Sequential} model, and the \hyperlink{model:endtoend}{End-to-end} model. The results from these experiments are presented and briefly discussed. 
 
 \section{SR Experiments} \label{sec: srexperiments}
 Before integrating \acs{SR} into the \acs{ReID} pipeline, the selected \acs{SR} architecture is evaluated independently to verify that it provides meaningful improvements over simple interpolation methods. This section presents the evaluation results and a direct comparison between \acs{EDSR} and bicubic interpolation.
@@ -115,7 +115,7 @@ Image pairs from an unseen dataset, with primarily indoor images, to test cross-
 \noindent All models presented in this chapter will be evaluated and compared using the \acs{OOD} test.
 
 
-\section{Experiments}
+\section{Experiments} \label{sec: experimentsdefined}
 
 In order to determine whether implementing an \acs{SR} module in the \acs{ReID} pipeline, several experiments were conducted to establish a clear and fair method for comparison. The experiments are designed to test the hypotheses defined in Section \ref{sec:hypotheses}. 
 \\\\
@@ -149,7 +149,7 @@ By keeping the other factors constant, this experiment isolated the effect of jo
 
 
 \section{Results}
-This section presents the results of the conducted experiments. 
+This section presents the results of the conducted experiments defined in Section \ref{sec: experimentsdefined}, first under \acs{InD} conditions and subsequently under multiple \acs{OOD} scenarios. 
 
 \subsection{In-Distribution Performance}
 Table \ref{tab:reid_indist} presents the \acs{InD} performance of all model configurations on the \acs{MSMT17}, Market-1501, and \acs{CUHK03} datasets, to establish a baseline performance on known datasets.
@@ -189,7 +189,7 @@ On \acs{CUHK03}, the \hyperlink{model:baseline}{Baseline} model again achieves t
 \\\\
 However, on \acs{MSMT17} the performance is notable lower for all model configurations. The \hyperlink{model:endtoend}{End-to-end} model achieves the highest performance among the other three models, with a \acs{mAP} of [placeholder]\% and Rank-1 of [placeholder]\%. 
 \\\\
-Overall, the \hyperlink{model:baseline}{Baseline} model demonstrates strong performance on the \acs{InD} test. 
+Overall, the \hyperlink{model:baseline}{Baseline} model demonstrates the highest performance on the \acs{InD} test. 
 
 \subsection*{Out-of-Distribution Test on DukeMTMC-ReID}
 
@@ -336,42 +336,9 @@ Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \
 
 \subsection{Summary of Results}
 
+In summary, the \hyperlink{model:endtoend}{End-to-end} model achieved the highest performance compared to the three other model configurations. 
+\\\\
 - tabel over hvilken model der havde bedste resultater i hver test.
 - overblik over hvilke hypoteser/req der blev opfyldt?
 
 
-
-
-% While different training setups were tried, the final model is trained as described in Section \ref{sec:implementationosnet}. The full training of the model with augmentations can be seen in Figure \ref{fig:baseaugtrain}. The training was repeated in order to save model states at peak validation result at epoch 81 for both the baseline and augmentation model, see Figure \ref{fig:augbaseloggings}. The epoch was chosen from the mean validation results Figure \ref{fig:baseaugvalaverage}. The retraining resulted in a slightly different performance, which is presumed to stem from the random augmentations applied. This shortcoming is acknowledged in Section \ref{sec: Dataaugmentation discussion}. 
-
-% \begin{figure}[H]
-%     \centering
-%     \begin{subfigure}[b]{0.49\textwidth}
-%         \includegraphics[width=\textwidth]{baseaugtrain.png}
-%         \caption{Training loss for baseline and augmentation model}
-%         \label{fig:baseaugtrain}
-%     \end{subfigure}
-%     \hfill % adds space between
-%     \begin{subfigure}[b]{0.49\textwidth}
-%         \includegraphics[width=\textwidth]{baseaugvalmap.png}
-%         \caption{Mean Average Precision for baseline and augmentation model}
-%         \label{fig:baseaugvalmap}
-%     \end{subfigure}
-%     \vfill % adds space between
-%     \begin{subfigure}[b]{0.49\textwidth}
-%         \includegraphics[width=\textwidth]{augbaserank.png}
-%         \caption{Rank-1 for baseline and augmentation model}
-%         \label{fig:baseaugvalrank}
-%     \end{subfigure}
-%     \hfill
-% \begin{subfigure}[b]
-% {0.49\textwidth}
-%         \includegraphics[width=\textwidth]{baseaugaverage.png}
-%         \caption{Mean validation result for baseline and augmentation model}
-%         \label{fig:baseaugvalaverage}
-%     \end{subfigure}
-%     \caption{Training and validation results for baseline and augmentation model}
-%     \label{fig:augbaseloggings}
-% \end{figure}
-
-% \noindent Even though the validation results is not showing anything close to State-of-the-Art performance, the test results can still be compared between the models presented in this chapter.
