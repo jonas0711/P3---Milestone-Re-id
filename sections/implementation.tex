@@ -53,6 +53,15 @@ The model's performance was monitored through periodic validation:
 
 \noindent This adaptive validation strategy allows for more frequent monitoring as learning rate drops, and the training approaches convergence. Training ran for a total of 350 epochs without early stopping, though checkpoints were saved every validation. From these saved checkpoints is the final model selected based on the best \acs{mAP} score.
 
+\subsection{Dataaugmentation}
+In Figure \ref{fig:visualaugmentations},  two different dataaugmentation pipelines, presented in Section \ref{sec: dataaugmentation}, has been applied to two random images from the \acs{DukeMTMC} dataset. This visualize the effects of the pipelines. Most noticeable is the augmentations from the strong augmentation pipeline.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{augmentation-3.png}
+    \caption{Results of the two dataaugmentation pipeline, light and strong, beside the original input.}
+    \label{fig:visualaugmentations}
+\end{figure}
+
 \subsection{Training Duration}
 The two different version, baseline and augmented, is trained using the same training hyperparameters, ensuring a comparable outcome. The training and validation plots for the two versions of the \acs{ReID} module can be seen in Figure \ref{fig:augbaseloggings}.
 \begin{figure}[H]
@@ -71,7 +80,7 @@ The two different version, baseline and augmented, is trained using the same tra
     \caption{Training and validation results for baseline and augmented model, see appendix \ref{app:fulllogings} for more.}
     \label{fig:augbaseloggings}
 \end{figure}
-\noindent Both models ran for the entire 350 epochs, but the best model was chosen based on \acs{mAP} score, because it prioritize the ability to rank all positive matches.
+\noindent Both models ran for the entire 350 epochs, but the best model was chosen based on \acs{mAP} score, because it prioritized the ability to rank all positive matches.
 \\\\
 The baseline model ran for a total of 6h 53m, while the best validation result was after 255 epochs (4 h 51m) at 45.72\% \acs{mAP}. 
 \\\\
@@ -93,7 +102,7 @@ The implemented version of the \acs{EDSR} architecture was taken from the source
 All images are normalized to the range $[-1, 1]$ by subtracting 0.5 and dividing by 0.5 for each color channel. This normalization is applied to both \acs{LR} and \acs{HR} images, ensuring that the model learns to produce outputs in the same range as the target images. The training script is implemented from scratch to ensure full control over the training process.
 
 
-\subsection{Training Hyperparameters}
+\subsection{Training Hyperparameters} \label{edsr_hyperparameters}
 This section describes the training hyperparameters, where an overview is presented in Table \ref{tab:edsrtrainingparameters}.
 \begin{table}[H]
     \centering
@@ -206,20 +215,18 @@ The \hyperlink{model:sequential}{Sequential model}, as defined in Section \ref{s
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{srreid_flow.drawio.png}
-    \caption{Flowchart of how data passes through the \hyperlink{model:sequential}{Sequential model} implementation.}
+    \caption{Flowchart of how data passes through the Sequential model implementation.}
     \label{fig:srreid_flow}
 \end{figure}
 
 \noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. No further training or finetuning was performed on either module,  effectively equivalent to running both models together in inference. 
 
 \section{Implementation of End-to-end ReID and SR}
-Since the \acs{SR} module was trained to clean and upscale on diverse images, it is not specialized for the domain of person \acs{ReID}. By combining the two modules end-to-end, the \acs{ReID} loss can flow back into the \acs{SR} module, ideally forcing it to learn specific cleaning or sharpening operations that improve the final \acs{ReID} task, while the \acs{ReID} can simultaneously learn to extract features from a \acs{SR} input. This effect can be seen in Figure XXX (sammenligningsbilleder, måske i resultater eller her?). 
+Since the \acs{SR} module was trained to clean and upscale on diverse images, it is not specialized to the domain of person \acs{ReID}. By combining the two modules end-to-end, the \acs{ReID} loss can flow back into the \acs{SR} module, ideally forcing it to learn specific cleaning or sharpening operations that improve the final \acs{ReID} task, while the \acs{ReID} can simultaneously learn to extract features from a \acs{SR} input.
 \\\\
-This model used the setup and pretrained modules as the \hyperlink{model:sequential}{Sequential model}, with the difference being that training was resumed. The training itself was done under the same configuration/method/settings/hjælp as the standalone \acs{OSNet} models described in Section \ref{sec:implementationosnet}. The only notable changes were in the number of total epochs, the chosen milestones for the learning rate scheduler, and the chosen learning rates for each module. One further addition is the option of freezing an individual module, this was however only utilized for the \acs{ReID} module. The training hyperparameters can be seen in Table \ref{tab:endtoendtrainingparameters}. 
-\\\\
-The learning rate of \(1e-5\) was chosen as the \acs{ReID} module is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images. At epoch 20 and 60, the learning rate dropped to \(1e-6\) and \(1e-7\), allowing for longer and finer tuning of the parameters. 
+This model used the same setup and pretrained modules as the \hyperlink{model:sequential}{Sequential model}, with the difference being that finetuning was performed. The finetuning was done using the same methods as the standalone \acs{OSNet} models described in Section \ref{sec:implementationosnet}. The only notable changes were in the number of total epochs, the chosen milestones for the learning rate scheduler, and the chosen learning rates for each module. One further addition is the option of freezing an individual module, this was however only utilized for the \acs{SR} module. The training hyperparameters can be seen in Table \ref{tab:endtoendtrainingparameters}.  
 
-\subsection*{Training Hyperparameters}
+\subsection{Training Hyperparameters}
 The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the details presented in Table \ref{tab:endtoendtrainingparameters}.
 \begin{table}[H]
     \centering
@@ -244,12 +251,28 @@ The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the deta
 \label{tab:endtoendtrainingparameters}
 \end{table}
 
-\noindent The model was trained using the strong augmentation pipeline, seen earlier in Table \ref{tab:three_subtables}, for the purpose of retaining the \acs{EDSR} model's robustness to poor image conditions. In order to still give \acs{EDSR} the chance to adapt to low resolution person images, the \acs{ReID} module was frozen for the first 20 epochs. In practice, freezing the module meant setting \texttt{module.eval()} and \texttt{require\_grad = False} for each its parameters. This action was then reversed during training by setting \texttt{module.train()} and \texttt{require\_grad = True}. The choice of freezing the \acs{ReID} module was made for the purpose of letting the \acs{SR} module adapt to the new domain and loss metric.
-\\\\
-To benefit from the end to end integration of the two models, training was continued with pretrained weights from baseline \acs{OSNet} and the best performing \acs{EDSR}. \acs{OSNet} weights were frozen for the first 20 epochs, such that \acs{EDSR} could adapt to the new data being \ac{LR} images of people, instead of the more diverse nature of \acs{DIV2K} and \acs{RELLISUR}. While only a classification loss back-propagated, it should still help specialize the model for the task, as can be seen in Section XXX. The learning rate for \acs{EDSR} was chosen at \texttt{65e-4}, due to it being a middle point between the training and finetuning learning rate used during the standalone training. The learning rate for \acs{OSNet} was set to \texttt{1e-4}, such that it would drop to \texttt{1e-5} after the the first milestone, which coincides with \acs{OSNet} being unfrozen. This was chosen as the model had already learned the task of \acs{ReID}, and in this end-to-end training should focus on learning to extract features from \acs{SR} images. A second milestone was set at epoch 60 for final finetuning with the lowest learning rate. Training concluded at epoch 100, at which point the model had learned enough for a fair comparison with the other models, even if more performance could have been squeezed out. 
+\noindent The learning rate of \(1e-5\) for the \acs{ReID} was chosen as it is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images for the first 20 epochs. The learning rate for the \acs{SR} module was set to \(1e-4\), in practice the learning rate would be \(1e-5\) by the time that the \acs{SR} module is unfrozen. Freezing the module meant setting \texttt{module.eval()} and \texttt{require\_grad = False} for each its parameters. This action was then reversed at epoch 20 by setting \texttt{module.train()} and \texttt{require\_grad = True}. This was chosen to be lower than the learning rate used in Section \ref{edsr_hyperparameters}, allowing the \acs{SR} module to maintain it's learned function, but also to get accustomed to the new domain and loss. At epoch 60, the learning rates for both drop for final finetuning, with learning rates \(1e-6\) and \(1e-7\) respectively. 
 
 \subsection{Training duration}
+The training and validation plots can be seen in Figure \ref{fig:srreid_plots}.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{srreid_trainloss.png}
+        \caption{Training loss for End-to-end model.}
+        \label{fig:srreid_train}
+    \end{subfigure}
+    \hfill % adds space between
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{srreid_map.png}
+        \caption{Mean Average Precision for End-to-end model.}
+        \label{fig:srreid_map}
+    \end{subfigure}
+    \caption{Training and validation results for End-to-end model.}
+    \label{fig:srreid_plots}
+\end{figure}
 
+\noindent The model ran for 75 epochs, with validation after every 5th epoch, and the best model was chosen based on \acs{mAP} at epoch 75, coincidentally also the last. Training took 11 hours and 59 minutes, achieving an \acs{mAP} of 42\%.
 
 \section{Deployment}
 \label{deployment}

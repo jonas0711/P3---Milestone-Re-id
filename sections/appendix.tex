@@ -187,17 +187,18 @@ Attached is the full validations loggings from the baseline and augmented \acs{R
 Other training setups for the end-to-end integration were tried to find the best configuration of the training hyperparameters. 
 
 
-\subsection{Unclamped SR learning}
+\subsection{Unclamped SR learning}\label{unclamped}
 
 This version was an initial version where the \acs{ReID} was frozen for the first 20 epoch, while SR was learning. This resulted in SR overcompensating and for it to turn into an extended feature extractor for \acs{ReID}, simply adding to the models size, instead of doing SR relevant work.
 
-LR SR: 
-LR ReID: \(65e\)
-Milestones:[20, 60]
-Frozen part: \acs{ReID}
+Epochs = 100
+LR SR:  \(65e-4\)
+LR ReID:  \(1e-4\)
+Milestones: [20,80]
+Frozen part: ReID
 Unfreeze epoch: 20
 
-
+This produced a fine training but pulling the image from the \acs{SR} resulting in very high tensor values. For this reason was the model not included in the main project.
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{unclamped.png}
@@ -214,14 +215,27 @@ Unfreeze epoch: 20
 
 
 \subsection{Clamped SR learning}
+A clamped version was also tried. Here is the bridge between the two modules clamped, meaning the values from the tensor output from the \acs{SR} is kept down, to avoid it exploding like in the unclamped version, presented in Section \ref{unclamped}.
 
-LR SR:
-LR ReID:
-Milestones:
-Frozen part:
-Unfreeze epoch:
+LR SR: \(1e-4\)
+LR ReID: \(1e-5\)
+Milestones:[20, 60]
+Frozen part: \acs{ReID}
+Unfreeze epoch: 20
 
-
+As seen on the Train loss Figure \ref{fig:trainlossclamped} is the train loss never close to the what achieved in other trainings of the \acs{ReID} module. Although the model is still learning at the end of the 100 epochs, it was considered, that other learning rates would give a more optimized training.
+\begin{figure}
+        \centering
+        \includegraphics[width=1\linewidth]{clamed.png}
+        \caption{Train loss for the clamped}
+        \label{fig:trainlossclamped}
+    \end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{clamed-2.png}
+    \caption{Enter Caption}
+        \label{fig:placeholder}
+\end{figure}
 
 
 \subsection{Finetuned ReID with SR}
@@ -601,7 +615,27 @@ Same improvement was found in the \acs{OOD} test.
 \end{table}
 
 \subsection{End-to-end}
-
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{In Distribution test End-to-End}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & MSMT & Market & CUHK \\ \hline
+\textbf{mAP}    & 3.75\%  & 61.44\%& 8.00\%\\ \hline
+\textbf{Rank-1} & 13.29\% & 80.49\%& 10.14\%\\ \hline
+\textbf{Rank-5} & 22.12\% & 91.18\%& 21.43\%\\ \hline
+\textbf{Rank-10}& 27.41\% & 94.57\%& 27.50\%\\ \hline
+\textbf{Rank-20}& 33.75\% & 96.67\%& 35.29\%\\ 
+\hline
+\end{tabular}
+\caption{Results for in distribution test for End-to-end.}
+\end{table}
 \begin{table}[H]
 \centering
 \begin{tabular}{|>{\centering\arraybackslash}
@@ -614,11 +648,11 @@ Same improvement was found in the \acs{OOD} test.
 \multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales}}\\\hline
 \rowcolor[HTML]{D8E9F7}
 {} & Scale 1& Scale 0.75& Scale 0.5\\ \hline
-\textbf{mAP}    & 7.90\%& 11.49\%& 9.86\%\\ \hline
-\textbf{Rank-1} & 17.19\%& 23.38\%& 20.51\%\\ \hline
-\textbf{Rank-5} & 29.58\%& 38.78\%& 34.61\%\\ \hline
-\textbf{Rank-10}& 34.82\%& 44.84\%& 41.70\%\\ \hline
-\textbf{Rank-20}& 43.13\%& 52.51\%& 48.92\%\\ \hline
+\textbf{mAP}    & 8.27\%& 11.95\%& 10.28\%\\ \hline
+\textbf{Rank-1} & 18.18\%& 24.15\%& 20.96\%\\ \hline
+\textbf{Rank-5} & 31.06\%& 39.18\%& 35.42\%\\ \hline
+\textbf{Rank-10}& 36.85\%& 45.96\%& 42.15\%\\ \hline
+\textbf{Rank-20}& 43.09\%& 53.50\%& 50.49\%\\ \hline
 \end{tabular}
 \caption{Scale test of End-to-end on 25 pairs from Market-1501 dataset.}
 \end{table}
@@ -637,11 +671,11 @@ Same improvement was found in the \acs{OOD} test.
 \rowcolor[HTML]{D8E9F7}
 {} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
 \makecell{Very low \\ (Q = 15)}\\ \hline
-\textbf{mAP}    & 7.90\%& 7.19\%& 6.91\%& 5.75\%\\ \hline
-\textbf{Rank-1} & 17.19\%& 15.98\%& 15.39\%& 12.70\%\\ \hline
-\textbf{Rank-5} & 29.58\%& 28.10\%& 26.97\%& 22.71\%\\ \hline
-\textbf{Rank-10}& 34.83\%& 33.30\%& 33.48\%& 28.95\%\\ \hline
-\textbf{Rank-20}&  43.13\%& 39.95\%& 41.02\%& 36.62\%\\ \hline
+\textbf{mAP}    & 8.27\%& 7.49\%& 7.23\%& 6.04\%\\ \hline
+\textbf{Rank-1} & 18.18\%& 16.34\%& 15.53\%& 13.20\%\\ \hline
+\textbf{Rank-5} & 31.06\%& 28.95\%& 28.77\%& 23.70\%\\ \hline
+\textbf{Rank-10}& 36.85\%& 35.41\%& 34.79\%& 30.48\%\\ \hline
+\textbf{Rank-20}&  43.09\%& 42.10\%& 41.83\%& 38.02\%\\ \hline
 \end{tabular}
 \caption{Compression test of End-to-end on 25 pairs from Market-1501 dataset.}
 \end{table}
@@ -654,10 +688,10 @@ Same improvement was found in the \acs{OOD} test.
     |}
 \hline
 \multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
-\textbf{Rank-1} & 10.67\%\\ \hline
+\textbf{Rank-1} & 13\%\\ \hline
 \textbf{Rank-5} & 22.67\%\\ \hline
-\textbf{Rank-10}& 33.67\%\\ \hline
-\textbf{Rank-20}& 47\%\\ \hline
+\textbf{Rank-10}& 34.67\%\\ \hline
+\textbf{Rank-20}& 47.67\%\\ \hline
 \end{tabular}
 \caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the End-to-end model.}
 \end{table}

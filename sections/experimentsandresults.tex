@@ -132,7 +132,14 @@ The \hyperlink{model:endtoend}{End-to-end} model is compared against the \hyperl
 \\\\
 By keeping the other factors constant, this experiment isolated the effect of joint end-to-end training, compared to the sequential integration. 
 
+\section{Image Results from SR}\label{kunfordigstoyan}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{srresults.png}
+    \caption{Visualisation of ho}
+    \label{fig:placeholder}
+\end{figure}
 \section{Results}
 This section presents the results of the conducted experiments defined in Section \ref{sec: experimentsdefined}, first under \acs{InD} conditions and subsequently under multiple \acs{OOD} scenarios. 
 
@@ -161,14 +168,13 @@ Table \ref{tab:reid_indist} presents the \acs{InD} performance of all model conf
          & 0.85\% & 0.79\%\\\hline
          \textbf{End-to-end} 
          & \textcolor{red}{0.78\%} & \textcolor{red}{2.48\%} 
-         & 28.04\% & 49.19\% 
-         & 2.17\% & 2.14\% \\\hline
+         & 61.44\%& 80.49\%& 8.00\% & 10.14\% \\\hline
     \end{tabular}
     \caption{In-distribution test results for all model configurations. The best values in each column are highlighted in red.}
     \label{tab:reid_indist}
 \end{table}
 
-\noindent On Market-1501 the \hyperlink{model:baseline}{Baseline} model achieves the highest performance, with a \acs{mAP} of 73.25\% and Rank-1 of 88.51\%. The \hyperlink{model:augmented}{Augmented} model showed reduced performance compared to the \hyperlink{model:baseline}{Baseline} model. -skriv færdig når end-to-end resultater kommer. 
+\noindent On Market-1501 the \hyperlink{model:baseline}{Baseline} model achieves the highest performance, with a \acs{mAP} of 73.25\% and Rank-1 of 88.51\%. The \hyperlink{model:augmented}{Augmented} model showed reduced performance compared to the \hyperlink{model:baseline}{Baseline} model, while the \hyperlink{model:sequential}{Sequential} has the lowest performance. The \hyperlink{model:endtoend}{End-to-end} model achieves the second highest performance, with a \acs{mAP} of 61.44\% and Rank-1 of 80.49\%.
 \\\\
 On \acs{CUHK03}, the \hyperlink{model:baseline}{Baseline} model again achieves the highest \acs{mAP} of 9.93\% and Rank-1 of 15.07\%. The three other model configurations show lower performance, with the \hyperlink{model:augmented}{Augmented} and \hyperlink{model:sequential}{Sequential} models exhibiting particularly low accuracy. 
 \\\\
@@ -193,13 +199,13 @@ Table \ref{tab:duke_all_models} presents the results from the \acs{OOD} test on 
 \\ \hline
 \textbf{Augmented}  & 4.76\%& 10.32\%\\ \hline
 \textbf{Sequential} & 1.46\%& 3.68\%\\ \hline
-\textbf{End-to-end} & 7.90\% & 17.19\% \\ \hline
+\textbf{End-to-end} & 8.27\%& 18.18\%\\ \hline
 \end{tabular}
 \caption{Comparison of all \acs{OSNet} configurations on the DukeMTMC-ReID dataset.}
 \label{tab:duke_all_models}
 \end{table}
 
-\noindent The \hyperlink{model:baseline}{Baseline} model achieves the highest performance among all the model configurations, with a \acs{mAP} of 10.5\% and Rank-1 of 22.75\%, while the \hyperlink{model:augmented}{Augmented} model achieves roughly half of that. The \hyperlink{model:endtoend}{End-to-end} model has a \acs{mAP} of 7.90\% and a Rank-1 of 17.19\%, which is significantly better than the \hyperlink{model:augmented}{Augmented} model and the \hyperlink{model:sequential}{Sequential} model, which has the lowest performance of them all, with a \acs{mAP} of 1.46\% and Rank-1 of 3.68\%.
+\noindent The \hyperlink{model:baseline}{Baseline} model achieves the highest performance among all the model configurations, with a \acs{mAP} of 10.5\% and Rank-1 of 22.75\%, while the \hyperlink{model:augmented}{Augmented} model achieves roughly half of that. The \hyperlink{model:endtoend}{End-to-end} model has a \acs{mAP} of 8.27\% and a Rank-1 of 18.18\%, which is significantly better than the \hyperlink{model:augmented}{Augmented} model and the \hyperlink{model:sequential}{Sequential} model, which has the lowest performance of them all, with a \acs{mAP} of 1.46\% and Rank-1 of 3.68\%.
 
 \subsection*{Out-of-Distribution Scale Test}
 
@@ -236,15 +242,14 @@ Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on
 & 1.46\%& 3.68\%& 2.04\%& 4.85\%& 3.38\%& 8.17\%\\
 \hline
 \textbf{End-to-end} 
-& 7.90\% & 17.19\% & 11.49\% & 23.38\%
-& 9.86\% & 20.51\% \\
+& 8.27\%& 18.18\%& 11.95\%& 24.15\%& 10.28\%& 20.96\%\\
 \hline
 \end{tabular}
 \caption{Comparison of \acs{OSNet} variants on \acs{DukeMTMC} across different input scales. Metrics shown: \acs{mAP} and Rank-1 (R-1).}
 \label{tab:scale_test}
 \end{table}
 
-\noindent When inspecting the results, it becomes evident that all metrics increase with the scale reduction of 0.75 compared to the unmodified images of scale 1.0. The \hyperlink{model:baseline}{Baseline} model again achieves the highest performance, with a \acs{mAP} of 14.77\% and a Rank-1 of 29.98\%, while the \hyperlink{model:augmented}{Augmented} model continuously achieves roughly half of those results. The \hyperlink{model:endtoend}{End-to-end} model has a \acs{mAP} of 11.49\% and Rank-1 of 23.38\%, while the \hyperlink{model:sequential}{Sequential} model again has the lowest performance out of all the models, with the highest performance being a \acs{mAP} of 3.38\% and Rank-1 of 8.17\% on scale 0.5. The three other models' performance drop on scale 0.5 compared to scale 0.75, but are still higher than the performance on full sized images. 
+\noindent When inspecting the results, it becomes evident that all metrics increase with the scale reduction of 0.75 compared to the unmodified images of scale 1.0. The \hyperlink{model:baseline}{Baseline} model again achieves the highest performance, with a \acs{mAP} of 14.77\% and a Rank-1 of 29.98\%, while the \hyperlink{model:augmented}{Augmented} model continuously achieves roughly half of those results. The \hyperlink{model:endtoend}{End-to-end} model has a \acs{mAP} of 11.95\% and Rank-1 of 24.15\%, while the \hyperlink{model:sequential}{Sequential} model again has the lowest performance out of all the models, with the highest performance being a \acs{mAP} of 3.38\% and Rank-1 of 8.17\% on scale 0.5. The three other models' performance drop on scale 0.5 compared to scale 0.75, but are still higher than the performance on full sized images. 
 
 
 \subsection*{Out-of-Distribution Compression Test}
@@ -285,9 +290,7 @@ Table \ref{tab:compression_test_all} presents the results from the \acs{OOD} com
 & 1.46\%& 3.68\%& 1.31\%& 3.50\%& 1.30\%& 3.32\%& 1.26\%& 3.28\%\\
 \hline
 \textbf{End-to-end} 
-& 7.90\% & 17.19\% & 7.19\% & 15.98\% 
-& 6.91\% & 15.39\% 
-& 5.75\% & 12.70\% \\
+& 8.27\%& 18.18\%& 7.49\%& 16.34\%& 7.23\%& 15.53\%& 6.04\%& 13.20\%\\
 \hline
 \end{tabular}
 \caption{Comparison of \acs{OSNet} variants on \acs{DukeMTMC} under varying compression levels. Metrics shown: \acs{mAP} and Rank-1.}
@@ -312,13 +315,13 @@ Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \
 \textbf{Baseline} & 10\%\\ \hline
 \textbf{Augmented} & 7.33\%\\ \hline
 \textbf{Sequential} & 2.00\% \\ \hline
-\textbf{End-to-end} & \textcolor{red}{10.67\%} \\ \hline
+\textbf{End-to-end} & \textcolor{red}{13\%}\\ \hline
 \end{tabular}
 \caption{Comparison of all OSNet configurations on the iLIDS-VID dataset.}
 \label{tab:ilidsvid_all_models}
 \end{table}
 
-\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are better than those observed on \acs{DukeMTMC} for all model configurations except the \hyperlink{model:baseline}{Baseline} model with a Rank-1 of 10\%, resulting in a difference of 0.5\% below the Rank-1 on \acs{DukeMTMC}. This also result in the \hyperlink{model:entoend}{End-to-end} model achieving the highest Rank-1 of 10.67\%, which is higher than the performance of the \hyperlink{model:baseline}{Baseline} model for the first time.
+\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are better than those observed on \acs{DukeMTMC} for all model configurations except the \hyperlink{model:baseline}{Baseline} model with a Rank-1 of 10\%, resulting in a difference of 0.5\% below the Rank-1 on \acs{DukeMTMC}. This also result in the \hyperlink{model:entoend}{End-to-end} model achieving the highest Rank-1 of 13\%, which is higher than the performance of the \hyperlink{model:baseline}{Baseline} model for the first time.
 
 
 \subsection{Summary of Results}

@@ -1,3 +1,11 @@
 \chapter{Conclusion} \label{cha:conclusion}
 
+The objective of this project was to investigate how \acf{SR} can be used to improve the performance of a person \acf{ReID} system in surveillance settings, particularly under challenging conditions such as \acf{LR} and domain shifts. Two hypotheses guided the project: whether training the \acs{ReID} module on data with strong augmentation improves robustness, and whether integrating \acs{SR} enhances \acs{ReID} performance.
+\\\\
+The experiments showed that simple data augmentation was not sufficient, and the model underperformed compared to the \hyperlink{model:baseline}{Baseline} model across all test scenarios. This suggests that careless or overly aggressive augmentations may have hindered the model, rather than help improve its generalizability. However, the experiments with \acs{SR} showed mixed results. The \hyperlink{model:sequential}{Sequential} model performed the worst on both metrics across all tests. Despite this, the \hyperlink{model:endtoend}{End-to-end} model produced the second best results overall, and was able to outperform the \hyperlink{model:baseline}{Baseline} model on the cross-domain \acs{OOD} test, showing promise for task-adaptive \acs{SR}.
+The best performing model in 4/5 scenarios was the \hyperlink{model:baseline}{Baseline} model, indicating that while improvements through \acs{SR} are possible, they require careful tuning and appropriate training strategies.  
+\\\\
+A proof-of-concept system was successfully deployed using Docker and \texttt{FastAPI}, demonstrating practical accessibility and ethical design considerations through cloud deployment.
+\\\\
+Future work should focus on
 
