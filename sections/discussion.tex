@@ -1,5 +1,5 @@
 \chapter{Discussion} \label{cha: discussion}
-This chapter is meant to further explore and dissect the choices and actions that were made while working on this project, with a focus on acknowledging elements that otherwise would not have been discussed. Furthermore, the results and experiments presented in Chapter \ref{cha: experiments and results} will be explained and rationalized with an emphasis on understanding the outcome. Lastly, a final assessment will be made on whether the project answered the problem statement in Chapter \ref{cha: problemstatement}, and if it achieved an acceptable state, as to meet the set requirements presented in Chapter \ref{cha:reqspec}
+This chapter presents a critical reflection on the project, discussing key decisions, challenges, and insights that emerged throughout the process. It presents elements that were not fully explored in the previous process, providing a broader context for the work. Furthermore, the results and experiments presented in Chapter \ref{cha: experiments and results} will be explained and rationalized with an emphasis on understanding the outcome. Lastly, a final assessment will be made on whether the project answered the problem statement in Chapter \ref{cha: problemstatement}, and if it achieved an acceptable state, as to meet the set requirements presented in Chapter \ref{cha:reqspec}
 
 \section{Data}
 In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This highlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, \acs{CUHK03}, and \acs{MSMT17} datasets are all recorded at different universities in different regions of China, while the \acs{DukeMTMC} dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The \acs{iLIDS-VID} dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
@@ -35,7 +35,7 @@ The \acs{OOD} dataset consists of different augmented versions of the \acs{DukeM
 
 \subsection{\acs{InD} Test}
 
-In the \acs{InD} test, the \hyperlink{model:baseline}{Baseline} model outperformed all other model configurations, especially on the Market-1501 dataset, where it reached an mAP of 73.25\%, and a Rank-1 accuracy of 88.51\%. This was expected, as Market-1501 is the dataset which best matches the \hyperlink{model:baseline}{Baseline} model's training distribution. In contrast, the \hyperlink{model:augmented}{Augmented} model showed a significant drop on Market-1501, suggesting that robustness oriented training (specifically by introducing data augmentations or adding a \acs{SR} module), comes at the cost of fitting the known distribution. The results underline a trade-off between specialization and generalization. While augmentations and \acs{SR} intend to improve \acs{OOD} robustness, they may introduce distortions that reduce performance when the data is close to the training distribution. The augmentations described in Section \ref{sec:dataaugmentation}, including Gaussian blur, color jitter, and JPEG compression, were intended to simulate real-world degradations. However, the substantial drop from 88.51\% to 66.66\% Rank-1 indicates that these augmentations may have been too aggressive.
+In the \acs{InD} test, the \hyperlink{model:baseline}{Baseline} model outperformed all other model configurations, especially on the Market-1501 dataset, where it reached an mAP of 73.25\%, and a Rank-1 accuracy of 88.51\%. This was expected, as Market-1501 is the dataset which best matches the \hyperlink{model:baseline}{Baseline} model's training distribution. In contrast, the \hyperlink{model:augmented}{Augmented} model showed a significant drop on Market-1501, suggesting that robustness oriented training (specifically by introducing data augmentations or adding a \acs{SR} module), comes at the cost of fitting the known distribution. The results underline a trade-off between specialization and generalization. While augmentations and \acs{SR} intend to improve \acs{OOD} robustness, they may introduce distortions that reduce performance when the data is close to the training distribution. The augmentations described in Section \ref{sec: dataaugmentation}, including Gaussian blur, color jitter, and JPEG compression, were intended to simulate real-world degradations. However, the substantial drop from 88.51\% to 66.66\% Rank-1 indicates that these augmentations may have been too aggressive.
 \\\\
 The \hyperlink{model:sequential}{Sequential} model achieved the lowest \acs{InD} performance with 25.86\% \acs{mAP} on Market-1501. This demonstrates that inserting a pre-trained \acs{SR} module before the \acs{ReID} module, without joint optimization, introduces a distribution shift that the \acs{ReID} module cannot accommodate.
 
@@ -110,13 +110,30 @@ One of the more serious issues regarding person \acs{ReID} systems is the potent
 \subsubsection{Data Security}
 As the system handles potentially sensitive data, it is important to ensure data security. This can be done through encryption and should be applied when storing the data as well as for transmitting the data. Furthermore, data should only be kept for as long as necessary, with access limited to authorized and relevant personnel. 
 
+\section{Assessment of Problem Statement and Requirements}
+
+The problem statement \textit{"How can a person Re-identification system be designed and deployed as a proof-of-concept, to
+improve performance through combination with super-resolution?"} was answered in terms of design, integration and deployment. The pipeline partially improved performance with \acs{SR}. The project delivered a working proof-of-concept, but further research is needed to confirm consistent performance gains under real-world conditions. 
+\\\\
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        Req nr. & Requirement & Evaluation & Result & Traceability \\
+        1 & \acs{SR} module must outperform bi-cubic interpolation. & \acs{PSNR} and \acs{SSIM} were calculated&  & \\
+         &  &  &  & \\
+         &  &  &  & \\
+         &  &  &  & \\
+         &  &  &  & \\
+    \end{tabular}
+    \caption{Caption}
+    \label{tab:placeholder}
+\end{table}
+\hyperlink{req:1}{\textit{Requirement 1}} was met in Section \ref{sec: srexperiments}. 
 
 \section{Future Work}
-%Hvad mangler det for at blive realiseret system?
 
-%- The gap between training data and deployment environments should be addressed in future works. 
-
-This project addresses the problem statement of designing a proof of concept system person \acs{ReID} system improved through \acs{SR} Integration. The results demonstrates ? ***** 
+This project addresses the problem statement of designing a proof of concept system person \acs{ReID} system improved through \acs{SR} Integration. The results demonstrates that \acs{SR} has the potential to improve \acs{ReID} performance, however the approach of this project was not sufficient and leaves room for improvements, some of which have been identified as the following: 
 
 \subsubsection{Dataset improvements}
 The training datasets used in this project primarily consists of Chinese and American university campus environments, which introduces cultural, geographical, and environmental bias. Future work should incorporate datasets with diverse populations, clothing styles, and demographics representations to ensure fair and robust performance across different deployment contexts. Additionally, datasets capturing challenging real-world scenarios such as extreme weather, heavy rain, fog, and very low-light scenarios should be included to better prepare the model for actual surveillance conditions. Finally, creating a custom dataset specifically designed to match the target deployment environment would allow for more accurate evaluation of system performance under realistic conditions.

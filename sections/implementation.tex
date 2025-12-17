@@ -1,13 +1,13 @@
 \chapter{Implementation} \label{cha: implementation}
-This Chapter presents the implementation of  \acs{ReID} module, \acs{SR} module and how they are combined. The description include details on dataloader, training hyperparameters, validation strategy and training duration. To evaluate the hypotheses outlined in Section \ref{sec:hypotheses}, four model configurations have been implemented, and will be compared against each other.
+This Chapter presents the implementation of the \acs{ReID} module, the \acs{SR} module and how they are combined. The description includes details on the dataloader, training hyperparameters, validation strategy and training duration. To evaluate the hypotheses outlined in Section \ref{sec:hypotheses}, four model configurations have been implemented, and will be compared against each other.
 
 \section{ReID Module}
 This section presents the implementation details, when it comes to the \acs{ReID} module, including the dataloader, training hyperparameters and training setup. 
 
 \subsection{Dataloader}
-The data loaders used for person \acs{ReID} training, validation, and testing are implemented using the \texttt{DataLoader} class from \texttt{torch.utils.data}. For training, the data loader operates on the combined dataset described in Section~\ref{combineddataset}, using a batch size of 64 with data shuffling enabled. This configuration ensures hat each batch has images from different datasets.
+The data loaders used for person \acs{ReID} training, validation, and testing are implemented using the \texttt{DataLoader} class from \texttt{torch.utils.data}. For training, the data loader operates on the combined dataset described in Section~\ref{combineddataset}, using a batch size of 64 with data shuffling enabled. This configuration ensures that each batch has images from different datasets.
 \\\\
-For validation and testing, the data loaders use a batch size of 1 and disable shuffling. This setup follows standard person \acs{ReID} practice, as each image is evaluated independently to enable precise query–gallery matching and reproducible performance measurement.
+For validation and testing, the data loaders use a batch size of 1 and have shuffling disabling. This setup follows standard person \acs{ReID} practice, as each image is evaluated independently to enable precise query–gallery matching and reproducible performance measurement.
 
 \subsection{Re-Implementation of OSNet}\label{sec:implementationosnet}
 The architecture of the implemented person \acs{ReID} model is identical to what described in Section \ref{sec:methodreid}. The implementation of the \acf{OSNet} architecture is taken from the \texttt{Torchreid} repository, which also comes with a pretrained \acs{OSNet} model \cite{TorchReIDM1501}. However, to ensure full control over the training process and to train from scratch, a custom training script was made. 
@@ -251,7 +251,7 @@ The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the deta
 \label{tab:endtoendtrainingparameters}
 \end{table}
 
-\noindent The learning rate of \(1e-5\) for the \acs{ReID} was chosen as it is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images for the first 20 epochs. The learning rate for the \acs{SR} module was set to \(1e-4\), in practice the learning rate would be \(1e-5\) by the time that the \acs{SR} module is unfrozen. Freezing the module meant setting \texttt{module.eval()} and \texttt{require\_grad = False} for each its parameters. This action was then reversed at epoch 20 by setting \texttt{module.train()} and \texttt{require\_grad = True}. This was chosen to be lower than the learning rate used in Section \ref{edsr_hyperparameters}, allowing the \acs{SR} module to maintain it's learned function, but also to get accustomed to the new domain and loss. At epoch 60, the learning rates for both drop for final finetuning, with learning rates \(1e-6\) and \(1e-7\) respectively. 
+\noindent The learning rate of \(1e-5\) for the \acs{ReID} was chosen as it is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images for the first 20 epochs. The learning rate for the \acs{SR} module was set to \(1e-4\), in practice the learning rate would be \(1e-5\) by the time that the \acs{SR} module is unfrozen. Freezing the module meant setting \texttt{module.eval()} and \texttt{require\_grad = False} for each of its parameters. This action was then reversed at epoch 20 by setting \texttt{module.train()} and \texttt{require\_grad = True}. This was chosen to be lower than the learning rate used in Section \ref{edsr_hyperparameters}, allowing the \acs{SR} module to maintain it's learned function, but also to get accustomed to the new domain and loss. At epoch 60, the learning rates for both drop for final finetuning, with learning rates \(1e-6\) and \(1e-7\) respectively. 
 
 \subsection{Training duration}
 The training and validation plots can be seen in Figure \ref{fig:srreid_plots}.
@@ -276,7 +276,7 @@ The training and validation plots can be seen in Figure \ref{fig:srreid_plots}.
 
 \section{Deployment}
 \label{deployment}
-As the \acs{ReID} system was made with focus and considerations on Section \ref{sec:ethical_considerations}, the intentions of the finalized project was to  strictly deploy it only on cloud based applications with API functionalities, as to limit its use and source code on hardware as much as possible. Therefore, a script was implemented which enables cloud based utilization of said system in a real-world setting.
+As the \acs{ReID} system was made with focus and considerations on Section \ref{sec:ethical_considerations}, the intentions of the finalized project was to strictly deploy it only on cloud based applications with API functionalities, as to limit its use and source code on hardware as much as possible. Therefore, a script was implemented which enables cloud based utilization of said system in a real-world setting.
 \\\\
 To ensure a more streamlined implementation of the system in future uses, the deployment was made with a Docker containerization setup. This ensures that relevant libraries, dependencies, and any other version-specific parameters needed to run the script, are present and being used. Furthermore, a requirements text file with used libraries and corresponding versions has also been included to allow reproducibility of the container or another virtual environment if needed.
 \\\\
@@ -287,6 +287,6 @@ The backend pipeline of the deployment script works by first processing the gall
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{deployment_example.png}
-    \caption{Screenshot of a localhost with the deployment script implemented. This image is after the script has computed the top ranking matches in the gallery as seen in the figure.}
+    \caption{Screenshot of a localhost with the deployment script implemented. This image is after the script has computed the top ranking matches in the gallery.}
     \label{fig:deployment_example}
 \end{figure}
