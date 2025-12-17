@@ -24,9 +24,7 @@ Alternatively, \acs{SR} is integrated to improve image quality and enhance featu
 This section introduces the chosen \acs{ReID}-architecture, which is described based on the original \acs{OSNet} publication \cite{OSNet}, along with the training and test strategies, loss function, and evaluation metrics. 
 
 \subsection{OSNet} \label{sec:methodreid}
-The \acf{OSNet} architecture introduced in Section \ref{sec:omniscale}, demonstrates strong performance across several person re-identification benchmarks \cite{OSNet}. In Section \ref{outofdistributiontest}, it was concluded that \acs{OSNet} performance still has room to improve, when confronted with lower resolution scales or more aggre
-
-As the omni-scale design is more robust against changes in scale, it provides a suitable basis for insight into the potential benefits of using \acs{SR} as an input module, beyond increase in spatial scale alone.
+The \acf{OSNet} architecture introduced in Section \ref{sec:omniscale}, demonstrates strong performance across several person re-identification benchmarks \cite{OSNet}. In Section \ref{outofdistributiontest}, it was concluded that \acs{OSNet} performance still has room to improve, when confronted with lower resolution scales or more aggressive compression. However, given its omni-scale design and lightweight architecture, \acs{OSNet} is a well-suited backbone for exploring improvements under resolution-degraded conditions, particularly in combination with super-resolution techniques. 
 \\\\
 As mentioned in Section \ref{sec:omniscale}, the model adaptively captures discriminative features for person \acs{ReID} across different spatial scales. This is achieved through \acf{OSBlock}s, which are the fundamental building units of \acs{OSNet}. The details for the architecture are presented in this section, based on Figure \ref{fig:osnetpipeline}.
 
@@ -37,7 +35,7 @@ As mentioned in Section \ref{sec:omniscale}, the model adaptively captures discr
     \label{fig:osnetpipeline}
 \end{figure}
 
-\noindent The first \acs{OSBlock} receives a feature map created by an initial standard convolution and max pooling, with the following \acs{OSBlock}s using the feature map from the previous layer. This process is repeated until the fourth convolution stage, which is then followed by a pointwise \textit{1x1} convolution, to fuse information across all channels together. Global average pooling is used to collapse the spatial dimensions into one value per channel, resulting in a feature vector that is passed through a fully connected layer to produce the final embedding used for person re-identification. 
+\noindent The first \acs{OSBlock} receives a feature map created by an initial standard convolution and max pooling, with the following \acs{OSBlock}s using the feature map from the previous layer. This process is repeated until the fourth convolution stage, which is then followed by a pointwise \textit{1x1} convolution, to fuse information across all channels together. Global average pooling is used to collapse the spatial dimensions into one value per channel, resulting in a feature vector that is passed through a fully connected layer to produce the final embedding used for person \acs{ReID}. 
 \\\\
 The internal process of a single \acs{OSBlock} is presented in Figure \ref{fig:osblockpipeline}. 
 
@@ -50,7 +48,7 @@ The internal process of a single \acs{OSBlock} is presented in Figure \ref{fig:o
 
 \noindent In these blocks, the feature map is processed by a pointwise \textit{1x1} convolution, which reduces the channel dimensions. Subsequently, four parallel streams apply depthwise convolutions with kernel sizes \textit{3x3}, \textit{5x5}, \textit{7x7}, and \textit{9x9}, corresponding to increasing receptive fields that capture features at different scales, which defines the omni-scale capability. Each branch uses these depthwise separable convolutions, also called lite \textit{3x3}, to improve efficiency. The outputs from the four parallel streams are  aggregated with channel-wise adaptive aggregation. The aggregation is implemented through a lightweight gating mechanism performed by an internal mini neural network that learns to weight feature channels based on the extracted feature maps.  The purpose of the aggregation gate is to dynamically combine scale-specific features into a unified representation that is robust to variations in spatial scale. 
 \\\\
-This fusion is what enables the models omni-scale behavior. After the fusion, a pointwise \textit{1x1} convolution restores the original channels. The final result is added to the input of the block by a skip connection and passed through a ReLU activation function. Each stage contains two \acs{OSBlock}s with \texttt{stride=1}, before an \acs{OSBlock} with \texttt{stride=2} downsamples the feature map. 
+This fusion is what enables the models omni-scale behavior. After the fusion, a pointwise \textit{1x1} convolution restores the original channels. The final result is added to the input of the block by a skip connection and passed through a ReLU activation function. Each stage contains two \acs{OSBlock}s with \texttt{stride=1}, before an \acs{OSBlock} with \texttt{stride=2} down-samples the feature map. 
 
 
 \subsubsection{Model Configuration}
@@ -175,7 +173,7 @@ Once processed individually, the three training datasets are merged into a singl
 \noindent As visualized in Figure \ref{fig:teststrategydataset}, the evaluation will follow a two stage approach: In distribution testing on \acs{MSMT17}, Market-1501, and \acs{CUHK03} to establish a baseline performance on known datasets. \acf{OOD} testing, which is the primary focus, using two datasets. \acs{DukeMTMC} \cite{Gou2017DukeMTMC4ReID} will serve as a same domain \acs{OOD} test with outdoor university surveillance, similar to the content of the training datasets, but with a new demographic and environment. \acs{iLIDS-VID} \cite{wang2014person} will provide a cross domain test with indoor airport footage, evaluating whether the model learned truly discriminative features or over-fitted to outdoor characteristics. Beyond dataset shifts, controlled degradations are applied to \acs{DukeMTMC} to simulate realistic surveillance challenges where persons appear at varying distances or footage is compressed for storage, directly testing the projects core hypothesis that \acs{SR} can reduce resolution degradation effects on \acs{ReID} performance. Furthermore, the evaluation strategy also differs in terms of data structure. \acs{DukeMTMC} supports multi-shot learning, where multiple gallery images of the same individual are available. In contrast, \acs{iLIDS-VID} introduces a one-shot learning scenario, where only a single gallery image per person is provided, increasing the difficulty and emphasizing the need for strong generalization from limited input.   
 
 \subsection{Data Augmentation} \label{sec: dataaugmentation}
-To support the objective of the testing strategy, a data augmentation strategy is applied to expose the model to controlled variations in image quality, lighting, scale, and appearance. This allows for direct comparison between a baseline version of \acs{OSNet} and an augmented version of \acs{OSNet}, assessing whether augmentations improve generalization under the testing conditions described in Section \ref{Reidteststrategy}. The augmentations are chosen based on the environmental effects described in Section \ref{sec:} challenges described in Section \ref{subsec:challenges-ReID}. The different types of augmentations and their purpose is included in Table \ref{tab:augmentationtypes}. 
+To support the objective of the testing strategy, a data augmentation strategy is applied to expose the model to controlled variations in image quality, lighting, scale, and appearance. This allows for direct comparison between a baseline version of \acs{OSNet} and an augmented version of \acs{OSNet}, assessing whether augmentations improve generalization under the testing conditions described in Section \ref{Reidteststrategy}. The augmentations are chosen based on the environmental effects described in Section \ref{sec: environmentaleffectontheimagequality}, and the challenges described in Section \ref{subsec:challenges-ReID}. The different types of augmentations and their purpose is included in Table \ref{tab:augmentationtypes}. 
 
 \begin{table}[H]
     \centering
@@ -192,7 +190,7 @@ To support the objective of the testing strategy, a data augmentation strategy i
     \caption{The different implemented augmentations.}
     \label{tab:augmentationtypes}
 \end{table}
-\noindent These data augmentations were used in two different transformation pipelines: One with light augmentations for the baseline version, and one with strong augmentations for the augmented version, see Table \ref{tab:three_subtables}.
+\noindent These data augmentations were applied with a fixed probability, as presented in Table \ref{tab:augmentationtypes}, and were used in two different transformation pipelines: One with light augmentations for the baseline version, and one with strong augmentations for the augmented version, see Table \ref{tab:three_subtables}.
 
 \begin{table}[H]
 \centering
@@ -230,14 +228,14 @@ To support the objective of the testing strategy, a data augmentation strategy i
 \end{table}
 
 \subsection{Key Takeaways}
-From the previous sections, several key design decisions have been made. These include the selection of \acs{ReID} architecture (OSNet), the choice of loss function (Multiclass Cross-Entropy Loss) and the evaluation metrics (Rank-\textit{k} and \acs{mAP}). In addition, the training and test strategy were defined as: training across three datasets, while testing both \acf{InD} and \acs{OOD} to asses the models' robustness under different surveillance conditions.
-Finally, two different versions of the \acs{ReID} module, \hyperlink{model:baseline}{Baseline} and \hyperlink{model:augmented}{Augmented}, were introduced to assess the hypothesis regarding whether data augmentation can improve generalization and feature robustness.
+From the previous sections, several key design decisions have been made. These include the selection of the \acs{ReID} architecture as \acs{OSNet}, the choice of loss function as softmax loss, and the evaluation metrics as Rank-\textit{k} and \acs{mAP}. In addition, the training and test strategy were defined as: training across three datasets, while testing both \acf{InD} and \acs{OOD} to asses the models' robustness under different surveillance conditions.
+Finally, two different versions of the \acs{ReID} module, the \hyperlink{model:baseline}{Baseline} model and the \hyperlink{model:augmented}{Augmented} model, were introduced to assess the hypothesis regarding whether data augmentation can improve generalization and feature robustness.
 
 \section{SR Module}\label{sec:designSRmodule}
-This section presents the chosen \acs{SR} architecture, as well as the training strategy using the two \acs{SR} datasets presented in Section \ref{sec: superresdata}. Based on the technical analysis of the perception-distortion trade of in the \acs{SR} domain presented in \ref{subsec:perception-distortion-tradeoff}, a low distortion model is considered more suitable for integration with \acs{ReID}, as it reduces the risk for introduction of \acs{SR} artifacts.
+This section presents the chosen \acs{SR} architecture, as well as the training strategy using the two \acs{SR} datasets presented in Section \ref{sec: superresdata}. Based on the technical analysis of the perception-distortion trade-off in the \acs{SR} domain, presented in \ref{subsec:perception-distortion-tradeoff}, a low distortion model is considered more suitable for integration with \acs{ReID}, as it reduces the risk of introducing \acs{SR} artifacts.
 
 \subsection{EDSR}
-\acf{EDSR} is a \acf{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}. For this project, the base configuration of \acs{EDSR} is selected due to its balance between reconstruction quality and computational efficiency. Table \ref{tab:edsr-config} summarizes the base \acs{EDSR} configuration, consisting of 16 residual blocks with 64 feature channels.
+\acf{EDSR} is a \acf{ResNet} based architecture for single image \acs{SR}, designed with an emphasis on high reconstruction quality and stable training. As mentioned in Section \ref{sec: edsr relatedworks}, \acs{EDSR} showed strong performance when optimizing for low distortion, making it a promising candidate as a pre-processing unit for the task of \acs{ReID}. For this project, the base configuration of \acs{EDSR} is selected due to its balance between reconstruction quality and computational efficiency. Table \ref{tab:edsr-config} summarizes the base \acs{EDSR} configurations, consisting of 16 residual blocks with 64 feature channels.
 
 \begin{table}[H]
     \centering
@@ -252,7 +250,8 @@ This section presents the chosen \acs{SR} architecture, as well as the training 
     \label{tab:edsr-config}
 \end{table}
 
-\noindent The architecture consists of a convolutional layer, a deep stack of residual blocks and an upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, while the internal structure of the residual blocks and upsampling module are illustrated in Figures \ref{fig:resblockpipeline} and \ref{fig:upsampleblockpipeline} respectively. 
+\noindent The architecture consists of a convolutional layer, a deep stack of residual blocks and an upsampling module that produces the super-resolution output for the given scale factor. The overall \acs{EDSR} pipeline can be seen in Figure \ref{fig:edsrpipeline}, while the internal structure of the residual blocks and up-sampling module are illustrated in Figure \ref{fig:resblockpipeline} and \ref{fig:upsampleblockpipeline} respectively. 
+
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{edsrpipeline.png}
@@ -260,7 +259,7 @@ This section presents the chosen \acs{SR} architecture, as well as the training 
     \label{fig:edsrpipeline}
 \end{figure}
 
-\noindent Similar to the \acs{ResNet} architecture, \acs{EDSR} has multiple skip connections enabling the training of deeper networks without suffering from vanishing gradient. These skip connections also improve feature refinement by allowing the network to focus on learning the residual improvements to the input, rather than storing the entire input in memory. In total \ac{EDSR} has two types skip-connections, one in each of the resblocks, see Figure \ref{fig:resblockpipeline} and one, from the first convolutional layer adding just before the upsampling block, see Figure \ref{fig:edsrpipeline}.
+\noindent Similar to the \acs{ResNet} architecture, \acs{EDSR} has multiple skip connections enabling the training of deeper networks without suffering from vanishing gradient. These skip connections also improve feature refinement, by allowing the network to focus on learning the residual improvements to the input, rather than storing the entire input in memory. In total, \acs{EDSR} has two types of skip-connections, one in each of the resblocks, see Figure \ref{fig:resblockpipeline}, and one from the first convolutional layer, adding just before the up-sampling block, see Figure \ref{fig:edsrpipeline}.
 
 \begin{figure} [H]
     \centering
@@ -269,17 +268,17 @@ This section presents the chosen \acs{SR} architecture, as well as the training 
     \label{fig:resblockpipeline}
 \end{figure}
 
-\noindent As \acs{EDSR} is a deep and wide model, residual scaling is commonly employed to stabilize training by multiplying the output of each residual block with a small factor before adding it to the skip connection. However, this does not apply to the baseline model used in this work, as it is the smallest configuration and employs a residual scaling factor of 1, which effectively corresponds to no residual scaling.
+\noindent As \acs{EDSR} is a deep and wide model, residual scaling is commonly employed to stabilize training by multiplying the output of each residual block with a small factor, before adding it to the skip connection. However, this does not apply to the baseline model used in this work, as it is the smallest configuration and employs a residual scaling factor of 1, which effectively corresponds to no residual scaling.
 
 
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.75\linewidth]{upsampleblockpipeline.png}
-    \caption{An overview of the internal process of the upsample block.}
+    \caption{An overview of the internal process of the up-sample block.}
     \label{fig:upsampleblockpipeline}
 \end{figure}
 
-\noindent As shown in Figure \ref{fig:edsrpipeline}, the upsampling stage is implemented by learnable upsampling modules placed at the end of the network, so that most of the computation is performed in the low-resolution space, effectively meaning only the final layers project the feature maps to high resolution. The internal structure of the upsampling module is illustrated in Figure \ref{fig:upsampleblockpipeline}, which shows the learnable nature of the upsampling process. Specifically, the upsampling module uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2}. As shown in the figure, this convolutional layer contains trainable weights, making the upsampling process learnable rather than relying on fixed interpolation methods such as bilinear or bicubic upsampling. The \texttt{PixelShuffle} operation then rearranges these learned features into the spatially upscaled output \cite{shi2016subpixel_arxiv}.
+\noindent As shown in Figure \ref{fig:edsrpipeline}, the up-sampling stage is implemented by learnable up-sampling modules, placed at the end of the network, so that most of the computation is performed in the \acf{LR} space, effectively meaning only the final layers project the feature maps to \acf{HR}. The internal structure of the up-sampling module is illustrated in Figure \ref{fig:upsampleblockpipeline}, which shows the learnable nature of the up-sampling process. Specifically, the up-sampling module uses a sub-pixel convolution approach called \texttt{PixelShuffle}, where a convolutional layer first expands the feature maps by a factor of scale\textsuperscript{2}. This convolutional layer contains trainable weights, making the up-sampling process learnable rather than relying on fixed interpolation methods, such as bilinear or bicubic up-sampling. The \texttt{PixelShuffle} operation then rearranges these learned features into the spatially up-scaled output \cite{shi2016subpixel_arxiv}.
 
 \subsection{Loss Function}\label{sec:srloss}
 For the training of the \acs{SR} module, \acf{MAE}, also called \acf{L1}, was used as the training objective, following the original \acs{EDSR} implementation \cite{lim2017edsr}. \acs{L1} loss is less sensitive to outliers than \acs{L2} loss, as large errors are not squared and therefore receive less emphasis during optimization \cite{Goodfellow2016}.
@@ -288,25 +287,25 @@ For the training of the \acs{SR} module, \acf{MAE}, also called \acf{L1}, was us
 The primary metric for evaluating the \acs{SR} module is \acf{PSNR}, supported by \acf{SSIM}. Both measure distortion and fit the chosen low-distortion \acs{SR} strategy, which aims to avoid hallucinated details and artifacts that could hurt downstream \acs{ReID} performance \cite{Blau2018PerceptionDistortion}.
 
 \subsubsection*{PSNR}
-\acs{PSNR} measures the pixel-wise difference between the super-resolved output and the reference \acs{HR} image, derived from the mean squared error (MSE). A higher \acs{PSNR} means lower distortion and more accurate reconstruction. For \acs{ReID}, the goal is to keep real discriminative details and avoid adding fake ones. \acs{PSNR} is therefore the primary model-selection criterion (best checkpoint chosen by highest validation \acs{PSNR}) to prioritize pixel accuracy over perceptual effects that could create false details \cite{lim2017edsr}.
+\acs{PSNR} measures the pixel-wise difference between the super-resolved output and the reference \acs{HR} image, derived from the mean squared error (MSE). A higher \acs{PSNR} means lower distortion and more accurate reconstruction. For \acs{ReID}, the goal is to keep real discriminative details and avoid adding fake ones. \acs{PSNR} is therefore the primary model-selection criterion, with the best model checkpoint being chosen by the highest validation \acs{PSNR}, to prioritize pixel accuracy over perceptual effects that could create false details \cite{lim2017edsr}.
 
 \subsubsection*{SSIM}
-\acs{SSIM} measures structural similarity (luminance, contrast, structure) between reference and output \cite{Wang2004SSIM}. Values close to 1 mean structures are well preserved. \acs{SSIM} is reported with \acs{PSNR} to check that edges and textures critical for \acs{ReID} embeddings remain intact. Using both \acs{PSNR} and \acs{SSIM} reflects the low-distortion strategy and reduces the risk of hallucinations and artifacts that could harm \acs{ReID} discrimination \cite{Blau2018PerceptionDistortion}.
+\acs{SSIM} measures structural similarity (luminance, contrast, structure) between reference and output \cite{Wang2004SSIM}. Values close to 1 mean structures are well preserved. \acs{SSIM} is reported with \acs{PSNR}, to check that edges and textures critical for \acs{ReID} embeddings remain intact. Using both \acs{PSNR} and \acs{SSIM} reflects the low-distortion strategy and reduces the risk of hallucinations and artifacts that could harm \acs{ReID} discrimination \cite{Blau2018PerceptionDistortion}.
 
 
 \subsection{Training and Validation Strategy}\label{SRtrainingdata}
-A two-stage training strategy was employed. First, the model was pretrained on the \acs{RELLISUR} dataset, followed by finetuning on \acs{DIV2K}. This approach was chosen instead of mixing the datasets directly due to their fundamentally different degradation characteristics. \acs{RELLISUR} consists of real low-light and low-resolution image pairs captured under natural imaging conditions, where degradations arise from the physical image capture process rather than synthetic downsampling.
+A two-stage training strategy was employed. First, the model was pretrained on the \acs{RELLISUR} dataset, followed by finetuning on \acs{DIV2K}. This approach was chosen instead of mixing the datasets directly due to their fundamentally different degradation characteristics. \acs{RELLISUR} consists of real low-light and low-resolution image pairs captured under natural imaging conditions, where degradations arise from the physical image capture process rather than synthetic down-sampling.
 \\\\
 By pretraining on \acs{RELLISUR}, the model is exposed to realistic degradation patterns, allowing it to learn robust representations for handling real-world low-light super-resolution. Subsequent finetuning on \acs{DIV2K}, which contains high-quality images with synthetically generated low-resolution counterparts, refines these representations under controlled degradation settings. This finetuning stage improves reconstruction stability and generalization while retaining the realism learned during pretraining.
 
 \subsubsection{Patch-Based Training Strategy}
 The \acs{RELLISUR} and \acs{DIV2K} datasets were prepared by cropping aligned \acs{LR} and \acs{HR} patches of size \textit{64×128} and \textit{128×256} pixels from the original images. This preprocessing was performed prior to training, creating a fixed dataset of patch pairs.
 \\\\
-The patch dimensions were chosen to match typical person bounding box sizes in \acs{ReID} datasets, such as Market-1501 (\textit{128×64}) and MSMT17 (\textit{256×128}), as described in Section \ref{sec:reid-dataset}. Training the \acs{SR} module on patches of similar dimensions ensures that the model learns to upscale images at scales relevant to the downstream \acs{ReID} task. This alignment between \acs{SR} training data and \acs{ReID} input data is critical for effective integration of the two modules \cite{lim2017edsr}.
+The patch dimensions were chosen to match typical person bounding box sizes in \acs{ReID} datasets, such as Market-1501 (\textit{128×64}) and \acs{MSMT17} (\textit{256×128}), as described in Section \ref{sec:reid-dataset}. Training the \acs{SR} module on patches of similar dimensions ensures that the model learns to upscale images at scales relevant to the downstream \acs{ReID} task. This alignment between \acs{SR} training data and \acs{ReID} input data is critical for effective integration of the two modules \cite{lim2017edsr}.
 
 
 \subsection{Data Augmentation}
-The purpose of integrating a \acs{SR} module into the \acs{ReID} pipeline is to handle the surveillance data better, while up scaling the images. For this reason is the \acs{SR} Module trained using the data augmentations presented in \ref{tab:edsraugmentation}.
+The purpose of integrating a \acs{SR} module into the \acs{ReID} pipeline is to handle the surveillance data better, while up-scaling the images. For this reason, the \acs{SR} module is trained using the data augmentations presented in Table \ref{tab:edsraugmentation}.
 
 \begin{table}[H]
 \centering
@@ -328,27 +327,26 @@ The purpose of integrating a \acs{SR} module into the \acs{ReID} pipeline is to 
 
 \section{Model Setups} \label{sec:model_definitions}
 
-In order to validate the hypotheses defined in Section \ref{sec:hypotheses}, three experiments will be conducted. For the purpose of these experiments, four model's will be implemented in Chapter \ref{cha: implementation}. The \hyperlink{model:baseline}{first model} will serve as a baseline for comparison. The \hyperlink{model:augmented}{second model} will be used to validate \hyperlink{hypothesis:1}{\textit{hypothesis 1}}. The \hyperlink{model:sequential}{third} and \hyperlink{model:endtoend}{fourth} models will be used to validate \hyperlink{hypothesis:2}{\textit{hypothesis 2}} at two different integration levels. Each model is defined as follows:
+In order to validate the hypotheses defined in Section \ref{sec:hypotheses}, three experiments will be conducted. For the purpose of these experiments, four models will be implemented in Chapter \ref{cha: implementation}. The \hyperlink{model:baseline}{first model} will serve as a baseline for comparison. The \hyperlink{model:augmented}{second model} will be used to validate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}}. The \hyperlink{model:sequential}{third} and \hyperlink{model:endtoend}{fourth} models will be used to validate \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} at two different integration levels. Each model is defined as follows:
 
 \subsection*{\hypertarget{model:baseline}{Baseline} Model}
-Baseline model of \acs{OSNet} trained from scratch using the light augmentations pipeline from Table \ref{tab:three_subtables}.
+\hyperlink{model:baseline}{Baseline} model of \acs{OSNet} trained from scratch, using the light augmentations pipeline from Table \ref{tab:three_subtables}.
 
 \subsection*{\hypertarget{model:augmented}{Augmented} Model}
-Augmented model of \acs{OSNet} trained from scratch using the strong augmentation pipeline from Table \ref{tab:three_subtables}.
+\hyperlink{model:augmented}{Augmented} model of \acs{OSNet} trained from scratch using the strong augmentation pipeline from Table \ref{tab:three_subtables}.
 
 \subsection*{\hypertarget{model:sequential}{Sequential} Model}
-Pretrained baseline model of \acs{OSNet} in sequential combination with pretrained \acs{EDSR}. Sequential is defined as the two modules (\acs{SR} and \acs{ReID}) being combined without further training.
+Pretrained \hyperlink{model:baseline}{Baseline} model of \acs{OSNet} in sequential combination with pretrained \acs{EDSR}. \hyperlink{model:sequential}{sequential} is defined as the two modules (\acs{SR} and \acs{ReID}) being combined without further training.
 
 \subsection*{\hypertarget{model:endtoend}{End-to-end} Model}
-Pretrained baseline model of \acs{OSNet} trained end-to-end with pretrained \acs{EDSR}, using the strong augmentation pipeline from Table \ref{tab:three_subtables}. End-to-end is defined as the modules being combined, such that losses from the \acs{ReID} module back-propagate into the \acs{SR} module.
+Pretrained \hyperlink{model:baseline}{Baseline} model of \acs{OSNet} trained end-to-end with pretrained \acs{EDSR}, using the strong augmentation pipeline from Table \ref{tab:three_subtables}. \hyperlink{model:endtoend}{End-to-end} is defined as the modules being combined, such that losses from the \acs{ReID} module back-propagate into the \acs{SR} module.
 
 \subsection{Summary}
 This section outlined the methods which will be implemented in this project to validate the two hypotheses presented in Section \ref{sec:hypotheses}: 
-\hyperlink{hypothesis:1}{\textit{Hypothesis 1}}: Training the \acs{ReID} module on augmented images will improve performance when evaluated under in-distribution and \acf{OOD} conditions.
+\hyperlink{hypothesis:1}{\textit{Hypothesis 1}}: Training the \acs{ReID} module on augmented images will improve performance when evaluated under \acs{InD} and \acf{OOD} conditions.
 \hyperlink{hypothesis:2}{\textit{Hypothesis 2}}: Running input through the \acs{SR} module, before it enters the \acs{ReID} module, will lead to better performance. 
 \\\\
-\acs{OSNet} is chosen as the \acs{ReID} architecture and \acs{EDSR} is chosen as the \acs{SR} architecture. These two architectures will be used to create four different model variations, that will be compared against each other. The comparison will be based on two test types, in-distribution and out-of-distribution, as described in section \ref{Reidteststrategy}. Table \ref{tab:dataset_summary} presents the datasets selected for each test type, note that the \acs{InD} datasets are the ones used in the combined dataset.  
-
+\acs{OSNet} is chosen as the \acs{ReID} architecture and \acs{EDSR} is chosen as the \acs{SR} architecture. These two architectures will be used to create four different model variations, that will be compared against each other. The comparison will be based on two test types, \acs{InD} and \acs{OOD}, as described in section \ref{Reidteststrategy}. Table \ref{tab:dataset_summary} presents the datasets selected for each test type, note that the \acs{InD} datasets are the ones used for the combined dataset.  
 \begin{table}[H]
 \centering
 \begin{tabular}{|
@@ -368,7 +366,7 @@ CUHK03 & China & 13,164 & 1,360 & 6 & \acs{InD} \\ \hline
 DukeMTMC-ReID & USA & 36,411 & 1,404 & 8 & \acs{OOD} \\ \hline
 iLIDS-VID & United Kingdom & 600 & 300 & 2 & \acs{OOD} \\ \hline
 \end{tabular}
-\caption{Overview of datasets used for person Re-Identification, including dataset origin, scale, and role in evaluation.}
+\caption{Overview of datasets used for person \acs{ReID}, including dataset origin, scale, and role in evaluation.}
 \label{tab:dataset_summary}
 \end{table}
 

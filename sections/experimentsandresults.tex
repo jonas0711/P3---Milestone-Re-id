@@ -5,7 +5,7 @@
 Before integrating \acs{SR} into the \acs{ReID} pipeline, the selected \acs{SR} architecture is evaluated independently, as to verify that it provides meaningful improvements over simple interpolation methods. This section presents the evaluation results and a direct comparison between \acs{EDSR} and bicubic interpolation.
 
 \subsubsection{Two-Stage Training Results}
-Two \acs{EDSR} models were trained using a two-stage approach: the first model was trained from scratch on \acs{RELLISUR}, and the second model was obtained by finetuning the first model on \acs{DIV2K}. Table \ref{tab:training_results} presents the validation results for both training stages.
+Two \acs{EDSR} models were trained using a two-stage approach. The first model was trained from scratch on \acs{RELLISUR}, and the second model was obtained by fine-tuning the first model on \acs{DIV2K}. Table \ref{tab:training_results} presents the validation results for both training stages.
 
 \begin{table}[H]
 \centering
@@ -19,15 +19,16 @@ Two \acs{EDSR} models were trained using a two-stage approach: the first model w
 \hline
 Stage 1: RELLISUR Scratch & \textcolor{red}{24.72} & \textcolor{red}{0.090} \\
 \hline
-Stage 2: DIV2K Finetuned & 24.28 & 0.095 \\
+Stage 2: DIV2K Fine-tuned & 24.28 & 0.095 \\
 \hline
 \end{tabular}
 \caption{Validation performance for both training stages. Best validation results highlighted in red.}
 \label{tab:training_results}
 \end{table}
 
+
 \subsubsection{Test Set Evaluation}
-Both models were evaluated on the \acs{RELLISUR} test set consisting of 85 naturally degraded low-resolution images. Table \ref{tab:edsr_test_results} presents the test set performance for both models. The scratch model achieved a mean \acs{PSNR} of 28.25 dB and \acs{SSIM} of 0.9751, while the finetuned model achieved 28.09 dB \acs{PSNR} and 0.9733 \acs{SSIM}. The scratch model outperformed the finetuned model by 0.16 dB in \acs{PSNR} and 0.0018 in \acs{SSIM}.
+Both models were evaluated on the \acs{RELLISUR} test set consisting of 85 naturally degraded, low-resolution images. Table \ref{tab:edsr_test_results} presents the test set performance for both models. The scratch model achieved a mean \acs{PSNR} of 28.25 dB and \acs{SSIM} of 0.9751, whereas the fine-tuned model reached 28.09 dB \acs{PSNR} and 0.9733 \acs{SSIM}. The scratch model outperformed the fine-tuned model by 0.16 dB in \acs{PSNR} and 0.0018 in \acs{SSIM}.
 
 \begin{table}[H]
 \centering
@@ -44,14 +45,17 @@ RELLISUR Scratch & \textcolor{red}{28.25} & \textcolor{red}{0.9751} \\
 DIV2K Finetuned & 28.09 & 0.9733 \\
 \hline
 \end{tabular}
-\caption{Test set performance comparison between scratch and finetuned \acs{EDSR} models on \acs{RELLISUR} test set (85 images). Best values highlighted in red.}
+\caption{Test set performance comparison between scratch and finetuned \acs{EDSR} models on the \acs{RELLISUR} test set (85 images). Best values highlighted in red.}
 \label{tab:edsr_test_results}
 \end{table}
+
+These results demonstrate acceptable performance for the \acs{RELLISUR} dataset. The absolute performance metrics show moderate quality: a \acs{PSNR} of 28.25 dB and an \acs{SSIM} of 0.9751 indicate reasonable reconstruction quality. The \acs{SSIM} value of 0.9751 indicates high structural similarity, which is favorable for preserving discriminative features needed for \acs{ReID}. The observation that finetuning on \acs{DIV2K} degrades performance on \acs{RELLISUR} validates that domain-specific training is more effective than transfer learning when the target domain (\acs{RELLISUR}) differs significantly from the source domain (\acs{DIV2K}).
+
 
 \subsubsection{EDSR vs. Bicubic Interpolation}
 To verify that \acs{EDSR} provides meaningful improvements over simple interpolation methods, as described in \hyperlink{req:1}{\textit{Requirement 1}}, a direct comparison was conducted between the trained \acs{EDSR} models and bicubic interpolation.
 \\\\
-Both \acs{EDSR} models and bicubic interpolation were evaluated on the same \acs{RELLISUR} test set. Table \ref{tab:edsr_vs_bicubic} presents the comparison results. The scratch \acs{EDSR} model achieved a mean \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, representing an improvement of 1.10 dB. The finetuned \acs{EDSR} model achieved 28.09 dB, representing an improvement of 0.94 dB over bicubic interpolation. For \acs{SSIM}, the scratch model achieved 0.9751 compared to 0.9689 for bicubic (improvement of 0.0061), and the finetuned model achieved 0.9733 (improvement of 0.0044). These results demonstrate that \acs{EDSR} consistently outperforms bicubic interpolation across all evaluated metrics.
+Both \acs{EDSR} models and bicubic interpolation were evaluated on the same \acs{RELLISUR} test set. Table \ref{tab:edsr_vs_bicubic} presents the comparison results. The scratch \acs{EDSR} model achieved a mean \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, representing an improvement of 1.10 dB. The finetuned \acs{EDSR} model achieved 28.09 dB, representing an improvement of 0.94 dB over bicubic interpolation. For \acs{SSIM}, the scratch model achieved 0.9751 compared to 0.9689 for bicubic (improvement of 0.0061), and the fine-tuned model achieved 0.9733 (improvement of 0.0044). These results indicate that \acs{EDSR} consistently outperforms bicubic interpolation across all evaluated metrics.
 
 \begin{table}[H]
 \centering
@@ -77,9 +81,9 @@ EDSR DIV2K Finetuned & 28.09 & 0.9733 & +0.94 & +0.0044 \\
 
 
 \section{Out-of-Distribution Test} \label{sec: oodtestny}
-Since the implemented person \acs{ReID} model was trained on the Market-1501 dataset, a new \acs{OOD} test had to be designed to fulfill this project's definition of an \acs{OOD} test, as described in Section \ref{outofdistributiontest}. This \acs{OOD} test was conducted using the test set from \acs{DukeMTMC} under three different conditions, as well as the entire \acs{iLIDS-VID} dataset which is unknown to \acs{OSNet}. They are presented in Table \ref{tab:newood_conditions}.
+Since the implemented person \acs{ReID} model was trained on the Market-1501 dataset, a new \acs{OOD} test had to be designed to fulfill this project's definition of an \acs{OOD} test, as described in Section \ref{outofdistributiontest}. This \acs{OOD} test was conducted using the test set from \acs{DukeMTMC} under three different conditions, as well as the entire \acs{iLIDS-VID} dataset, which is unseen by \acs{OSNet}. An overview is presented in Table \ref{tab:newood_conditions}.
 \\\\
-The test on \acs{DukeMTMC} has 2,228 query and 17,661 gallery images, while \acs{iLIDS-VID} uses the 300 images from camera 1 for query and the other 300 images from camera 2 for gallery. This increase in data increases the representativeness of this evaluation. Since \acs{iLIDS-VID} contains only two images per identity, the evaluation remains a one-shot setting. In contrast, \acs{DukeMTMC} includes multiple gallery images per identity, making it a multi-shot evaluation. Therefore, \acs{DukeMTMC} was evaluated using Rank-\textit{k} accuracy and \acs{mAP}, while \acs{iLIDS-VID} is evaluated using Rank-\textit{k} accuracy only.
+The test on \acs{DukeMTMC} uses 2,228 query images and 17,661 gallery images, while \acs{iLIDS-VID} uses the 300 images from camera 1 as query and the other 300 images from camera 2 as the gallery. This larger test set directly improves the representativeness of the evaluation. Since \acs{iLIDS-VID} contains only two images per identity, the evaluation remains a one-shot setting. In contrast, \acs{DukeMTMC} includes multiple gallery images per identity, making it a multi-shot evaluation. Therefore, \acs{DukeMTMC} was evaluated using Rank-\textit{k} accuracy and \acs{mAP}, while \acs{iLIDS-VID} was evaluated using only Rank-\textit{k} accuracy.
 
 \begin{table}[H]
 \centering
@@ -92,11 +96,11 @@ The test on \acs{DukeMTMC} has 2,228 query and 17,661 gallery images, while \acs
 \rowcolor[HTML]{D8E9F7}
 \textbf{Condition} & \textbf{Description} & \textbf{Dataset} \\
 \hline
-Unmodifed &
+Unmodified &
 Unmodified images, used as the reference baseline. & \acs{DukeMTMC} \\
 \hline
 Downscale: \newline 0.75 / 0.5 / 0.25 &
-Images downscaled with a scaler, using height and width of the image.  &
+Images downscaled using a scale factor that was applied to the height and width of the image.  &
 \acs{DukeMTMC} \\
 \hline
 JPEG Compression: \newline 50 / 25 / 15 &
@@ -108,18 +112,18 @@ Image pairs from an unseen dataset, with primarily indoor images, to test cross-
 \acs{iLIDS-VID} \\
 \hline
 \end{tabular}
-\caption{Overview of the datasets used to evaluate OSNet under degraded and out-of-distribution conditions.}
+\caption{Overview of the datasets used to evaluate \acs{OSNet} under degraded and out-of-distribution conditions.}
 \label{tab:newood_conditions}
 \end{table}
 
-\noindent All models presented in this chapter will be evaluated and compared using the \acs{OOD} test.
+\noindent All models presented in this chapter will be evaluated and compared using the \acs{OOD} test protocol.
 
 
 \section{Experiments} \label{sec: experimentsdefined}
 
-In order to determine whether implementing an \acs{SR} module in the \acs{ReID} pipeline, several experiments were conducted to establish a clear and fair method for comparison. The experiments are designed to test the hypotheses defined in Section \ref{sec:hypotheses}. 
+In order to determine whether implementing an \acs{SR} module in the \acs{ReID} pipeline improves performance, several experiments were conducted to establish a clear and fair comparison. The experiments are designed to test the hypotheses defined in Section \ref{sec:hypotheses}. 
 \\\\
-Before incorporating the \acs{SR} module, the effect of applying strong data augmentation during training is evaluated first, to determine whether robustness to \acs{OOD} conditions can be achieved through training strategies alone. This step provides a reference point to determine whether the additional complexity introduced by the \acs{SR} module is justified. 
+Before incorporating the \acs{SR} module, the effects of applying strong data augmentation during training is first evaluated, to determine whether robustness to \acs{OOD} conditions can be achieved through training strategies alone. This step provides a reference point to determine whether the additional complexity introduced by the \acs{SR} module is justified. 
 
 \subsection{Experiment One: Augmented Model} \label{sec: baselineosnet}
 
@@ -204,11 +208,11 @@ Table \ref{tab:duke_all_models} presents the results from the \acs{OOD} test on 
 \multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on DukeMTMC-ReID}} \\ \hline
 \rowcolor[HTML]{D8E9F7}
 & \textbf{\acs{mAP}}& \textbf{Rank-1} \\ \hline
-\textbf{Baseline}   & 10.05\%& 22.75\%
+\textbf{Baseline}   & \textcolor{red}{10.05\%}& \textcolor{red}{22.75\%}
 \\ \hline
 \textbf{Augmented}  & 4.76\%& 10.32\%\\ \hline
 \textbf{Sequential} & 1.46\%& 3.68\%\\ \hline
-\textbf{End-to-end}      & \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} \\ \hline
+\textbf{End-to-end} & 7.90\% & 17.19\% \\ \hline
 \end{tabular}
 \caption{Comparison of all \acs{OSNet} configurations on the DukeMTMC-ReID dataset.}
 \label{tab:duke_all_models}
@@ -249,9 +253,8 @@ Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on
 & 1.46\%& 3.68\%& 2.04\%& 4.85\%& 3.38\%& 8.17\%\\
 \hline
 \textbf{End-to-end} 
-& \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%}
-& \textcolor{red}{4.30\%} & \textcolor{red}{8.75\%}
-& \textcolor{red}{3.05\%} & \textcolor{red}{6.73\%} \\
+& 7.90\% & 17.19\% & 11.49\% & 23.38\%
+& 9.86\% & 20.51\% \\
 \hline
 \end{tabular}
 \caption{Comparison of \acs{OSNet} variants on \acs{DukeMTMC} across different input scales. Metrics shown: \acs{mAP} and Rank-1 (R-1).}
@@ -297,10 +300,9 @@ Table \ref{tab:compression_test_all} presents the results from the \acs{OOD} com
 & 1.46\%& 3.68\%& 1.31\%& 3.50\%& 1.30\%& 3.32\%& 1.26\%& 3.28\%\\
 \hline
 \textbf{End-to-end} 
-& \textcolor{red}{3.69\%} & \textcolor{red}{7.23\%} 
-& \textcolor{red}{3.61\%} & \textcolor{red}{7.18\%} 
-& \textcolor{red}{3.64\%} & \textcolor{red}{7.41\%} 
-& \textcolor{red}{3.37\%} & \textcolor{red}{6.42\%} \\
+& 7.90\% & 17.19\% & 7.19\% & 15.98\% 
+& 6.91\% & 15.39\% 
+& 5.75\% & 12.70\% \\
 \hline
 \end{tabular}
 \caption{Comparison of OSNet variants on DukeMTMC-ReID under varying compression levels. Metrics shown: \acs{mAP} and Rank-1.}
@@ -322,10 +324,10 @@ Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \
 \multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID}}\\ \hline
 \rowcolor[HTML]{D8E9F7}
 & \textbf{Rank-1} \\ \hline
-\textbf{Baseline} & \textcolor{red}{10\%}\\ \hline
+\textbf{Baseline} & 10\%\\ \hline
 \textbf{Augmented} & 7.33\%\\ \hline
 \textbf{Sequential} & 2.00\% \\ \hline
-\textbf{End-to-end} & 3\% \\ \hline
+\textbf{End-to-end} & \textcolor{red}{10.67\%} \\ \hline
 \end{tabular}
 \caption{Comparison of all OSNet configurations on the iLIDS-VID dataset.}
 \label{tab:ilidsvid_all_models}

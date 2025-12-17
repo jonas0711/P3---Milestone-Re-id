@@ -178,7 +178,9 @@ The \hyperlink{model:sequential}{Sequential model}, as defined in Section \ref{s
     \caption{Flowchart of how data passes through the \hyperlink{model:sequential}{Sequential model} implementation.}
     \label{fig:srreid_flow}
 \end{figure}
-\noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. No further training or finetuning was performed, and the model served no purpose beyond evaluating \hyperlink{hypothesis:1}{\textit{Hypothesis 2}} in Chapter \ref{cha: experiments and results}. 
+\noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. This model was tested under two different configurations. In the first configuration, no further training was performed on either module,  effectively equivalent to running both models together in inference. In the second configuration, the \acs{ReID} module was finetuned on the new \acs{SR} input, for the purpose of adapting to the 
+
+\hyperlink{hypothesis:2}{\textit{Hypothesis 2}} in Chapter \ref{cha: experiments and results}. 
 \\\\
 To fully asses the impact of implementing a \ac{SR} system with \acs{ReID}, a script was created to evaluate a sequential combination of the two models, where the data is first passed through the trained \acs{SR} model, whose output is then fed into the trained \acs{ReID} model. The efficiency of this setup is expressed with error metrics \acs{mAP} and Rank-1, and can then be compared with other evaluation instances, such as the same \acs{ReID} model without the \acs{SR} module. 
 \\\\
@@ -227,7 +229,7 @@ The learning rate is flipped.
 \\\\
 \noindent To benefit from the end to end integration of the two models, training was continued with pretrained weights from baseline \acs{OSNet} and \acs{EDSR}. \acs{OSNet} weights were frozen for the first 20 epochs, such that \acs{EDSR} could adapt to the new data being \ac{LR} images of people, instead of the more diverse nature of \acs{DIV2K} and \acs{RELLISUR}. While only a classification loss back-propagated, it should still help specialize the model for the task, as can be seen in Section XXX. The learning rate for \acs{EDSR} was chosen at \texttt{65e-4}, due to it being a middle point between the training and finetuning learning rate used during the standalone training. The learning rate for \acs{OSNet} was set to \texttt{1e-4}, such that it would drop to \texttt{1e-5} after the the first milestone, which coincides with \acs{OSNet} being unfrozen. This was chosen as the model had already learned the task of \acs{ReID}, and in this end-to-end training should focus on learning to extract features from \acs{SR} images. A second milestone was set at epoch 60 for final finetuning with the lowest learning rate. Training concluded at epoch 100, at which point the model had learned enough for a fair comparison with the other models, even if more performance could have been squeezed out. 
 
-\subection{Training duration}
+\subsection{Training duration}
 
 
 \section{Deployment}
