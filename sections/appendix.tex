@@ -7,6 +7,15 @@ During documentation of the project, generative AI have been useful in correctin
 \\
 In developing the AI system, generative AI have mostly been used for debugging error messages that are especially difficult to decode. Generative AI can not only simplify hard to grasp problems but also assist with minor code changes to solve errors This drastically reduces the time spend on debugging, allowing for time spend on improving model and testing different configurations. In addition, Generative AI has been used for a quick documentation description, examples of application of methods and brainstorming alternative solutions. 
 
+
+\section{Related Works}
+
+\subsubsection{DeepReID: Deep Filter Pairing Neural Network for Person Re-Identification}
+
+This paper from 2014 proposes a \acf{FPNN} for person \acs{ReID} that automatically learns features optimal for this task directly from image data, instead of relying on hand-crafted ones \cite{Li2014DeepReID}. The model uses paired filters, one set for each camera view, to learn how a person’s appearance changes across different cameras. This helps the network adapt to variations in lighting, color, angles, viewpoints, and person positions. The model learns to focus on person-specific features and becomes tolerant to imperfect detections and background clutter. The model is evaluated through the Rank-1 metric, against eight different state-of-the-art methods.  
+\\\\
+Despite outperforming state-of-the-art methods at the time, this solution has several limitations. The dataset used is relatively small, with 13,164 images of 1,360 different people, which can introduce bias and limit generalization. While the dataset does represent real-life scenarios of obtained data from surveillance cameras, and lighting is mentioned as a key challenge, there is no analysis of image resolution effects or how they could improve the model’s performance. This gap could be explored through integrating \acs{SR} techniques. However, as this paper is more than a decade old, it is beneficial to look at more recent papers.
+
 \section{Image names for out-of-distribution test}\label{app:out-of-dis}
 
 \subsection{Subset from Market1501}
@@ -101,6 +110,40 @@ cam2\_person316.png & cam2\_person294.png \\
     \label{fig:trade_model_comparison}
 \end{figure}
 Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer Michaeli \cite{Blau2018PerceptionDistortion}. 16 models were plotted against each other in 6 different graphs. All graphs had NIQE for measuring perception, and 6 different metrics were used to evaluate distortion.
+
+\section{Alternative Training Setups}\label{alternative training setups}
+Two different setups have been tried:
+Learning Rate: \(1e-3\) , milestones: [100, 175, 250]
+Learning Rate: \(65e-3\) , milestones: [100, 175, 250]
+The results can be seen on Figure \ref{fig:train01, fig:map01, fig:train65, map65} . When comparing these results to those from the used setup, is the models trained using a learning rate of  \(1e-3\) lower in performance, while  \(65e-3\) is closer performance vice, but does not get quit as good a result in validation.
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{train001.png}
+    \caption{Train loss for baseline and augmented with learning rate  \(1e-3\)}
+    \label{fig:train01}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \includegraphics[width=1\linewidth]{map001.png}
+        \caption{Validation results for baseline and augmented with learning rate  \(1e-3\)}
+                \label{fig:map01}
+    \end{figure}
+
+\begin{figure}
+            \centering
+            \includegraphics[width=1\linewidth]{tr65.png}
+            \caption{Train loss for baseline and augmented with learning rate  \(65e-3\)}
+            \label{fig:train65}
+        \end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{map65.png}
+    \caption{Validation results for baseline and augmented with learning rate  \(65e-3\)}
+        \label{fig:train65}
+\end{figure}
+
 
 \section{Full Validation Loggings}\label{app:fulllogings}
 Attached is the full validations loggings from the baseline and augmented \acs{ReID} model.

@@ -1,10 +1,9 @@
 \chapter{Requirement Specification} 
 \label{cha:reqspec}
 
-As defined in the problem statement, this project focuses on building and testing how \acs{SR} can be combined with and improve the performance of \acs{ReID}. Consequently, the requirements will focus on these two networks and their integration. For that same reason, the requirements will not describe a complete \acs{ReID} system and are therefore not exhaustive. The scope implies that the \acs{SR} and \acs{ReID} integration does not include an object detection module, and thus expects cropped images as input.
+As defined in the problem statement, this project focuses on building and testing how \acs{SR} can be combined with and improve the performance of \acs{ReID}. Consequently, the requirements will focus on two modules and their integration. For that same reason, the requirements will not describe a complete \acs{ReID} system and are therefore not exhaustive. The scope implies that the \acs{SR} and \acs{ReID} integration does not include an object detection module, and thus expects cropped images as input.
 \\\\
-Each requirement will be testable and measurable with defined success criteria, and have a traceability tag.
-
+Each requirement will be testable with defined success criteria, and have a traceability tag.
 \begin{table}[H]
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
@@ -16,8 +15,10 @@ Each requirement will be testable and measurable with defined success criteria, 
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.1\linewidth}|>{\raggedright\arraybackslash}p{0.45\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}p{0.15\linewidth}|}\hline
 \rowcolor[HTML]{D8E9F7} 
 \textbf{Req. no.}& \textbf{Module: Re-Identification}& \textbf{Success Criteria}& \textbf{Traceability}              \\\hline
- \hypertarget{req:2}{2}& The module must produce valid Rank-1 accuracy results on the selected datasets for evaluation. & Fail/Pass &Section \ref{subsec:takeawayspreid}\\\hline
- \hypertarget{req:3}{3} & The module must produce valid \acs{mAP} accuracy results on the selected datasets for evaluation. & Fail/Pass &Section \ref{subsec:takeawayspreid}\\\hline\end{tabular}
+ \hypertarget{req:2}{2}& The ReID module must achieve meaningful Rank-1 accuracy on the selected evaluation datasets, demonstrating its capability to correctly re-identify individuals under varying viewpoints and imaging conditions& Fail/Pass &Section \ref{sec:ReID-tech}
+Section \ref{subsec:reid_reworks}\\\hline
+ \hypertarget{req:3}{3} & The ReID module must achieve meaningful mAP accuracy on the selected evaluation datasets, demonstrating its capability to correctly re-identify individuals under varying viewpoints and imaging conditions& Fail/Pass &Section \ref{sec:ReID-tech}
+Section \ref{subsec:reid_reworks}\\\hline\end{tabular}
 \end{table}
 
 \begin{table}[H]
@@ -27,5 +28,3 @@ Each requirement will be testable and measurable with defined success criteria, 
  \hypertarget{req:4}{4}& The combined \acs{SR} and \acs{ReID} system should outperform the \acs{ReID} network measured in \acs{mAP} and Rank-1.& Fail/Pass&Section \ref{sec:superres-reid}\\\hline
  \hypertarget{req:5}{5}& The complete system must be deployed in the cloud.& Fail/Pass&Chapter \ref{cha: problemstatement}\\\hline\end{tabular}
 \end{table}
-
-%Skal vi stille krav til generaliserbarhed i stedet?
