@@ -189,23 +189,43 @@ Other training setups for the end-to-end integration were tried to find the best
 
 \subsection{Unclamped SR learning}
 
+This version
+
 LR SR:
 LR ReID:
 Milestones:
 Frozen part:
 Unfreeze epoch:
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{unclamped.png}
+    \caption{Enter Caption}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{unclamped-2.png}
+    \caption{Enter Caption}
+    \label{fig:placeholder}
+\end{figure}
+
+
 
 \subsection{Clamped SR learning}
 
-
 LR SR:
 LR ReID:
 Milestones:
 Frozen part:
 Unfreeze epoch:
 
+
+
+
 \subsection{Finetuned ReID with SR}
-In this version, the \acs{SR} module was frozen the entire training - loss is only backpropagated into \acs{ReID} module. This secures that the \acs{SR} module is still producing upscaled and improved images, and not being a extension of the \acs{ReID} module. This is the 
+In this version, the \acs{SR} module was frozen the entire training - loss is only backpropagated into \acs{ReID} module. This secures that the \acs{SR} module is still producing upscaled and improved images, and not being a extension of the \acs{ReID} module. This is not included in the main project, as it is not considered an end-to-end module, just a \acs{ReID} model finetuned to SR data, which was not a part of the experiments.
 
 Epochs = 100
 LR SR: None
@@ -228,8 +248,7 @@ Best validation result 41.93\% \acs{mAP} at epoch 55, see Figure \ref{fig:finetu
     \caption{Validation results mAP from finetuned ReID version}
     \label{fig:finetuned_validation}
 \end{figure}
-
-The results are improved compared to the sequential model presented in the Chapter \ref{cha: experiments and results}. In distribution test showed improvements on 
+Both test were performed on this model, so a comparison could be made between the original sequential model and this finetuned version. The results are improved compared to the sequential model presented in the Chapter \ref{cha: experiments and results}. In distribution test showed improvements on 
 
 In distribution test show an improvement across metrics on all datasets. E.g. \acs{mAP} increased from 25.86\% to 60.80\% on Market and Rank-1 on MSMT from 1.92\% to 10.16\%. The rest of the results of the \acs{InD} is included in Table \ref{fig:finetuned seq}.
 \begin{table}[H]

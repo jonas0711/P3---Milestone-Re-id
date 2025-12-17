@@ -1,10 +1,12 @@
 \chapter{Discussion} \label{cha: discussion}
-This chapter discusses the results presented in chapter \ref{cha: experiments and results} and the 
+This chapter is meant to further explore and dissect the choices and actions that were made while working on this project. This is 
+
+the results presented in Chapter \ref{cha: experiments and results} and the 
 
 \section{Data}
 In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This highlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, \acs{CUHK03}, and \acs{MSMT17} datasets are all recorded at different universities in different regions of China, while the \acs{DukeMTMC} dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The \acs{iLIDS-VID} dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
 \\\\
-The data was split so that the models were trained on the Market-1501, \acs{MSMT17}, and \acs{CUHK03} datasets, and final testing was performed on the \acs{iLIDS-VID} and \acs{DukeMTMC} datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch likely impacts performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
+The data was split so that the models were trained on the Market-1501, \acs{MSMT17}, and \acs{CUHK03} datasets, and final testing was performed on the \acs{iLIDS-VID} and \acs{DukeMTMC} datasets. This design creates a cross-domain evaluation setup, which is useful for assessing generalization. However, it also introduces a domain mismatch. The model is trained to identify university students on campuses in China, and then tested on different demographic groups in the forms of university students on campus in the USA, and more diverse people inside of an airport. This mismatch could impact performance, and raises questions about the fairness and robustness of the system in deployment scenarios. 
 \\\\
 Furthermore, the datasets are not balanced in size. For example the \acs{MSMT17} dataset contains almost three times more identities and nearly ten times more images than \acs{CUHK03}, which may cause the model to over-represent the dominant dataset and under-represent features from the smaller datasets. In future work, a more structured training strategy could be explored, such as training on each dataset separately, balancing datasets in each batch, or incorporating datasets with diverse cultural, environmental and geographical conditions during training, to improve cross-domain generalization and fairness. 
 \\\\
@@ -59,17 +61,8 @@ This result highlight the benefits of jointly learning to enhance and identify. 
 
 \section{Experiments}
 
-The results on the \acs{InD} and \acs{OOD} tests indicate that it is not sufficient to simply adjust the training strategy of the \acs{ReID} module to improve robustness. However, it is possible that the augmentations used to train the \hyperlink{model:augmented}{Augmented} model degraded the images to such a state that it was impossible for the model to learn any meaningful features. Furthermore, the results 
+The experimental results from the \acs{InD} and \acs{OOD} tests indicate that it is not sufficient to simply adjust the training strategy of the \acs{ReID} module to improve robustness. However, the results for the \hyperlink{model:augmented}{Augmented} model suggest that the augmentations used to train the model possibly degraded the images to such a state that it was impossible for the model to learn any meaningful features. Rather than improving generalizability, this seems to have hindered the model's ability to learn discriminative embeddings. 
 
-
-
-\subsection{OSNet}
-Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? (nemmere kode, nødvendigt grundet deadline)
-
-\subsubsection{Baseline}
-Opnåede vi det vi ville med baseline, er den lavet så den er fair til at bruge til sammenligning?
-
-\subsubsection{Augmented}
 
 \subsection{EDSR}
 \acs{EDSR} was chosen as the \acs{SR} architecture because the model is known for operating in the low-distortion region of the perception-distortion trade-off, as described in Section \ref{subsec:perception-distortion-tradeoff}. This choice aligned well with the project's goal of preserving the details that the \acs{ReID} module relies on, rather than creating visually appealing images that risk introducing artificial details.

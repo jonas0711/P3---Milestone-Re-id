@@ -6,7 +6,7 @@ This section presents the implementation details, when it comes to the \acs{ReID
 
 \subsection{Dataloader}
 The data loaders used for person \acs{ReID} training, validation, and testing are implemented using the \texttt{DataLoader} class from \texttt{torch.utils.data}. For training, the data loader operates on the combined dataset described in Section~\ref{combineddataset}, using a batch size of 64 with data shuffling enabled. This configuration ensures hat each batch has images from different datasets.
-
+\\\\
 For validation and testing, the data loaders use a batch size of 1 and disable shuffling. This setup follows standard person \acs{ReID} practice, as each image is evaluated independently to enable precise query–gallery matching and reproducible performance measurement.
 
 \subsection{Re-Implementation of OSNet}\label{sec:implementationosnet}
@@ -59,7 +59,7 @@ The two different version, baseline and augmented, is trained using the same tra
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{baseaugtrain.png}
-        \caption{Training loss for baseline and augmentation model}
+        \caption{Training loss for baseline and augmentation model.}
         \label{fig:baseaugtrain}
     \end{subfigure}
     \hfill % adds space between
@@ -68,7 +68,7 @@ The two different version, baseline and augmented, is trained using the same tra
         \caption{Mean Average Precision for baseline and augmentation model}
         \label{fig:baseaugvalmap}
     \end{subfigure}
-    \caption{Training and validation results for baseline and augmented model, see appendix \ref{app:fulllogings} for more}
+    \caption{Training and validation results for baseline and augmented model, see appendix \ref{app:fulllogings} for more.}
     \label{fig:augbaseloggings}
 \end{figure}
 \noindent Both models ran for the entire 350 epochs, but the best model was chosen based on \acs{mAP} score, because it prioritize the ability to rank all positive matches.
@@ -153,7 +153,7 @@ The data augmentation strategy outlined in Section \ref{SRtrainingdata} was appl
 As presented in section \ref{SRtrainingdata}, different training strategies were tried, one training from scratch on \acs{RELLISUR}, and one finetuning the best model on \acs{DIV2K}. 
 
 \subsubsection{Training from Scratch on \acs{RELLISUR}}
-Strategy 1 employed the patch-based training strategy described in Section \ref{SRtrainingdata}, where aligned \acs{LR} and \acs{HR} patches of size \textit{64×128} and \textit{128×256} pixels respectively were randomly cropped from \acs{RELLISUR} image pairs during each training iteration. The training and validation loss curves for Stage 1 can be seen in Figure \ref{fig:rellisur_training_curves}.
+Strategy 1 employed the patch-based training strategy described in Section \ref{SRtrainingdata}, where aligned \acs{LR} and \acs{HR} patches of size \textit{64×128} and \textit{128×256} pixels respectively were randomly cropped from \acs{RELLISUR} image pairs during each training iteration. The training and validation loss curves for Stage 1 can be seen in Figure \ref{fig:rellisur_loss_curves}.
 
 \begin{figure}[H]
     \centering
@@ -174,10 +174,10 @@ Strategy 1 employed the patch-based training strategy described in Section \ref{
     \label{fig:rellisur_training_combined}
 \end{figure}
 
-\noindent This training continued for 200 epochs, which took 1h30m, although the best validation result was achieved after only 74 epochs. At this point, the validation \acs{PSNR} reached 24.72 dB, as shown in Figure \ref{fig:rellisur_psnr_curves}. The loss curves in Figure \ref{fig:rellisur_loss_curves} show that training loss continued to decrease while validation loss remained relatively stable after the initial convergence, indicating that extended training beyond epoch 74 did not improve generalization.
+\noindent This training continued for 200 epochs, which took 1h 30m, although the best validation result was achieved after only 74 epochs. At this point, the validation \acs{PSNR} reached 24.72 dB, as shown in Figure \ref{fig:rellisur_psnr_curves}. The loss curves in Figure \ref{fig:rellisur_loss_curves} show that training loss continued to decrease while validation loss remained relatively stable after the initial convergence, indicating that extended training beyond epoch 74 did not improve generalization.
 
 \subsubsection{Finetuning on DIV2K}
-Strategy 2 used the same patch-based training strategy as Stage 1, applied to the \ac{DIV2K} dataset. The best checkpoint from Stage 1, after 74 epochs, served as the initialization for this finetuning stage. The training and validation loss curves for Stage 2 can be seen in Figure \ref{fig:div2k_training_curves}.
+Strategy 2 used the same patch-based training strategy as Stage 1, applied to the \acs{DIV2K} dataset. The best checkpoint from Stage 1, after 74 epochs, served as the initialization for this finetuning stage. The training and validation loss curves for Stage 2 can be seen in Figure \ref{fig:div2k_loss_curves}.
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
