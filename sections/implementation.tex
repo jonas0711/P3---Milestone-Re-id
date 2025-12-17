@@ -53,7 +53,7 @@ The model's performance was monitored through periodic validation:
 
 \noindent This adaptive validation strategy allows for more frequent monitoring as learning rate drops, and the training approaches convergence. Training ran for a total of 350 epochs without early stopping, though checkpoints were saved every validation. From these saved checkpoints is the final model selected based on the best \acs{mAP} score.
 
-\subsection{Training Duration and Checkpointing}
+\subsection{Training Duration}
 The two different version, baseline and augmented, is trained using the same training hyperparameters, ensuring a comparable outcome. The training and validation plots for the two versions of the \acs{ReID} module can be seen in Figure \ref{fig:augbaseloggings}.
 \begin{figure}[H]
     \centering
@@ -111,36 +111,16 @@ This section describes the training hyperparameters, where an overview is presen
 \label{tab:edsrtrainingparameters}
 \end{table}
 
-\noindent The training follows the two-stage strategy outlined in Section \ref{SRtrainingdata}: Stage 1 trains from scratch on \acs{RELLISUR}, while Stage 2 finetunes the best checkpoint from Stage 1 on \acs{DIV2K}. Both stages use the Adam optimizer with momentum parameters $\beta_1 = 0.9$ and $\beta_2 = 0.999$, as this is the standard optimizer configuration used in the original \acs{EDSR} implementation \cite{lim2017edsr}. A batch size of 16 is used for both stages.
-\\\\
-For Stage 1, a learning rate of \(1 \times 10^{-4}\) is applied to enable rapid learning from random initialization. The model is trained for 200 epochs. For Stage 2, the learning rate is reduced to \(5 \times 10^{-5}\) to preserve the learned representations while allowing gradual adaptation to the new dataset. This reduction is critical for finetuning, as it prevents forgetting of the pretrained features. The model is trained for 100 epochs during finetuning.
+\noindent To compare the two training strategies outlined in Section \ref{SRtrainingdata}, two models were trained with different configurations. The scratch model was trained for 200 epochs on \acs{RELLISUR} with a learning rate of \(1 \times 10^{-4}\) to enable rapid learning from random initialization. The finetuned model was initialized from the best checkpoint of the scratch model and trained for 100 epochs on \acs{DIV2K} with a reduced learning rate of \(5 \times 10^{-5}\) to preserve the learned representations while allowing gradual adaptation to the new dataset. Both models use the Adam optimizer with momentum parameters $\beta_1 = 0.9$ and $\beta_2 = 0.999$, as this is the standard optimizer configuration used in the original \acs{EDSR} implementation \cite{lim2017edsr}. A batch size of 16 is used for both training runs.
 \\\\
 The loss function used for training is the L1 loss, as described in Section \ref{sec:srloss}. This is implemented using the \texttt{L1Loss} module from the \texttt{torch.nn} library.
 
-\subsubsection{Validation Strategy}
+\subsection{Validation Strategy}
 Validation was performed at the end of each epoch using the \acs{RELLISUR} validation split for both training stages. The validation pipeline computed both validation loss (L1) and validation \ac{PSNR} to monitor training progress. Model checkpoints were saved every 10 epochs, and the best model based on validation \ac{PSNR} was saved separately for final evaluation. Using the same validation set for both stages ensures consistent evaluation and allows monitoring whether the model retains its ability to handle realistic degradations after finetuning on synthetic data.
 
-\subsubsection{Training from Scratch on \acs{RELLISUR}}
-Stage 1 employed the patch-based training strategy described in Section \ref{SRtrainingdata}, where aligned \acs{LR} and \acs{HR} patches of size \textit{64×128} and \textit{128×256} pixels respectively were randomly cropped from \acs{RELLISUR} image pairs during each training iteration. The training and validation loss curves for Stage 1 can be seen in Figure \ref{fig:rellisur_training_curves}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{models_cropped_rellisur_scratch_training_curves.png}
-    \caption{Training and validation loss curves for EDSR trained from scratch on \acs{RELLISUR}. The plot shows the full training progress over 200 epochs, with the best epoch marked at epoch 74.}
-    \label{fig:rellisur_training_curves}
-\end{figure}
 
-
-\subsubsection{Finetuning on DIV2K}
-Stage 2 used the same patch-based training strategy as Stage 1, applied to the \ac{DIV2K} dataset. The best checkpoint from Stage 1 served as the initialization for this finetuning stage. The training and validation loss curves for Stage 2 can be seen in Figure \ref{fig:div2k_training_curves}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{models_cropped_div2k_finetuned_training_curves.png}
-    \caption{Training and validation loss curves for EDSR finetuned on \ac{DIV2K}. The plot shows the full training progress over 100 epochs, with the best epoch marked at epoch 1.}
-    \label{fig:div2k_training_curves}
-\end{figure}
-
-\subsubsection{Data Augmentation}
-The data augmentation strategy outlined in Section \ref{SRtrainingdata} was applied during both training stages. Horizontal flip and brightness change were applied with synchronized random states between \acs{LR} and \acs{HR} images to maintain correspondence, which is required for supervised super-resolution training. Gaussian noise (mean: 0.0, std: 0.1) and Gaussian blur (kernel size: 7, sigma: [0.1, 2.0]) were applied only to the \acs{LR} images to simulate realistic acquisition artifacts commonly found in surveillance imagery, while keeping the \acs{HR} targets clean. The augmentation transforms are summarized in Table \ref{tab:sr-augmentation}. An example of the augmentation effect on a \acs{RELLISUR} image is shown in Figure \ref{fig:rellisur_augmentation}.
+\subsection{Data Augmentation}
+The data augmentation strategy outlined in Section \ref{SRtrainingdata} was applied during both trainings. Horizontal flip and brightness change were applied with synchronized random states between \acs{LR} and \acs{HR} images to maintain correspondence, which is required for supervised super-resolution training. Gaussian noise (mean: 0.0, std: 0.1) and Gaussian blur (kernel size: 7, sigma: [0.1, 2.0]) were applied only to the \acs{LR} images to simulate realistic acquisition artifacts commonly found in surveillance imagery, while keeping the \acs{HR} targets clean. The augmentation transforms are summarized in Table \ref{tab:sr-augmentation}. An example of the augmentation effect on a \acs{RELLISUR} image is shown in Figure \ref{fig:rellisur_augmentation}.
 
 \begin{table}[H]
     \centering
@@ -169,6 +149,33 @@ The data augmentation strategy outlined in Section \ref{SRtrainingdata} was appl
 \end{figure}
 
 
+\subsection{Training duration}
+As presented in section \ref{SRtrainingdata}, different training strategies were tried, one training from scratch on \acs{RELLISUR}, and one finetuning the best model on \acs{DIV2K}. 
+
+\subsubsection{Training from Scratch on \acs{RELLISUR}}
+Strategy 1 employed the patch-based training strategy described in Section \ref{SRtrainingdata}, where aligned \acs{LR} and \acs{HR} patches of size \textit{64×128} and \textit{128×256} pixels respectively were randomly cropped from \acs{RELLISUR} image pairs during each training iteration. The training and validation loss curves for Stage 1 can be seen in Figure \ref{fig:rellisur_training_curves}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{models_cropped_rellisur_scratch_training_curves.png}
+    \caption{Training and validation loss curves for EDSR trained from scratch on \acs{RELLISUR}. The plot shows the full training progress over 200 epochs, with the best epoch marked at epoch 74.}
+    \label{fig:rellisur_training_curves}
+\end{figure}
+
+\noindent This training continued for 200 epoch, which took 1h30m, although the best validation result was after only 74 epoch. Here the validation resulted in a PSNR of 24.72.
+
+\subsubsection{Finetuning on DIV2K}
+Strategy 2 used the same patch-based training strategy as Stage 1, applied to the \ac{DIV2K} dataset. The best checkpoint from Stage 1, after 74 epochs, served as the initialization for this finetuning stage. The training and validation loss curves for Stage 2 can be seen in Figure \ref{fig:div2k_training_curves}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{models_cropped_div2k_finetuned_training_curves.png}
+    \caption{Training and validation loss curves for EDSR finetuned on \ac{DIV2K}. The plot shows the full training progress over 100 epochs, with the best epoch marked at epoch 1.}
+    \label{fig:div2k_training_curves}
+\end{figure}
+
+\noindent This training only took 51m for 100 epochs, but the best validations result of 24.28 was already after epoch 1.
+\\\\
+The two best performing versions, epoch 74 and epoch 1, based on validation, are tested in Section \ref{sec: srexperiments}, to decide which model to implement with \acs{ReID}.
 
 \section{Implementation of Sequential ReID and SR}
 The \hyperlink{model:sequential}{Sequential model}, as defined in Section \ref{sec:model_definitions}, was implemented by simply passing the input image through the \acs{EDSR} module, before giving it to the \acs{ReID} module. This pass is visualized in Figure \ref{fig:srreid_flow}.
@@ -178,21 +185,33 @@ The \hyperlink{model:sequential}{Sequential model}, as defined in Section \ref{s
     \caption{Flowchart of how data passes through the \hyperlink{model:sequential}{Sequential model} implementation.}
     \label{fig:srreid_flow}
 \end{figure}
-\noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. This model was tested under two different configurations. In the first configuration, no further training was performed on either module,  effectively equivalent to running both models together in inference. In the second configuration, the \acs{ReID} module was finetuned on the new \acs{SR} input, for the purpose of adapting to the 
 
-\hyperlink{hypothesis:2}{\textit{Hypothesis 2}} in Chapter \ref{cha: experiments and results}. 
-\\\\
-To fully asses the impact of implementing a \ac{SR} system with \acs{ReID}, a script was created to evaluate a sequential combination of the two models, where the data is first passed through the trained \acs{SR} model, whose output is then fed into the trained \acs{ReID} model. The efficiency of this setup is expressed with error metrics \acs{mAP} and Rank-1, and can then be compared with other evaluation instances, such as the same \acs{ReID} model without the \acs{SR} module. 
-\\\\
-This sequential evaluation script is used to test the \acs{ReID} model on its own and together with the \acs{SR} module. The models are already trained and are not updated in this step, as the script only runs inference to evaluate performance.
+\noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. This model was tested under two different configurations. In the first configuration, no further training was performed on either module,  effectively equivalent to running both models together in inference. In the second configuration, the \acs{ReID} module was finetuned on the new \acs{SR} input, for the purpose of adapting to the up-scaled images and potential artifacts/hallucinations. 
 
-The dataloader discussed in \ref{imp_dataloading} was also used in conjunction with this script, but mostly with a distinct emphasis on the evaluation part, such as query and gallery for the relevant \acs{ReID} datasets. 
-% Noget om forskellige sr scales prøvet. Batch sizes, num workers?
-% Baseline models tested (off the shelf måske?)
-% Den wrap ved "class IntPidCamDataset" kan også forklares hvis det er.
-% Noget om feature extraction måske?
-% Noget om alle de forskellige args?
+\subsection{Finetuning hyperparameters}
+Finetuning was treated the same as training of the \hyperlink{model:augmented}{Augmented} model, using the same dataloaders and training script. The only differences in configuration were the total number of epochs, the learning rate, and the milestones for learning rate drops. An overview of the finetuning configuration can be seen in Table \ref{tab:seqfinetuneparameters}. 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}\hline
+         \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Value}\\\hline
+        No. Classes & 2117\\\hline
+        No. Epochs & 100\\\hline
+        Batch Size & 64 \\\hline
+        Optimizer & \acs{SGD} \\\hline
+        Momentum &0.9 \\\hline
+        Weight Decay & 0.0005\\\hline
+        Learning Rate Scheduler & \texttt{MultiStepLR}\\\hline
+        OSNet Learning Rate & 1e-5\\\hline
+        LR Milestones &  [20, 60]\\\hline
+        LR Gamma &  0.1\\\hline
+        Loss Function & CrossEntropyLoss\\\hline 
+        Label Smoothing & 0.1\\ \hline
+    \end{tabular}
+    \caption{The training hyperparameters for finetuning the \acs{OSNet} module in the \hyperlink{model:sequential}{Sequential} model.}
+\label{tab:seqfinetuneparameters}
+\end{table}
 
+\noindent The learning rate of \(1e-5\) was chosen as the \acs{ReID} module is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images. At epoch 20 and 60, the learning rate dropped to \(1e-6\) and \(1e-7\), allowing for longer and finer tuning of the parameters. 
 
 \section{Implementation of End-to-end ReID and SR}
 Since the \acs{SR} module was trained to clean and upscale on diverse images, it is not specialized for the domain of person \acs{ReID}. By combining the two modules end-to-end, the \acs{ReID} loss can flow back into the \acs{SR} module, ideally forcing it to learn specific cleaning or sharpening operations that improve the final \acs{ReID} task, while the \acs{ReID} can simultaneously learn to extract features from a \acs{SR} input. This effect can be seen in Figure XXX (sammenligningsbilleder, måske i resultater eller her?). 
@@ -227,7 +246,7 @@ The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the deta
 \\\\
 The learning rate is flipped. 
 \\\\
-\noindent To benefit from the end to end integration of the two models, training was continued with pretrained weights from baseline \acs{OSNet} and \acs{EDSR}. \acs{OSNet} weights were frozen for the first 20 epochs, such that \acs{EDSR} could adapt to the new data being \ac{LR} images of people, instead of the more diverse nature of \acs{DIV2K} and \acs{RELLISUR}. While only a classification loss back-propagated, it should still help specialize the model for the task, as can be seen in Section XXX. The learning rate for \acs{EDSR} was chosen at \texttt{65e-4}, due to it being a middle point between the training and finetuning learning rate used during the standalone training. The learning rate for \acs{OSNet} was set to \texttt{1e-4}, such that it would drop to \texttt{1e-5} after the the first milestone, which coincides with \acs{OSNet} being unfrozen. This was chosen as the model had already learned the task of \acs{ReID}, and in this end-to-end training should focus on learning to extract features from \acs{SR} images. A second milestone was set at epoch 60 for final finetuning with the lowest learning rate. Training concluded at epoch 100, at which point the model had learned enough for a fair comparison with the other models, even if more performance could have been squeezed out. 
+\noindent To benefit from the end to end integration of the two models, training was continued with pretrained weights from baseline \acs{OSNet} and the best performing \acs{EDSR}. \acs{OSNet} weights were frozen for the first 20 epochs, such that \acs{EDSR} could adapt to the new data being \ac{LR} images of people, instead of the more diverse nature of \acs{DIV2K} and \acs{RELLISUR}. While only a classification loss back-propagated, it should still help specialize the model for the task, as can be seen in Section XXX. The learning rate for \acs{EDSR} was chosen at \texttt{65e-4}, due to it being a middle point between the training and finetuning learning rate used during the standalone training. The learning rate for \acs{OSNet} was set to \texttt{1e-4}, such that it would drop to \texttt{1e-5} after the the first milestone, which coincides with \acs{OSNet} being unfrozen. This was chosen as the model had already learned the task of \acs{ReID}, and in this end-to-end training should focus on learning to extract features from \acs{SR} images. A second milestone was set at epoch 60 for final finetuning with the lowest learning rate. Training concluded at epoch 100, at which point the model had learned enough for a fair comparison with the other models, even if more performance could have been squeezed out. 
 
 \subsection{Training duration}
 

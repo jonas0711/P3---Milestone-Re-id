@@ -2,33 +2,10 @@
  This chapter presents the experiments conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}} and \hyperlink{hypothesis:2}{\textit{Hypothesis 2}} as defined in Section \ref{sec:hypotheses}. The objective is to determine whether incorporating an \acs{SR} module improves the robustness of a person \acs{ReID} module with the \acs{InD} and \acs{OOD} conditions in mind. To support this evaluation, this chapter first presents an independent assessment of the chosen \acs{SR} model, followed by the four models defined in Section \ref{sec:model_definitions}: the \hyperlink{model:baseline}{Baseline} model, the \hyperlink{model:augmented}{Augmented} model, the \hyperlink{model:sequential}{Sequential} model, and the \hyperlink{model:endtoend}{End-to-end} model. The results from these experiments are presented and briefly discussed. 
 
 \section{SR Experiments} \label{sec: srexperiments}
-Before integrating \acs{SR} into the \acs{ReID} pipeline, the selected \acs{SR} architecture is evaluated independently, as to verify that it provides meaningful improvements over simple interpolation methods. This section presents the evaluation results and a direct comparison between \acs{EDSR} and bicubic interpolation.
-
-\subsubsection{Two-Stage Training Results}
-Two \acs{EDSR} models were trained using a two-stage approach. The first model was trained from scratch on \acs{RELLISUR}, and the second model was obtained by fine-tuning the first model on \acs{DIV2K}. Table \ref{tab:training_results} presents the validation results for both training stages.
-
-\begin{table}[H]
-\centering
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{|l|c|c|}
-\hline
-\multicolumn{3}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Training Validation Results}} \\
-\hline
-\rowcolor[HTML]{D8E9F7}
-\textbf{Training Stage} & \textbf{Validation PSNR (dB)} & \textbf{Validation Loss} \\
-\hline
-Stage 1: RELLISUR Scratch & \textcolor{red}{24.72} & \textcolor{red}{0.090} \\
-\hline
-Stage 2: DIV2K Fine-tuned & 24.28 & 0.095 \\
-\hline
-\end{tabular}
-\caption{Validation performance for both training stages. Best validation results highlighted in red.}
-\label{tab:training_results}
-\end{table}
-
+Before integrating \acs{SR} into the \acs{ReID} pipeline, the \acs{EDSR} architecture is evaluated independently to verify that it provides meaningful improvements over simple interpolation methods and to determine which training strategy produces the best results for real-world degradations. This section presents the training results, a comparison between scratch and finetuned models, and a direct comparison against bicubic interpolation.
 
 \subsubsection{Test Set Evaluation}
-Both models were evaluated on the \acs{RELLISUR} test set consisting of 85 naturally degraded, low-resolution images. Table \ref{tab:edsr_test_results} presents the test set performance for both models. The scratch model achieved a mean \acs{PSNR} of 28.25 dB and \acs{SSIM} of 0.9751, whereas the fine-tuned model reached 28.09 dB \acs{PSNR} and 0.9733 \acs{SSIM}. The scratch model outperformed the fine-tuned model by 0.16 dB in \acs{PSNR} and 0.0018 in \acs{SSIM}.
+Two \acs{EDSR} models were trained to compare different training strategies: one trained from scratch exclusively on \acs{RELLISUR}, and one finetuned on \acs{DIV2K} starting from the best scratch checkpoint. Both models were evaluated on the \acs{RELLISUR} test set consisting of 85 naturally degraded, low-resolution images. Table \ref{tab:edsr_test_results} presents the test set performance for both models. The scratch model achieved a mean \acs{PSNR} of 28.25 dB and \acs{SSIM} of 0.9751, whereas the finetuned model reached 28.09 dB \acs{PSNR} and 0.9733 \acs{SSIM}. The scratch model outperformed the finetuned model by 0.16 dB in \acs{PSNR} and 0.0018 in \acs{SSIM}.
 
 \begin{table}[H]
 \centering
@@ -49,13 +26,19 @@ DIV2K Finetuned & 28.09 & 0.9733 \\
 \label{tab:edsr_test_results}
 \end{table}
 
-These results demonstrate acceptable performance for the \acs{RELLISUR} dataset. The absolute performance metrics show moderate quality: a \acs{PSNR} of 28.25 dB and an \acs{SSIM} of 0.9751 indicate reasonable reconstruction quality. The \acs{SSIM} value of 0.9751 indicates high structural similarity, which is favorable for preserving discriminative features needed for \acs{ReID}. The observation that finetuning on \acs{DIV2K} degrades performance on \acs{RELLISUR} validates that domain-specific training is more effective than transfer learning when the target domain (\acs{RELLISUR}) differs significantly from the source domain (\acs{DIV2K}).
+
+\subsubsection{Analysis of SR Results}
+The \acs{SR} experiments reveal several important findings regarding both model performance and training strategy effectiveness. The scratch model trained on \acs{RELLISUR} achieved a \acs{PSNR} of 28.25 dB, which represents a meaningful improvement of 1.10 dB over bicubic interpolation (27.15 dB). The high \acs{SSIM} value of 0.9751 indicates that the model preserves structural details effectively, which is favorable for downstream \acs{ReID} tasks that rely on discriminative features such as clothing patterns and textures. These results confirm that the domain-specific training approach produced a functional \acs{SR} model capable of outperforming traditional interpolation methods.
+\\\\
+However, contrary to expectations, finetuning on \acs{DIV2K} degraded performance rather than improving it. The finetuned model achieved 0.16 dB lower \acs{PSNR} and 0.0018 lower \acs{SSIM} compared to the scratch model. The validation \acs{PSNR} dropped from 24.72 dB after scratch training to 24.28 dB after finetuning, with the best epoch occurring immediately at epoch 1, indicating that continued training on synthetic data was detrimental. This performance degradation can be attributed to the domain gap between \acs{RELLISUR} and \acs{DIV2K}. \acs{RELLISUR} contains real optical degradations caused by physical factors such as focal length and sensor characteristics, while \acs{DIV2K} uses synthetic bicubic downsampling. When the model was finetuned on \acs{DIV2K}, it adapted to synthetic degradation patterns that do not match the realistic degradations in the test data. This phenomenon, sometimes referred to as negative transfer, caused the model to partially forget the realistic degradation patterns learned during scratch training.
+\\\\
+The observation that domain-specific training outperforms transfer learning when the target domain differs significantly from the source domain validates the importance of matching training data characteristics to the deployment scenario. For this project, the scratch model was therefore selected for integration with the \acs{ReID} pipeline in subsequent experiments.
 
 
 \subsubsection{EDSR vs. Bicubic Interpolation}
 To verify that \acs{EDSR} provides meaningful improvements over simple interpolation methods, as described in \hyperlink{req:1}{\textit{Requirement 1}}, a direct comparison was conducted between the trained \acs{EDSR} models and bicubic interpolation.
 \\\\
-Both \acs{EDSR} models and bicubic interpolation were evaluated on the same \acs{RELLISUR} test set. Table \ref{tab:edsr_vs_bicubic} presents the comparison results. The scratch \acs{EDSR} model achieved a mean \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, representing an improvement of 1.10 dB. The finetuned \acs{EDSR} model achieved 28.09 dB, representing an improvement of 0.94 dB over bicubic interpolation. For \acs{SSIM}, the scratch model achieved 0.9751 compared to 0.9689 for bicubic (improvement of 0.0061), and the fine-tuned model achieved 0.9733 (improvement of 0.0044). These results indicate that \acs{EDSR} consistently outperforms bicubic interpolation across all evaluated metrics.
+Both \acs{EDSR} models and bicubic interpolation were evaluated on the same \acs{RELLISUR} test set. Table \ref{tab:edsr_vs_bicubic} presents the comparison results. The scratch \acs{EDSR} model achieved a mean \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, representing an improvement of 1.10 dB. The finetuned \acs{EDSR} model achieved 28.09 dB, representing an improvement of 0.94 dB over bicubic interpolation. For \acs{SSIM}, the scratch model achieved 0.9751 compared to 0.9689 for bicubic (improvement of 0.0061), and the finetuned model achieved 0.9733 (improvement of 0.0044). These results confirm that both \acs{EDSR} models consistently outperform bicubic interpolation, with the scratch model providing the largest improvement.
 
 \begin{table}[H]
 \centering
@@ -123,33 +106,33 @@ Image pairs from an unseen dataset, with primarily indoor images, to test cross-
 
 In order to determine whether implementing an \acs{SR} module in the \acs{ReID} pipeline improves performance, several experiments were conducted to establish a clear and fair comparison. The experiments are designed to test the hypotheses defined in Section \ref{sec:hypotheses}. 
 \\\\
-Before incorporating the \acs{SR} module, the effects of applying strong data augmentation during training is first evaluated, to determine whether robustness to \acs{OOD} conditions can be achieved through training strategies alone. This step provides a reference point to determine whether the additional complexity introduced by the \acs{SR} module is justified. 
+Before incorporating the \acs{SR} module, the effects of applying strong data augmentation during training is foremost evaluated to determine whether robustness to \acs{OOD} conditions can be achieved through training strategies alone. This step provides a reference point to establish whether the additional complexity introduced by the \acs{SR} module is justified. 
 
 \subsection{Experiment One: Augmented Model} \label{sec: baselineosnet}
 
-This experiment was conducted to evaluate \hyperlink{Hypothesis 1}{\textit{Hypothesis 1}}, which states that training a person \acs{ReID} module on augmented data will improve robustness under \acs{OOD} conditions.  
+This experiment was conducted to evaluate \hyperlink{hypothesis:1}{\textit{Hypothesis 1}}, which states that training a person \acs{ReID} module on augmented data will improve robustness under \acs{OOD} conditions.  
 \\\\
-Two models were compared: the \hyperlink{Baseline}{Baseline} model and the \hyperlink{Augmented}{Augmented} model. Both models share the same architecture, training datasets, and training procedure, ensuring that the applied augmentation strategy is the only variable that can affect performance. Evaluations were conducted using the \acs{OOD} test as described in Section \ref{sec: oodtestny}. 
+Two models were compared: the \hyperlink{model:baseline}{Baseline} model and the \hyperlink{model:augmented}{Augmented} model. Both models share the same architecture, training datasets, and training procedures, ensuring that the applied augmentation strategy is the only inconsistency that can affect performance. Evaluations were conducted using the \acs{OOD} test as described in Section \ref{sec: oodtestny}. 
 \\\\
 This experiment establishes whether robustness to \acs{OOD} conditions can be achieved through training strategies alone, without introducing additional components to the \acs{ReID} module. 
  
 
 \subsection{Experiment Two: \acs{EDSR} and Baseline Combined} \label{sec: sr+baseline}
 
-This experiment was conducted to evaluate \hyperlink{Hypothesis 2}{\textit{Hypothesis 2}}, by investigating if adding \acs{EDSR} as a preprocessing step improves \acs{ReID} performance under \acs{OOD} conditions. 
+This experiment was conducted to evaluate \hyperlink{hypothesis:2}{\textit{Hypothesis 2}}, by investigating if adding \acs{EDSR} as a preprocessing step improves \acs{ReID} performance under \acs{OOD} conditions. 
 \\\\
-Two model configurations were compared: the \hyperlink{Baseline}{Baseline} model and a sequentially combined \acs{EDSR} and \hyperlink{Baseline}{Baseline} model, where images are first preprocessed by the \acs{SR} module and subsequently passed to the \acs{ReID} module. The \acs{ReID} model architecture, training data, and training strategies remained identical to the ones used in the \hyperlink{Baseline}{Baseline} model configuration.
+Two model configurations were compared: the \hyperlink{model:baseline}{Baseline} model and a sequentially combined \acs{EDSR} + \hyperlink{model:baseline}{Baseline} configuration, where images are first preprocessed by the \acs{SR} module and subsequently passed to the \acs{ReID} module. The \acs{ReID} model architecture, training data, and training procedures remained identical to the ones used for the \hyperlink{model:baseline}{Baseline} configuration.
 \\\\
-In this setup, with the \acs{EDSR} and \hyperlink{Baseline}{Baseline} modules combined without joint end-to-end training, the effect of \acs{SR} as a preprocessing step on \acs{ReID} performance can be evaluated independently. 
+In this setup, with the \acs{EDSR} and \hyperlink{model:baseline}{Baseline} modules combined without joint end-to-end training, the effect of \acs{SR} as a preprocessing step on \acs{ReID} performance can be evaluated more directly. 
 
 
 \subsection{Experiment Three: End-to-end \acs{EDSR} and Baseline}
 
-This experiment was conducted to further evaluate \hyperlink{Hypothesis 2}{Hypothesis 2} by assessing if joint end-to-end training of the \acs{SR} and \acs{ReID} module improves robustness under \acs{OOD} conditions.
+This experiment was conducted to further evaluate \hyperlink{hypothesis:2}{Hypothesis 2} by assessing if joint end-to-end training of the \acs{SR} and \acs{ReID} module improves robustness under \acs{OOD} conditions.
 \\\\
-The \hyperlink{End-to-end}{End-to-end} model is compared against the \hyperlink{Sequential}{Sequential} model. Both configurations used the same \acs{EDSR} and \hyperlink{Baseline}{Baseline} model, with the only difference being the training strategy of the configurations. Where the \hyperlink{Sequential}{Sequential} model was combined, the \hyperlink{model:endtoend}{End-to-end} model trained the \acs{EDSR} and \hyperlink{model:baseline}{Baseline} models jointly, allowing the \acs{SR} module to adapt specifically to the \acs{ReID} task.
+The \hyperlink{model:endtoend}{End-to-end} model is compared against the \hyperlink{Sequential}{Sequential} model. Both configurations used the same \acs{EDSR} and \hyperlink{model:baseline}{Baseline} model, with the only difference being the training strategy. While the \hyperlink{model:sequential}{Sequential} model is combined, the \hyperlink{model:endtoend}{End-to-end} model trained the \acs{EDSR} and \hyperlink{model:baseline}{Baseline} models jointly, allowing the \acs{SR} module to adapt specifically to the \acs{ReID} task.
 \\\\
-By keeping the other factors constant, this experiment isolated the effect of joint end-to-end training compared to sequential integration. 
+By keeping the other factors constant, this experiment isolated the effect of joint end-to-end training, compared to the sequential integration. 
 
 
 \section{Results}
@@ -218,11 +201,11 @@ Table \ref{tab:duke_all_models} presents the results from the \acs{OOD} test on 
 \label{tab:duke_all_models}
 \end{table}
 
-\noindent The \hyperlink{model:endtoend}{End-to-end} model achieves the highest performance among all the model configurations, with a \acs{mAP} of x\% and Rank-1 of x\%. The \hyperlink{model:baseline}{Baseline} model has a \acs{mAP} of 10.05\% and a Rank-1 of 22.75\%, while the \hyperlink{model:augmented}{Augmented} model achieves roughly half of that. The \hyperlink{model:sequential}{Sequential} model has the lowest performance of them all, with a \acs{mAP} of 1.46\% and Rank-1 of 3.68\%.
+\noindent The \hyperlink{model:baseline}{Baseline} model achieves the highest performance among all the model configurations, with a \acs{mAP} of 10.5\% and Rank-1 of 22.75\%, while the \hyperlink{model:augmented}{Augmented} model achieves roughly half of that. The \hyperlink{model:endtoend}{End-to-end} model has a \acs{mAP} of 7.90\% and a Rank-1 of 17.19\%, which is significantly better than the \hyperlink{model:augmented}{Augmented} model and the \hyperlink{model:sequential}{Sequential} model, which has the lowest performance of them all, with a \acs{mAP} of 1.46\% and Rank-1 of 3.68\%.
 
 \subsection*{Out-of-Distribution Scale Test}
 
-Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on \acs{DukeMTMC}, to report model performance across varying input image sizes. The results from the scale 1.0 column are identical to the results from Table \ref{tab:duke_all_models}, as it is the same test, and they are used for comparison. 
+Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on \acs{DukeMTMC}, to report model performance across varying input image sizes. The results from the scale 1.0 column are identical to the results from Table \ref{tab:duke_all_models}, as it is the same test, and therefore are used for comparison. 
 
 \begin{table}[H]
 \centering
@@ -244,7 +227,9 @@ Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on
 & \textbf{\acs{mAP}}& \textbf{Rank-1} \\
 \hline
 \textbf{Baseline} 
-& 10.05\%& 22.75\%& 14.77\%& 29.98\%& 11.16\%& 21.54\%\\
+& \textcolor{red}{10.05\%} & \textcolor{red}{22.75\%}
+& \textcolor{red}{14.77\%} & \textcolor{red}{29.98\%}
+& \textcolor{red}{11.16\%} & \textcolor{red}{21.54\%} \\
 \hline
 \textbf{Augmented} 
 & 4.76\%& 10.32\%& 6.58\%& 14.32\%& 5.07\%& 11.13\%\\
@@ -261,7 +246,7 @@ Table \ref{tab:scale_test} presents the results from the \acs{OOD} scale test on
 \label{tab:scale_test}
 \end{table}
 
-\noindent When inspecting the results, it becomes evident that all metrics increase with the scale reduction of 0.75 compared to the unmodified images of scale 1.0. The \hyperlink{model:endtoend}{End-to-end} model again achieves the highest performance, with a \acs{mAP} of x\% and Rank-1 of x\%. The \hyperlink{model:baseline}{Baseline} model has a \acs{mAP} of 14.77\% and a Rank-1 of 29.98\%, while the \hyperlink{model:augmented}{Augmented} model continuously achieves roughly half of those results. The \hyperlink{model:sequential}{Sequential} model has the lowest performance out of all the models, with the highest performance being a \acs{mAP} of 3.38\% and Rank-1 of 8.17\% on scale 0.5. The three other models' performance drop on scale 0.5 compared to scale 0.75, but are still higher than the performance on full sized images. 
+\noindent When inspecting the results, it becomes evident that all metrics increase with the scale reduction of 0.75 compared to the unmodified images of scale 1.0. The \hyperlink{model:baseline}{Baseline} model again achieves the highest performance, with a \acs{mAP} of 14.77\% and a Rank-1 of 29.98\%, while the \hyperlink{model:augmented}{Augmented} model continuously achieves roughly half of those results. The \hyperlink{model:endtoend}{End-to-end} model has a \acs{mAP} of 11.49\% and Rank-1 of 23.38\%, while the \hyperlink{model:sequential}{Sequential} model again has the lowest performance out of all the models, with the highest performance being a \acs{mAP} of 3.38\% and Rank-1 of 8.17\% on scale 0.5. The three other models' performance drop on scale 0.5 compared to scale 0.75, but are still higher than the performance on full sized images. 
 
 
 \subsection*{Out-of-Distribution Compression Test}
@@ -290,8 +275,10 @@ Table \ref{tab:compression_test_all} presents the results from the \acs{OOD} com
 & \textbf{\acs{mAP}}& \textbf{Rank-1} \\
 \hline
 \textbf{Baseline} 
-& 10.05\%& 22.75\%
-& 9.39\%& 21.41\%& 8.82\%& 20.06\%& 7.08\%& 15.89\%\\
+& \textcolor{red}{10.05\%} & \textcolor{red}{22.75\%}
+& \textcolor{red}{9.39\%}  & \textcolor{red}{21.41\%}
+& \textcolor{red}{8.82\%}  & \textcolor{red}{20.06\%}
+& \textcolor{red}{7.08\%}  & \textcolor{red}{15.89\%} \\
 \hline
 \textbf{Augmented} 
 & 4.76\%& 10.32\%& 4.67\%& 10.28\%& 4.50\%& 10.10\%& 4.14\%& 9.61\%\\
@@ -305,11 +292,11 @@ Table \ref{tab:compression_test_all} presents the results from the \acs{OOD} com
 & 5.75\% & 12.70\% \\
 \hline
 \end{tabular}
-\caption{Comparison of OSNet variants on DukeMTMC-ReID under varying compression levels. Metrics shown: \acs{mAP} and Rank-1.}
+\caption{Comparison of \acs{OSNet} variants on \acs{DukeMTMC} under varying compression levels. Metrics shown: \acs{mAP} and Rank-1.}
 \label{tab:compression_test_all}
 \end{table}
 
-\noindent The performance for all model configurations steadily drops when decreasing the quality of the input images. The \hyperlink{model:endtoend}{End-to-end} model consistently achieves the highest performance across all compression levels, while the \hyperlink{model:sequential}{Sequential} model attains the lowest results. 
+\noindent The performance for all model configurations steadily drops when decreasing the quality of the input images. The \hyperlink{model:baseline}{Baseline} model consistently achieves the highest performance across all compression levels, while the \hyperlink{model:sequential}{Sequential} model attains the lowest results. 
 
 
 \subsection*{Out-of-Distribution Test on iLIDS-VID}
@@ -333,14 +320,49 @@ Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \
 \label{tab:ilidsvid_all_models}
 \end{table}
 
-\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are better than those observed on \acs{DukeMTMC} for all model configurations except the \hyperlink{model:baseline}{Baseline} model with a Rank-1 of 10\%, resulting in a difference of 0.5\% below the Rank-1 on \acs{DukeMTMC}. The \hyperlink{x}{x} model achieves the highest Rank-1 of x\%. 
+\noindent While direct comparison is limited due to the difference in test setups, the Rank-1 results for the test on the \acs{iLIDS-VID} dataset are better than those observed on \acs{DukeMTMC} for all model configurations except the \hyperlink{model:baseline}{Baseline} model with a Rank-1 of 10\%, resulting in a difference of 0.5\% below the Rank-1 on \acs{DukeMTMC}. This also result in the \hyperlink{model:entoend}{End-to-end} model achieving the highest Rank-1 of 10.67\%, which is higher than the performance of the \hyperlink{model:baseline}{Baseline} model for the first time.
 
 
 \subsection{Summary of Results}
 
-In summary, the \hyperlink{model:endtoend}{End-to-end} model achieved the highest performance compared to the three other model configurations. 
+The experiments confirmed that image resolution and compression significantly affect person \acs{ReID} performance. The \hyperlink{model:baseline}{Baseline} model achieved the highest performance compared to the three other model configurations, particularly under \acs{InD} and \acs{DukeMTMC} \acs{OOD} conditions. 
 \\\\
-- tabel over hvilken model der havde bedste resultater i hver test.
-- overblik over hvilke hypoteser/req der blev opfyldt?
+However, the \hyperlink{model:entoend}{End-to-end} model showed promising results in the cross-domain \acs{OOD} test, achieving the highest Rank-1 out of all the models, which supports the idea that integrating \acs{SR} into \acs{ReID} can improve generalization to unseen datasets. 
+\\\\
+The \hyperlink{model:augmented}{Augmented} and \hyperlink{model:sequential}{Sequential} models consistently achieve the lowest results out of the four, suggesting that data augmentation and simple pre-processing with \acs{SR} is insufficient without proper integration. Table \ref{tab:model_comparison_summary} provides an overview of the best performing  model for each test.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.5\linewidth} |>{\centering\arraybackslash}p{0.35\linewidth}|}
+\hline
+\rowcolor[HTML]{D8E9F7}
+\textbf{Test Scenario} & \textbf{Best Performing Model} \\
+\hline
+InD & Baseline \\
+\hline
+OOD – DukeMTMC & Baseline \\
+\hline
+OOD – Downscale (0.5 / 0.75) & Baseline \\
+\hline
+OOD – Compression (Q=15–100) & Baseline \\
+\hline
+OOD – Cross-domain (iLIDS-VID) & End-to-end \\
+\hline
+\end{tabular}
+\caption{Comparison of best-performing model per test scenario.}
+\label{tab:model_comparison_summary}
+\end{table}
+
+\noindent These observations provide the basis for evaluating whether the experimental results support or contradict the hypotheses defined in Section \ref{sec:hypotheses}. 
+
+\begin{description}
+  \item[\hyperlink{hypothesis:1}{\textit{Hypothesis 1}}] Training the \acs{ReID} module on augmented images will improve performance when evaluated under \acf{InD} and \acf{OOD} conditions. \\
+  \textbf{Result: Not supported.} The \hyperlink{model:augmented}{Augmented} model consistently underperformed compared to the \hyperlink{model:baseline}{Baseline} model across all test conditions.
+
+  \item[\hyperlink{hypothesis:1}{\textit{Hypothesis 1}}] Feeding data through the \acs{SR} module, before it enters the \acs{ReID} module, will lead to a better performance. \\
+  \textbf{Result: Partially supported.} The \hyperlink{model:endtoend}{End-to-end} model outperformed the other three models in cross-domain evaluation, but not in all scenarios.
+\end{description}
+
 
 
