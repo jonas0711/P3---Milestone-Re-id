@@ -111,7 +111,7 @@ cam2\_person316.png & cam2\_person294.png \\
 \end{figure}
 Figure taken from "The Perception-Distortion Tradeoff" by Yochai Blau and Tomer Michaeli \cite{Blau2018PerceptionDistortion}. 16 models were plotted against each other in 6 different graphs. All graphs had NIQE for measuring perception, and 6 different metrics were used to evaluate distortion.
 
-\section{Alternative Training Setups}\label{alternative training setups}
+\section{Alternative Training Setups ReID}\label{alternative training setups}
 Two different setups have been tried:
 Learning Rate: \(1e-3\) , milestones: [100, 175, 250]
 Learning Rate: \(65e-3\) , milestones: [100, 175, 250]
@@ -183,6 +183,137 @@ Attached is the full validations loggings from the baseline and augmented \acs{R
     \caption{Rank-20 for baseline (blue) and augmented (red) }
 \end{figure}
 
+\section{Alternative Training Setups End-to-End}
+Other training setups for the end-to-end integration were tried to find the best configuration of the training hyperparameters. 
+
+
+\subsection{Unclamped SR learning}
+
+LR SR:
+LR ReID:
+Milestones:
+Frozen part:
+Unfreeze epoch:
+
+\subsection{Clamped SR learning}
+
+
+LR SR:
+LR ReID:
+Milestones:
+Frozen part:
+Unfreeze epoch:
+
+\subsection{Finetuned ReID with SR}
+In this version, the \acs{SR} module was frozen the entire training - loss is only backpropagated into \acs{ReID} module. This secures that the \acs{SR} module is still producing upscaled and improved images, and not being a extension of the \acs{ReID} module. This is the 
+
+Epochs = 100
+LR SR: None
+LR ReID: \(1e-4\)
+Milestones: [20, 60]
+Frozen part: SR
+Unfreeze epoch: None
+
+Best validation result 41.93\% \acs{mAP} at epoch 55, see Figure \ref{fig:finetuned_validation}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{finetuned.png}
+    \caption{Training loss from finetuned ReID version}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{finetuned_map.png}
+    \caption{Validation results mAP from finetuned ReID version}
+    \label{fig:finetuned_validation}
+\end{figure}
+
+The results are improved compared to the sequential model presented in the Chapter \ref{cha: experiments and results}. In distribution test showed improvements on 
+
+In distribution test show an improvement across metrics on all datasets. E.g. \acs{mAP} increased from 25.86\% to 60.80\% on Market and Rank-1 on MSMT from 1.92\% to 10.16\%. The rest of the results of the \acs{InD} is included in Table \ref{fig:finetuned seq}.
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{In Distribution test: Finetuned Sequential}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & MSMT & Market & CUHK \\ \hline
+\textbf{mAP}    & 3.01\%& 60.80\%& 8.02\%\\ \hline
+\textbf{Rank-1} & 10.16\%& 79.69\%& 10.00\%\\ \hline
+\textbf{Rank-5} & 18.48\%& 91.00\%& 21.00\%\\ \hline
+\textbf{Rank-10}& 23.26\%& 94.30\%& 27.07\%\\ \hline
+\textbf{Rank-20}& 28.99\%& 96.61\%& 35.29\%\\ 
+\hline
+\end{tabular}
+\caption{Results for in distribution test for Sequential.}
+\label{fig:finetuned seq}
+\end{table}
+Same improvement was found in the \acs{OOD} test.
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{4}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Different Scales: Finetuned Sequential}}\\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & Scale 1& Scale 0.75& Scale 0.5\\ \hline
+\textbf{mAP}    & 7.90\%& 11.49\%& 9.86\%\\ \hline
+\textbf{Rank-1} & 17.19\%& 23.38\%& 20.51\%\\ \hline
+\textbf{Rank-5} & 29.58\%& 38.78\%& 34.61\%\\ \hline
+\textbf{Rank-10}& 34.82\%& 44.84\%& 41.70\%\\ \hline
+\textbf{Rank-20}& 43.13\%& 52.51\%& 48.92\%\\ \hline
+\end{tabular}
+\caption{Scale test of End-to-end on 25 pairs from Market-1501 dataset.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    >{\centering\arraybackslash}p{0.17\linewidth} |
+    }
+\hline
+\multicolumn{5}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on Compression with Differing Quality Levels: Finetuned Sequential}} \\\hline
+\rowcolor[HTML]{D8E9F7}
+{} & \makecell{Unmodified \\ (Q = 100)} & \makecell{Medium \\ (Q = 50)}& \makecell{Low \\(Q = 25)}&
+\makecell{Very low \\ (Q = 15)}\\ \hline
+\textbf{mAP}    & 7.90\%& 7.19\%& 6.91\%& 5.75\%\\ \hline
+\textbf{Rank-1} & 17.19\%& 15.98\%& 15.39\%& 12.70\%\\ \hline
+\textbf{Rank-5} & 29.58\%& 28.10\%& 26.97\%& 22.71\%\\ \hline
+\textbf{Rank-10}& 34.83\%& 33.30\%& 33.48\%& 28.95\%\\ \hline
+\textbf{Rank-20}&  43.13\%& 39.95\%& 41.02\%& 36.62\%\\ \hline
+\end{tabular}
+\caption{Compression test of End-to-end on 25 pairs from Market-1501 dataset.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}
+    p{0.17\linewidth} 
+    |>{\centering\arraybackslash}p{0.17\linewidth} 
+    |}
+\hline
+\multicolumn{2}{|c|}{\cellcolor[HTML]{D8E9F7}\textbf{Test on iLIDS-VID: Finetuned Sequential}}\\ \hline
+\textbf{Rank-1} & 10.67\%\\ \hline
+\textbf{Rank-5} & 22.67\%\\ \hline
+\textbf{Rank-10}& 33.67\%\\ \hline
+\textbf{Rank-20}& 47\%\\ \hline
+\end{tabular}
+\caption{Results for iLIDS-VID test on DukeMTMC-ReID dataset for the End-to-end model.}
+\end{table}
 
 
 \section{Full Result Tables}

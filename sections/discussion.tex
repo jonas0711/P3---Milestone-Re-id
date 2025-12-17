@@ -39,21 +39,29 @@ In the \acs{InD} test, the \hyperlink{model:baseline}{Baseline} model outperform
 
 \subsection{OOD Test DukeMTMC}
 
+The \acs{OOD} test on \acs{DukeMTMC} revealed that the \hyperlink{model:baseline}{Baseline} model retained the highest performance, despite being trained solely on unmodified images. Interestingly, the \hyperlink{model:endtoend}{End-to-end} model surpassed the \hyperlink{model:augmented}{Augmented} and \hyperlink{model:sequential}{Sequential} models by a considerable margin, suggesting that integrating \acs{SR} in an end-to-end framework can positively contribute under moderate domain-shifts. 
+\\\\
+The results further suggest that not all strategies for improving robustness are equally effective. Simply training the \acs{ReID} module on heavily augmented data or feeding up-sampled images from \acs{SR} without adaption results in performance degradation, as can be seen with the \hyperlink{model:sequential}{Sequential} model. This underlines the importance of joint optimization when integrating additional modules like \acs{SR}. 
 
 \subsection{OOD Scale Test}
 
-One of the most surprising findings came from the scale test. The results showed an increase in performance on scale 0.75 which was unexpected. However, this is assumed to be caused by the presence of differently sized images in the new dataset, compared to those used during training. Since the model is trained with a maximum image size of \textit{128×64}, it is not fully equipped to handle the larger or differently scaled images. Performance drop again across all metrics when testing on scale 0.5, however the results are still higher than those from the full-sized images. 
+One of the most surprising findings came from the scale test. The results showed an increase in performance on scale 0.75 which was unexpected. However, this is assumed to be caused by the presence of differently sized images in the new dataset, compared to those used during training. Since the model is trained with a maximum image size of \textit{128×64}, it is not fully equipped to handle the larger or differently scaled images. Performance drop again across all metrics when testing on scale 0.5, however the results are still higher than those from the full-sized images. This indicates that matching image scale to the training distribution may be more important than preserving high resolution.
 
 \subsection{OOD Compression Test}
 
+The compression test demonstrated a predictable trend, which is all models performance should decrease as the image quality worsened. However, the \hyperlink{model:baseline}{Baseline} model remained the best-performing across all compression levels, followed closely by the \hyperlink{model:endtoend}{End-to-end} model. This suggests that even when compression artifacts are introduced, the model can still extract features for person \acs{ReID}. 
+
 \subsection{OOD Test iLIDS-VID}
 
+The \acs{iLIDS-VID} results represent the most pronounced support for \hyperlink{hypothesis:1}{Hypothesis 1}, as the \hyperlink{model:endtoend}{End-to-end} model achieved the highest Rank-1 accuracy, outperforming all three models including the \hyperlink{model:baseline}{Baseline} that otherwise dominated the \acs{InD} and \acs{OOD} tests. 
+\\\\
+This result highlight the benefits of jointly learning to enhance and identify. The \hyperlink{model:sequential}{Sequential} model again achieved the lowest results, reinforcing the idea that simply adding enhancements without retraining or fine-tuning are insufficient for improving generalization.
 
 \section{Experiments}
 
 The results on the \acs{InD} and \acs{OOD} tests indicate that it is not sufficient to simply adjust the training strategy of the \acs{ReID} module to improve robustness. However, it is possible that the augmentations used to train the \hyperlink{model:augmented}{Augmented} model degraded the images to such a state that it was impossible for the model to learn any meaningful features. Furthermore, the results 
 
-- Hvorfor er det bedre at træne End-to-end?
+
 
 \subsection{OSNet}
 Hvad fik vi ud af at bruge cross-entropy loss fremfor triplet loss? (nemmere kode, nødvendigt grundet deadline)
@@ -66,9 +74,9 @@ Opnåede vi det vi ville med baseline, er den lavet så den er fair til at bruge
 \subsection{EDSR}
 \acs{EDSR} was chosen as the \acs{SR} architecture because the model is known for operating in the low-distortion region of the perception-distortion trade-off, as described in Section \ref{subsec:perception-distortion-tradeoff}. This choice aligned well with the project's goal of preserving the details that the \acs{ReID} module relies on, rather than creating visually appealing images that risk introducing artificial details.
 \\\\
-The independent evaluation of \acs{EDSR} showed that the model learned to upscale images better than simple interpolation. The scratch model achieved a \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, an improvement of 1.10 dB. This improvement confirms that \acs{EDSR} provides better reconstruction quality than traditional methods. However, the improvement is relatively modest compared to what larger \acs{EDSR} configurations or more recent \acs{SR} architectures might achieve. The baseline configuration with 64 features and 16 residual blocks was chosen to balance computation time with quality, but this conservative choice may have limited the model's ability to handle more complex degradation patterns.
+The independent evaluation of \acs{EDSR} showed that the model learned to upscale images better than simple interpolation. The scratch model achieved a \acs{PSNR} of 28.25 dB compared to 27.15 dB for bicubic interpolation, an improvement of 1.10 dB (Table \ref{tab:edsr_vs_bicubic}). This improvement confirms that \acs{EDSR} provides better reconstruction quality than traditional methods. However, the improvement is relatively modest compared to what larger \acs{EDSR} configurations or more recent \acs{SR} architectures might achieve. The baseline configuration with 64 features and 16 residual blocks was chosen to balance computation time with quality, but this conservative choice may have limited the model's ability to handle more complex degradation patterns.
 \\\\
-The training strategy comparison yielded an important finding: domain-specific training outperformed transfer learning for this application. The scratch model, trained only on \acs{RELLISUR}, performed 0.16 dB better than the finetuned model on the \acs{RELLISUR} test set. The initial hypothesis was that finetuning on \acs{DIV2K} would improve generalization by exposing the model to diverse, high-quality training data. However, the results showed the opposite effect. The difference between realistic degradations in \acs{RELLISUR} and synthetic bicubic degradations in \acs{DIV2K} was too large, causing the model to adapt to synthetic patterns at the cost of its ability to handle real low-resolution images. The drop in validation \acs{PSNR} from 24.72 dB after scratch training to 24.28 dB after finetuning supports this interpretation. This finding suggests that when training \acs{SR} models for specific deployment scenarios, matching the training data characteristics to the target domain is more important than increasing data diversity through synthetic sources.
+The training strategy comparison yielded an important finding: domain-specific training outperformed transfer learning for this application. The scratch model, trained only on \acs{RELLISUR}, performed 0.16 dB better than the finetuned model on the \acs{RELLISUR} test set. The initial hypothesis was that finetuning on \acs{DIV2K} would improve generalization by exposing the model to diverse, high-quality training data. However, the results showed the opposite effect. The difference between realistic degradations in \acs{RELLISUR} and synthetic bicubic degradations in \acs{DIV2K} was too large, causing the model to adapt to synthetic patterns at the cost of its ability to handle real low-resolution images. The drop in validation \acs{PSNR} from 24.72 dB after scratch training (Figure \ref{fig:rellisur_psnr_curves}) to 24.28 dB after finetuning (Figure \ref{fig:div2k_psnr_curves}) supports this interpretation. This finding suggests that when training \acs{SR} models for specific deployment scenarios, matching the training data characteristics to the target domain is more important than increasing data diversity through synthetic sources.
 \\\\
 A fundamental limitation of the \acs{EDSR} approach in this project was that the \acs{SR} training was not connected to the \acs{ReID} task. \acs{EDSR} was trained to minimize pixel-wise L1 loss against \acs{HR} ground-truth images, but this objective does not directly optimize for preserving features that are important for person re-identification. The \acs{SR} module had no way of learning which image details are most relevant for \acs{ReID} embeddings. This may explain why the Sequential configuration showed significantly worse \acs{ReID} performance, even though the \acs{SR} module provided measurable \acs{PSNR} improvements. This observation aligns with the point made in Section \ref{subsec:srandreidsota} about the risk of applying off-the-shelf \acs{SR} models directly to person \acs{ReID} problems.
 \\\\
@@ -76,11 +84,11 @@ The perception-distortion trade-off also sets natural limits on what \acs{EDSR} 
 
 
 \subsection{Sequential EDSR and Baseline}
-Implementing both models sequentially effectively meant that only \acs{OSNet} had the chance to improve. By only inputting the \acs{HR} \acs{ReID} image, \acs{EDSR} could not learn more than it already knew about general upscaling. \acs{OSNet} learned how to extract useful embeddings from \acs{SR} images. 
+Implementing both models sequentially effectively meant that only \acs{OSNet} had the chance to improve. By only inputting the \acs{HR} \acs{ReID} image, \acs{EDSR} could not learn more than it already knew about general up-scaling. \acs{OSNet} learned how to extract useful embeddings from \acs{SR} images. 
 
 \subsection{End-to-end EDSR and Baseline}
 
-The End-to-end implementation of the \acs{EDSR} and \acs{OSNet} models served it's purpose as intended. The combined forward pass allowed \acs{EDSR} to learn from \acs{OSNet}'s loss, and thereby specialize the upscaling to assists in better embeddings. However, having no \acs{SR} specific loss, limited this ability. Implementing an auxillary loss, by inputting downscaled \acs{ReID} data, and comparing it to the original \acs{HR} data, could have improved performance. Therefore this addition should be considered for future work. 
+The End-to-end implementation of the \acs{EDSR} and \acs{OSNet} models served it's purpose as intended. The combined forward pass allowed \acs{EDSR} to learn from \acs{OSNet}'s loss, and thereby specialize the up-scaling to assists in better embeddings. However, having no \acs{SR} specific loss, limited this ability. Implementing an auxillary loss, by inputting down-scaled \acs{ReID} data, and comparing it to the original \acs{HR} data, could have improved performance. Therefore this addition should be considered for future work. 
 
 \section{Deployment}
 
@@ -92,7 +100,7 @@ However, cloud deployment is not without limitations. It requires a stable and s
  
 
 \section{Ethical Considerations}
-%Hvilke ethical constrains har vi haft på vores system?
+
 The development and deployment of person \acs{ReID} systems raises several ethical concerns. These systems handle sensitive visual data of individuals, often without their explicit consent, which can impact the right to privacy, and freedom of movement. Therefore, ethical constrains were considered in the design and deployment phase. These concerns are defined and discussed as follows:
 
 \subsubsection{Privacy and Consent}
@@ -115,23 +123,13 @@ As the system handles potentially sensitive data, it is important to ensure data
 
 This project addresses the problem statement of designing a proof of concept system person \acs{ReID} system improved through \acs{SR} Integration. The results demonstrates ? ***** 
 
-%Dataset
-% X Flere forskellige kulturer, religoner i træning for at undgå bias. 
-% X Evt selv lave et dataset
-% X Dataset med udfordrende vejr. eller lav belysning
 \subsubsection{Dataset improvements}
-The training datasets used in this project is primarily consists of ** vi ved det ikke helt **  Chinese and American university campus environments, which introduces cultural, geographical,, and environmental bias. Future work should incorporate datasets with diverse populations, clothing styles and demographics representations to ensure fair and robust performance across different deployment contexts. Additionally, datasets capturing challenging real-world scenarios such as extreme weather, heavy rain, fog, and very low-light scenarios should be included to better prepare the model for actual surveillance conditions. Finally, creating a custom dataset specifically designed to match the target deployment environment would allow for more accurate evaluation of system performance under realistic conditions.
+The training datasets used in this project primarily consists of Chinese and American university campus environments, which introduces cultural, geographical, and environmental bias. Future work should incorporate datasets with diverse populations, clothing styles, and demographics representations to ensure fair and robust performance across different deployment contexts. Additionally, datasets capturing challenging real-world scenarios such as extreme weather, heavy rain, fog, and very low-light scenarios should be included to better prepare the model for actual surveillance conditions. Finally, creating a custom dataset specifically designed to match the target deployment environment would allow for more accurate evaluation of system performance under realistic conditions.
 
 
-%SR forbedringer
-% X Implementere auxiliary loss i End-to-end training så SR også optimeres på reconstruction quality
-% X Fokus på at SR forbedre specifikke tøj detaljer 
-% X Undersøg multi scale SR Der tager forskellige input resolutions
 \subsubsection{Super-Resolution Enhancements}
 The \acs{SR} module could be improved through several approaches. Implementing an auxiliary loss during end-to-end training would allow the \acs{SR} module to optimize for both reconstruction quality and \acs{ReID} performance at the same time, rather then only learning from only learning from the \acs{ReID} loss. The \acs{SR} network could be designed to specifically  enhance discriminative features such as clothing patterns, logos and textures that are particularly relevant for person identification, rather than generic image enhancement. Furthermore, developing a multi-scale \acs{SR} approach that can handle varying input resolutions would improve robustness across different camera qualities and different distances, which are essential for real-world surveillance scenarios. 
 
-
-%ReID forbedringer
 \subsubsection{Re-Identification Enhancements}
 The \acs{ReID} module training could be improved through systematic experimentation. Comparing different loss functions such as triplet loss versus cross-entropy loss would provide insights into which approach better handles the one-shot and open-set nature of person \acs{ReID}. Investigating different freezing strategies during End-to-end training, such as trying unfreezing layers or trying different learning rates for \acs{SR} or \acs{ReID} modules, could lead to better feature learning. Finally, conducting systematic hyperparameter tuning including batch size, learning rate schedules, and augmentation strengths would help optimize models   performance.
 

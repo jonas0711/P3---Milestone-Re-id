@@ -27,14 +27,6 @@ DIV2K Finetuned & 28.09 & 0.9733 \\
 \end{table}
 
 
-\subsubsection{Analysis of SR Results}
-The \acs{SR} experiments reveal several important findings regarding both model performance and training strategy effectiveness. The scratch model trained on \acs{RELLISUR} achieved a \acs{PSNR} of 28.25 dB, which represents a meaningful improvement of 1.10 dB over bicubic interpolation (27.15 dB). The high \acs{SSIM} value of 0.9751 indicates that the model preserves structural details effectively, which is favorable for downstream \acs{ReID} tasks that rely on discriminative features such as clothing patterns and textures. These results confirm that the domain-specific training approach produced a functional \acs{SR} model capable of outperforming traditional interpolation methods.
-\\\\
-However, contrary to expectations, finetuning on \acs{DIV2K} degraded performance rather than improving it. The finetuned model achieved 0.16 dB lower \acs{PSNR} and 0.0018 lower \acs{SSIM} compared to the scratch model. The validation \acs{PSNR} dropped from 24.72 dB after scratch training to 24.28 dB after finetuning, with the best epoch occurring immediately at epoch 1, indicating that continued training on synthetic data was detrimental. This performance degradation can be attributed to the domain gap between \acs{RELLISUR} and \acs{DIV2K}. \acs{RELLISUR} contains real optical degradations caused by physical factors such as focal length and sensor characteristics, while \acs{DIV2K} uses synthetic bicubic downsampling. When the model was finetuned on \acs{DIV2K}, it adapted to synthetic degradation patterns that do not match the realistic degradations in the test data. This phenomenon, sometimes referred to as negative transfer, caused the model to partially forget the realistic degradation patterns learned during scratch training.
-\\\\
-The observation that domain-specific training outperforms transfer learning when the target domain differs significantly from the source domain validates the importance of matching training data characteristics to the deployment scenario. For this project, the scratch model was therefore selected for integration with the \acs{ReID} pipeline in subsequent experiments.
-
-
 \subsubsection{EDSR vs. Bicubic Interpolation}
 To verify that \acs{EDSR} provides meaningful improvements over simple interpolation methods, as described in \hyperlink{req:1}{\textit{Requirement 1}}, a direct comparison was conducted between the trained \acs{EDSR} models and bicubic interpolation.
 \\\\
@@ -61,6 +53,12 @@ EDSR DIV2K Finetuned & 28.09 & 0.9733 & +0.94 & +0.0044 \\
 \label{tab:edsr_vs_bicubic}
 \end{table}
 
+\subsubsection{Analysis of SR Results}
+The \acs{SR} experiments reveal several important findings regarding both model performance and training strategy effectiveness. The scratch model trained on \acs{RELLISUR} achieved a \acs{PSNR} of 28.25 dB, which as shown in Table \ref{tab:edsr_vs_bicubic} represents a meaningful improvement of 1.10 dB over bicubic interpolation. The high \acs{SSIM} value of 0.9751 indicates that the model preserves structural details effectively, which is favorable for downstream \acs{ReID} tasks that rely on discriminative features such as clothing patterns and textures. These results confirm that the domain-specific training approach produced a functional \acs{SR} model capable of outperforming traditional interpolation methods.
+\\\\
+However, contrary to expectations, finetuning on \acs{DIV2K} degraded performance rather than improving it. The finetuned model achieved 0.16 dB lower \acs{PSNR} and 0.0018 lower \acs{SSIM} compared to the scratch model. This trend was already visible during training, as the validation \acs{PSNR} dropped from 24.72 dB after scratch training to 24.28 dB after finetuning (Figure \ref{fig:rellisur_psnr_curves} and Figure \ref{fig:div2k_psnr_curves}), with the best epoch occurring immediately at epoch 1, indicating that continued training on synthetic data was detrimental. This performance degradation can be attributed to the domain gap between \acs{RELLISUR} and \acs{DIV2K}. \acs{RELLISUR} contains real optical degradations caused by physical factors such as focal length and sensor characteristics, while \acs{DIV2K} uses synthetic bicubic downsampling. When the model was finetuned on \acs{DIV2K}, it adapted to synthetic degradation patterns that do not match the realistic degradations in the test data. 
+\\\\
+These results show that when the target domain differs significantly from the source domain, domain specific training works better than finetuning. This finding validates the importance of matching training data characteristics to the deployment scenario. For this project, the scratch model was therefore selected for integration with the \acs{ReID} pipeline.
 
 
 \section{Out-of-Distribution Test} \label{sec: oodtestny}
@@ -327,7 +325,7 @@ Table \ref{tab:ilidsvid_all_models} presents the results from the cross-domain \
 
 The experiments confirmed that image resolution and compression significantly affect person \acs{ReID} performance. The \hyperlink{model:baseline}{Baseline} model achieved the highest performance compared to the three other model configurations, particularly under \acs{InD} and \acs{DukeMTMC} \acs{OOD} conditions. 
 \\\\
-However, the \hyperlink{model:entoend}{End-to-end} model showed promising results in the cross-domain \acs{OOD} test, achieving the highest Rank-1 out of all the models, which supports the idea that integrating \acs{SR} into \acs{ReID} can improve generalization to unseen datasets. 
+However, the \hyperlink{model:entoend}{End-to-end} model showed promising results in the cross-domain \acs{OOD} test, achieving the highest Rank-1 out of all the models, which supports the idea that integrating \acs{SR} into \acs{ReID} can improve generalization on unseen datasets. 
 \\\\
 The \hyperlink{model:augmented}{Augmented} and \hyperlink{model:sequential}{Sequential} models consistently achieve the lowest results out of the four, suggesting that data augmentation and simple pre-processing with \acs{SR} is insufficient without proper integration. Table \ref{tab:model_comparison_summary} provides an overview of the best performing  model for each test.
 
@@ -360,7 +358,7 @@ OOD – Cross-domain (iLIDS-VID) & End-to-end \\
   \item[\hyperlink{hypothesis:1}{\textit{Hypothesis 1}}] Training the \acs{ReID} module on augmented images will improve performance when evaluated under \acf{InD} and \acf{OOD} conditions. \\
   \textbf{Result: Not supported.} The \hyperlink{model:augmented}{Augmented} model consistently underperformed compared to the \hyperlink{model:baseline}{Baseline} model across all test conditions.
 
-  \item[\hyperlink{hypothesis:1}{\textit{Hypothesis 1}}] Feeding data through the \acs{SR} module, before it enters the \acs{ReID} module, will lead to a better performance. \\
+  \item[\hyperlink{hypothesis:2}{\textit{Hypothesis 2}}] Feeding data through the \acs{SR} module, before it enters the \acs{ReID} module, will lead to a better performance. \\
   \textbf{Result: Partially supported.} The \hyperlink{model:endtoend}{End-to-end} model outperformed the other three models in cross-domain evaluation, but not in all scenarios.
 \end{description}
 

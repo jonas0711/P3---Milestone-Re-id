@@ -157,23 +157,47 @@ Strategy 1 employed the patch-based training strategy described in Section \ref{
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{models_cropped_rellisur_scratch_training_curves.png}
-    \caption{Training and validation loss curves for EDSR trained from scratch on \acs{RELLISUR}. The plot shows the full training progress over 200 epochs, with the best epoch marked at epoch 74.}
-    \label{fig:rellisur_training_curves}
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{models_cropped_rellisur_scratch_training_curves.png}
+        \caption{Training and validation loss curves.}
+        \label{fig:rellisur_loss_curves}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_curves (1).png}
+        \caption{Validation \acs{PSNR} progression.}
+        \label{fig:rellisur_psnr_curves}
+    \end{subfigure}
+    \caption{\acs{EDSR} training from scratch on \acs{RELLISUR} over 200 epochs. (a) Shows the training and validation loss (L1), where the gap between curves indicates some overfitting to training data. (b) Shows the validation \acs{PSNR}, which reached a peak of 24.72 dB at epoch 74 (marked with green star), after which performance plateaued with minor fluctuations.}
+    \label{fig:rellisur_training_combined}
 \end{figure}
 
-\noindent This training continued for 200 epoch, which took 1h30m, although the best validation result was after only 74 epoch. Here the validation resulted in a PSNR of 24.72.
+\noindent This training continued for 200 epochs, which took 1h30m, although the best validation result was achieved after only 74 epochs. At this point, the validation \acs{PSNR} reached 24.72 dB, as shown in Figure \ref{fig:rellisur_psnr_curves}. The loss curves in Figure \ref{fig:rellisur_loss_curves} show that training loss continued to decrease while validation loss remained relatively stable after the initial convergence, indicating that extended training beyond epoch 74 did not improve generalization.
 
 \subsubsection{Finetuning on DIV2K}
 Strategy 2 used the same patch-based training strategy as Stage 1, applied to the \ac{DIV2K} dataset. The best checkpoint from Stage 1, after 74 epochs, served as the initialization for this finetuning stage. The training and validation loss curves for Stage 2 can be seen in Figure \ref{fig:div2k_training_curves}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{models_cropped_div2k_finetuned_training_curves.png}
-    \caption{Training and validation loss curves for EDSR finetuned on \ac{DIV2K}. The plot shows the full training progress over 100 epochs, with the best epoch marked at epoch 1.}
-    \label{fig:div2k_training_curves}
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{models_cropped_div2k_finetuned_training_curves.png}
+        \caption{Training and validation loss curves.}
+        \label{fig:div2k_loss_curves}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_curves.png}
+        \caption{Validation \acs{PSNR} progression.}
+        \label{fig:div2k_psnr_curves}
+    \end{subfigure}
+    \caption{\acs{EDSR} finetuning on \acs{DIV2K} over 100 epochs, initialized from the best \acs{RELLISUR} checkpoint. (a) Shows that training and validation loss remain relatively flat throughout training, with the validation loss slightly increasing compared to the initial state. (b) Shows the validation \acs{PSNR} dropping from the initial 24.28 dB (best at epoch 1) and declining throughout training, indicating that finetuning on synthetic data degraded the model's performance on realistic degradations.}
+    \label{fig:div2k_training_combined}
 \end{figure}
 
-\noindent This training only took 51m for 100 epochs, but the best validations result of 24.28 was already after epoch 1.
+\noindent This training took 51m for 100 epochs, but the best validation result of 24.28 dB \acs{PSNR} was already achieved at epoch 1, as shown in Figure \ref{fig:div2k_psnr_curves}. The declining \acs{PSNR} curve throughout training demonstrates that continued training on synthetic \acs{DIV2K} data caused the model to adapt to bicubic degradation patterns at the cost of its ability to handle realistic degradations from the \acs{RELLISUR} validation set.
 \\\\
 The two best performing versions, epoch 74 and epoch 1, based on validation, are tested in Section \ref{sec: srexperiments}, to decide which model to implement with \acs{ReID}.
 
@@ -186,37 +210,14 @@ The \hyperlink{model:sequential}{Sequential model}, as defined in Section \ref{s
     \label{fig:srreid_flow}
 \end{figure}
 
-\noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. This model was tested under two different configurations. In the first configuration, no further training was performed on either module,  effectively equivalent to running both models together in inference. In the second configuration, the \acs{ReID} module was finetuned on the new \acs{SR} input, for the purpose of adapting to the up-scaled images and potential artifacts/hallucinations. 
-
-\subsection{Finetuning hyperparameters}
-Finetuning was treated the same as training of the \hyperlink{model:augmented}{Augmented} model, using the same dataloaders and training script. The only differences in configuration were the total number of epochs, the learning rate, and the milestones for learning rate drops. An overview of the finetuning configuration can be seen in Table \ref{tab:seqfinetuneparameters}. 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|c|c|}\hline
-         \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Value}\\\hline
-        No. Classes & 2117\\\hline
-        No. Epochs & 100\\\hline
-        Batch Size & 64 \\\hline
-        Optimizer & \acs{SGD} \\\hline
-        Momentum &0.9 \\\hline
-        Weight Decay & 0.0005\\\hline
-        Learning Rate Scheduler & \texttt{MultiStepLR}\\\hline
-        OSNet Learning Rate & 1e-5\\\hline
-        LR Milestones &  [20, 60]\\\hline
-        LR Gamma &  0.1\\\hline
-        Loss Function & CrossEntropyLoss\\\hline 
-        Label Smoothing & 0.1\\ \hline
-    \end{tabular}
-    \caption{The training hyperparameters for finetuning the \acs{OSNet} module in the \hyperlink{model:sequential}{Sequential} model.}
-\label{tab:seqfinetuneparameters}
-\end{table}
-
-\noindent The learning rate of \(1e-5\) was chosen as the \acs{ReID} module is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images. At epoch 20 and 60, the learning rate dropped to \(1e-6\) and \(1e-7\), allowing for longer and finer tuning of the parameters. 
+\noindent This model used \acs{EDSR} and \hyperlink{model:baseline}{Baseline model}, with pretrained weights from the best performing epoch from their respective training runs. No further training or finetuning was performed on either module,  effectively equivalent to running both models together in inference. 
 
 \section{Implementation of End-to-end ReID and SR}
 Since the \acs{SR} module was trained to clean and upscale on diverse images, it is not specialized for the domain of person \acs{ReID}. By combining the two modules end-to-end, the \acs{ReID} loss can flow back into the \acs{SR} module, ideally forcing it to learn specific cleaning or sharpening operations that improve the final \acs{ReID} task, while the \acs{ReID} can simultaneously learn to extract features from a \acs{SR} input. This effect can be seen in Figure XXX (sammenligningsbilleder, måske i resultater eller her?). 
 \\\\
 This model used the setup and pretrained modules as the \hyperlink{model:sequential}{Sequential model}, with the difference being that training was resumed. The training itself was done under the same configuration/method/settings/hjælp as the standalone \acs{OSNet} models described in Section \ref{sec:implementationosnet}. The only notable changes were in the number of total epochs, the chosen milestones for the learning rate scheduler, and the chosen learning rates for each module. One further addition is the option of freezing an individual module, this was however only utilized for the \acs{ReID} module. The training hyperparameters can be seen in Table \ref{tab:endtoendtrainingparameters}. 
+\\\\
+\noindent The learning rate of \(1e-5\) was chosen as the \acs{ReID} module is not learning major new tasks, just getting accustomed to the effect of \acs{SR} on images. At epoch 20 and 60, the learning rate dropped to \(1e-6\) and \(1e-7\), allowing for longer and finer tuning of the parameters. 
 
 \subsection*{Training Hyperparameters}
 The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the details presented in Table \ref{tab:endtoendtrainingparameters}.
@@ -225,15 +226,15 @@ The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the deta
     \begin{tabular}{|c|c|}\hline
          \cellcolor[HTML]{D8E9F7} \textbf{Training Hyperparameter}&  \cellcolor[HTML]{D8E9F7} \textbf{Value}\\\hline
         No. Classes & 2117\\\hline
-        No. Epochs & 100\\\hline
-        No. Epochs with frozen OSNet & 20\\\hline
+        No. Epochs & 75\\\hline
+        No. Epochs with frozen EDSR & 20\\\hline
         Batch Size & 64 \\\hline
         Optimizer & \acs{SGD} \\\hline
         Momentum &0.9 \\\hline
         Weight Decay & 0.0005\\\hline
         Learning Rate Scheduler & \texttt{MultiStepLR}\\\hline
-        EDSR Learning Rate & 65e-4\\\hline
-        OSNet Learning Rate & 1e-4\\\hline
+        EDSR Learning Rate & 1e-4\\\hline
+        OSNet Learning Rate & 1e-5\\\hline
         LR Milestones &  [20, 60]\\\hline
         LR Gamma &  0.1\\\hline
         Loss Function & CrossEntropyLoss\\\hline 
@@ -244,8 +245,6 @@ The training of the end-to-end \acs{ReID} and \acs{SR} is trained after the deta
 \end{table}
 \noindent The model was trained using the strong augmentation pipeline, seen earlier in Table \ref{tab:three_subtables}, for the purpose of retaining the \acs{EDSR} model's robustness to poor image conditions. In order to still give \acs{EDSR} the chance to adapt to low resolution person images, the \acs{ReID} module was frozen for the first 20 epochs. In practice, freezing the module meant setting \texttt{module.eval()} and \texttt{require\_grad = False} for each its parameters. This action was then reversed during training by setting \texttt{module.train()} and \texttt{require\_grad = True}. The choice of freezing the \acs{ReID} module was made for the purpose of letting the \acs{SR} module adapt to the new domain and loss metric.
 \\\\
-The learning rate is flipped. 
-\\\\
 \noindent To benefit from the end to end integration of the two models, training was continued with pretrained weights from baseline \acs{OSNet} and the best performing \acs{EDSR}. \acs{OSNet} weights were frozen for the first 20 epochs, such that \acs{EDSR} could adapt to the new data being \ac{LR} images of people, instead of the more diverse nature of \acs{DIV2K} and \acs{RELLISUR}. While only a classification loss back-propagated, it should still help specialize the model for the task, as can be seen in Section XXX. The learning rate for \acs{EDSR} was chosen at \texttt{65e-4}, due to it being a middle point between the training and finetuning learning rate used during the standalone training. The learning rate for \acs{OSNet} was set to \texttt{1e-4}, such that it would drop to \texttt{1e-5} after the the first milestone, which coincides with \acs{OSNet} being unfrozen. This was chosen as the model had already learned the task of \acs{ReID}, and in this end-to-end training should focus on learning to extract features from \acs{SR} images. A second milestone was set at epoch 60 for final finetuning with the lowest learning rate. Training concluded at epoch 100, at which point the model had learned enough for a fair comparison with the other models, even if more performance could have been squeezed out. 
 
 \subsection{Training duration}
@@ -253,11 +252,11 @@ The learning rate is flipped.
 
 \section{Deployment}
 \label{deployment}
-As the \acs{ReID} system was made with the intention to be utilized in a real-world setting, a script was created that allows it to be deployed on a third-party system with API functionality, as to facilitate its use by other external systems and users if needed.
+As the \acs{ReID} system was made with focus and considerations on Section \ref{sec:ethical_considerations}, the intentions of the finalized project was to  strictly deploy it only on cloud based applications with API functionalities, as to limit its use and source code on hardware as much as possible. Therefore, a script was implemented which enables cloud based utilization of said system in a real-world setting.
 \\\\
 To ensure a more streamlined implementation of the system in future uses, the deployment was made with a Docker containerization setup. This ensures that relevant libraries, dependencies, and any other version-specific parameters needed to run the script, are present and being used. Furthermore, a requirements text file with used libraries and corresponding versions has also been included to allow reproducibility of the container or another virtual environment if needed.
 \\\\
-The deployment script utilizes the \texttt{FastAPI} library as its core framework for web related communication. This is specifically chosen because of its ease of use, yet powerful foundation, and tools. As deployment was not the primary focus point of this project, only a simple \texttt{GET} and \texttt{POST} request method were integrated in the script, which runs through hard-coded image directories located in the server. with little to no front end in mind. If implementation on a real system was the end-goal of this project, more work should be done to achieve an acceptable industry standard.
+The deployment script utilizes the \texttt{FastAPI} library as its core framework for web related communication. This is specifically chosen because of its ease of use, yet powerful foundation, and tools. As deployment was not the primary focus point of this project, only a simple \texttt{GET} and \texttt{POST} request method were integrated in the script, which runs through hard-coded image directories located in the server with little to no front end in mind. If implementation on a real system was the end-goal of this project, more work should be done to achieve an acceptable industry standard.
 \\\\
 The backend pipeline of the deployment script works by first processing the gallery and query image(s) from a \texttt{.JPG} filetype to a \texttt{base64} encoding and a tensor. The tensor contains the image with preprocessing applied, such as normalization and image resizing, which is done to align with the \acs{ReID} models architecture for optimal compatibility. Alternatively, the \texttt{base64} encryption is a copy of the non preprocessed image that is used to make file handling between the client and server more efficient. Subsequently, the tensors for query and gallery are computed by the \acs{ReID} model, which returns the best matches back to the client. A simple HTML setup has been created to integrate some visualization for the front end by displaying the returned matches with a ranking order and the original query image for comparison as seen in Figure \ref{fig:deployment_example}. 
 
