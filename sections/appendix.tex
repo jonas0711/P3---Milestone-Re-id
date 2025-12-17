@@ -189,13 +189,13 @@ Other training setups for the end-to-end integration were tried to find the best
 
 \subsection{Unclamped SR learning}
 
-This version
+This version was an initial version where the \acs{ReID} was frozen for the first 20 epoch, while SR was learning. This resulted in SR overcompensating and for it to turn into an extended feature extractor for \acs{ReID}, simply adding to the models size, instead of doing SR relevant work.
 
-LR SR:
-LR ReID:
-Milestones:
-Frozen part:
-Unfreeze epoch:
+LR SR: 
+LR ReID: \(65e\)
+Milestones:[20, 60]
+Frozen part: \acs{ReID}
+Unfreeze epoch: 20
 
 
 \begin{figure}

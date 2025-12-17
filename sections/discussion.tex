@@ -1,7 +1,5 @@
 \chapter{Discussion} \label{cha: discussion}
-This chapter is meant to further explore and dissect the choices and actions that were made while working on this project. This is 
-
-the results presented in Chapter \ref{cha: experiments and results} and the 
+This chapter is meant to further explore and dissect the choices and actions that were made while working on this project, with a focus on acknowledging elements that otherwise would not have been discussed. Furthermore, the results presented in Chapter \ref{cha: experiments and results} will be explained and rationalized, with an emphasis on understanding the outcome. Lastly, a final assessment will be made on whether this project answered the proble
 
 \section{Data}
 In this project, publicly available person \acs{ReID} datasets were used, due to strict privacy regulations regarding personal data. This highlights a common challenge in the \acs{ReID} field, specifically that these existing datasets often reflect specific cultural, environmental, and geographic contexts. For example the Market-1501, \acs{CUHK03}, and \acs{MSMT17} datasets are all recorded at different universities in different regions of China, while the \acs{DukeMTMC} dataset is recorded at a University in North Carolina, USA. This introduces a potential cultural bias toward the appearance and behavior of university students, as well as a geographical bias, since all of the data is collected from campus environments. Moreover, the majority of the data originates from China, which may limit the models generalizability to populations in other countries. The \acs{iLIDS-VID} dataset is captured at an airport in the United Kingdom, which introduces an entirely different environment. It includes challenges such as occlusions, crowding, carrying luggage, varying clothing styles, and is solely in an indoors environment. This makes it valuable for testing generalization beyond university settings. 
@@ -89,7 +87,7 @@ The choice to cloud-deploy the system, is based on ethical considerations. If th
 \\\\
 On the contrary, if the system is deployed in the cloud, it remains inactive until invoked for a specific purpose. This ensures that footage is not automatically processed unless it is necessary and that access can be controlled through authentication and logs.
 \\\\
-However, cloud deployment is not without limitations. It requires a stable and secure internet connection, that enables safe transmission of sensitive data, though this risk can be mitigated through encryption. An alternative deployment strategy could be XXX.
+However, cloud deployment is not without limitations. It requires a stable and secure internet connection, that enables safe transmission of sensitive data, though this risk can be mitigated through encryption.
  
 
 \section{Ethical Considerations}
@@ -133,7 +131,7 @@ The \acs{ReID} module training could be improved through systematic experimentat
 
 
 \subsubsection{Deployment and System Integration}
-For practical deployment, several improvements are necessary . The pipeline should be optimized for real-time inference to enable immediate processing of surveillance footage during active investigations **Maybe not** . Exploring edge deployment options would allow the system to run on local hardware, reducing latency and dependency on network connectivity. A comprehensive logging system should be implemented to track when and by whom the system is accessed, supporting transparency and accountability in accordance with ethical guidelines. Establishing a feedback loop from practical use would enable continuous improvement based on real-world performance and user needs. Finally, implementing end-to-end encryption for both data storage and transmission is essential to protect the sensitive personal data processed by the system 
+For practical deployment, several improvements are necessary. A comprehensive logging system should be implemented to track when and by whom the system is accessed, supporting transparency and accountability in accordance with ethical guidelines. Establishing a feedback loop from practical use would enable continuous improvement based on real-world performance and user needs. Finally, implementing end-to-end encryption for both data storage and transmission is essential to protect the sensitive personal data processed by the system 
 
 %Real-time inference 
 %Edge deployment
